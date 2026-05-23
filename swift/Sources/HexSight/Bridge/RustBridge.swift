@@ -85,6 +85,92 @@ final class RustBridge: @unchecked Sendable {
         hexsight_destroy(ctx)
         self.ctx = nil
     }
+
+    // MARK: - 数据提供 API
+
+    /// 获取支持的模式列表
+    func getSupportedModes() -> [[String: Any]] {
+        callWithConfigRoot { root in
+            guard let ptr = hexsight_get_supported_modes_json(root),
+                  let json = String(validatingCString: ptr) else { return [] }
+            hexsight_free_string(ptr)
+            return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [[String: Any]]) ?? []
+        } ?? []
+    }
+
+    /// 获取阵容列表
+    func getLineups(mode: String) -> [[String: Any]] {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                guard let ptr = hexsight_get_lineups_json(root, modePtr),
+                      let json = String(validatingCString: ptr) else { return [] }
+                hexsight_free_string(ptr)
+                return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [[String: Any]]) ?? []
+            }
+        } ?? []
+    }
+
+    /// 获取阵容详情
+    func getLineupDetail(mode: String, lineupId: String) -> [String: Any]? {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                lineupId.withCString { idPtr in
+                    guard let ptr = hexsight_get_lineup_detail_json(root, modePtr, idPtr),
+                          let json = String(validatingCString: ptr) else { return nil }
+                    hexsight_free_string(ptr)
+                    return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+                }
+            }
+        } ?? nil
+    }
+
+    /// 获取阵容规则/LLM上下文
+    func getLineupRulesContext(mode: String, lineupId: String) -> [String: Any]? {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                lineupId.withCString { idPtr in
+                    guard let ptr = hexsight_get_lineup_rules_context_json(root, modePtr, idPtr),
+                          let json = String(validatingCString: ptr) else { return nil }
+                    hexsight_free_string(ptr)
+                    return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+                }
+            }
+        } ?? nil
+    }
+
+    /// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
+    func refreshLineups(mode: String) -> Bool {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                guard let ptr = hexsight_refresh_lineups_json(root, modePtr),
+                      let json = String(validatingCString: ptr) else { return false }
+                hexsight_free_string(ptr)
+                return json.contains("\"ok\"")
+            }
+        } ?? false
+    }
+
+    /// 校验数据快照
+    func validateDataSnapshot(mode: String) -> [String: Any]? {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                guard let ptr = hexsight_validate_data_snapshot_json(root, modePtr),
+                      let json = String(validatingCString: ptr) else { return nil }
+                hexsight_free_string(ptr)
+                return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+            }
+        } ?? nil
+    }
+
+    // MARK: - 辅助
+
+    /// 获取 config 目录路径并传入闭包
+    private func callWithConfigRoot<T>(_ block: (UnsafePointer<CChar>) -> T) -> T? {
+        let configPath = ProjectPaths.configDirectory().path
+        return configPath.withCString { rootPtr in
+            block(rootPtr)
+        }
+    }
 }
 
 // MARK: - C FFI 函数声明
@@ -122,3 +208,48 @@ private func hexsight_destroy(_ ctx: UnsafeMutableRawPointer)
 /// 释放 Rust 分配的字符串
 @_silgen_name("hexsight_free_string")
 private func hexsight_free_string(_ ptr: UnsafeMutablePointer<CChar>)
+
+// MARK: - 数据提供 FFI
+
+/// 获取支持的模式列表（JSON）
+@_silgen_name("hexsight_get_supported_modes_json")
+private func hexsight_get_supported_modes_json(
+    _ config_root: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 获取阵容列表（JSON）
+@_silgen_name("hexsight_get_lineups_json")
+private func hexsight_get_lineups_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 获取阵容详情（JSON）
+@_silgen_name("hexsight_get_lineup_detail_json")
+private func hexsight_get_lineup_detail_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>,
+    _ lineup_id: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 获取阵容规则上下文（JSON）
+@_silgen_name("hexsight_get_lineup_rules_context_json")
+private func hexsight_get_lineup_rules_context_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>,
+    _ lineup_id: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 刷新远端阵容缓存
+@_silgen_name("hexsight_refresh_lineups_json")
+private func hexsight_refresh_lineups_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 校验数据对齐
+@_silgen_name("hexsight_validate_data_snapshot_json")
+private func hexsight_validate_data_snapshot_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?

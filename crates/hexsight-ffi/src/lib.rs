@@ -3,13 +3,24 @@
 // - 导出 C ABI 兼容函数给 Swift 调用
 // - 管理引擎生命周期（init / process / reset / destroy）
 // - 数据序列化：Swift → 像素指针 → Rust → JSON 字符串 → Swift
+// - 数据提供：阵容列表、详情、规则上下文 JSON API
 //
 // 导出函数：
-//   hexsight_init(config_json) → *mut EngineContext
-//   hexsight_process_frame(ctx, pixels, w, h) → *mut c_char (JSON Decision)
-//   hexsight_reset(ctx)
-//   hexsight_destroy(ctx)
-//   hexsight_free_string(ptr)
+//   游戏识别管线：
+//     hexsight_init(config_json) → *mut EngineContext
+//     hexsight_process_frame(ctx, pixels, w, h) → *mut c_char (JSON Decision)
+//     hexsight_reset(ctx)
+//     hexsight_destroy(ctx)
+//     hexsight_free_string(ptr)
+//   数据提供：
+//     hexsight_get_supported_modes_json(config_root)
+//     hexsight_get_lineups_json(config_root, mode)
+//     hexsight_get_lineup_detail_json(config_root, mode, lineup_id)
+//     hexsight_get_lineup_rules_context_json(config_root, mode, lineup_id)
+//     hexsight_refresh_lineups_json(config_root, mode, raw_json)
+//     hexsight_validate_data_snapshot_json(config_root, mode)
+
+pub mod data_ffi;
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;

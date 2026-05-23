@@ -285,7 +285,9 @@ struct LineupPanel: View {
         selectedCategory = nil
         lineups = []
 
-        if let cached = loadLocalCache(mode: mode), shouldApply(mode: mode, token: token) {
+        // 优先加载本地缓存（通过 Rust FFI）
+        let cached = await loadLocalCache(mode: mode)
+        if shouldApply(mode: mode, token: token) {
             lineups = cached
         }
 
@@ -296,7 +298,7 @@ struct LineupPanel: View {
             return
         }
 
-        let fetched = await fetchFromAPI(mode: mode)
+        let fetched = await refreshLineupsFromRemote(mode: mode)
         if shouldApply(mode: mode, token: token) {
             if !fetched.isEmpty {
                 lineups = fetched
@@ -305,35 +307,22 @@ struct LineupPanel: View {
         }
     }
 
-    private func loadLocalCache(mode: String) -> [LineupCard]? {
-        guard let fileName = LineupCatalog.cacheFileName(for: mode) else { return nil }
-        let path = ProjectPaths.lineupDirectory().appendingPathComponent(fileName).path
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return nil }
-        return LineupSourceAdapter.cards(fromTopLevelData: data, mode: mode)
+    private func loadLocalCache(mode: String) async -> [LineupCard] {
+        await LineupRepository.shared.loadLineups(mode: mode)
+        return LineupRepository.shared.lineups
     }
 
-    private func fetchFromAPI(mode: String) async -> [LineupCard] {
-        guard let url = LineupCatalog.remoteURL(for: mode),
-              let (data, _) = try? await URLSession.shared.data(from: url)
-        else { return [] }
-
-        let fetched = LineupSourceAdapter.cards(fromTopLevelData: data, mode: mode)
-        persistRemoteCache(data: data, mode: mode)
-        return fetched
+    private func refreshLineupsFromRemote(mode: String) async -> [LineupCard] {
+        // Rust 负责远端 CDN URL 拼装、HTTP 请求、校验和缓存写入
+        let bridge = RustBridge.shared
+        await Task.detached {
+            let _ = bridge.refreshLineups(mode: mode)
+        }.value
+        return await loadLocalCache(mode: mode)
     }
 
     private func shouldApply(mode: String, token: Int) -> Bool {
         data.selectedMode == mode && loadToken == token
-    }
-
-    private func persistRemoteCache(data: Data, mode: String) {
-        guard let fileName = LineupCatalog.cacheFileName(for: mode) else { return }
-        let url = ProjectPaths.lineupDirectory().appendingPathComponent(fileName)
-        try? FileManager.default.createDirectory(
-            at: ProjectPaths.lineupDirectory(),
-            withIntermediateDirectories: true
-        )
-        try? data.write(to: url, options: .atomic)
     }
 
     private var emptyView: some View {

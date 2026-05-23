@@ -2,24 +2,14 @@ import Foundation
 
 /// LineupCatalog 阵容数据源策略
 /// 核心职责：
-/// - 统一声明各模式的阵容缓存文件策略
-/// - 统一声明各模式是否支持远端阵容拉取
-/// - 为阵容页提供稳定的空态文案
+/// - 声明支持的模式集合
+/// - 为阵容页提供空态文案
+/// CDN URL / 缓存文件 / 远端拉取已下沉 Rust `RemoteLineupSource`
 enum LineupCatalog {
-    static let currentSeason = "S18"
     static let supportedModes = Set(["17", "16", "4"])
-    static let channel = "11"
-
-    static func cacheFileName(for mode: String) -> String? {
-        ModeProfile.profile(for: mode)?.cacheFileName
-    }
 
     static func supportsRemoteFetch(for mode: String) -> Bool {
         ModeProfile.profile(for: mode) != nil
-    }
-
-    static func remoteURL(for mode: String) -> URL? {
-        ModeProfile.profile(for: mode)?.remoteURL
     }
 
     static func emptyState(for mode: String) -> (title: String, hint: String) {

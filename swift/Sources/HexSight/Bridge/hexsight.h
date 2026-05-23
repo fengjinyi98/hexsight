@@ -34,4 +34,43 @@ void hexsight_free_string(char* ptr);
 /// 获取引擎版本号
 char* hexsight_version(void);
 
+// ---- 数据提供 API ----
+
+/// 获取支持的模式列表（JSON 数组）
+/// config_root: config/ 目录路径
+/// 返回：JSON 格式模式列表，调用方需用 hexsight_free_string 释放
+char* hexsight_get_supported_modes_json(const char* config_root);
+
+/// 获取某模式阵容列表和详情摘要（JSON 数组）
+/// config_root: config/ 目录路径
+/// mode: 模式 ID（"17"/"16"/"4"）
+/// 返回：JSON 格式阵容列表，调用方需用 hexsight_free_string 释放
+char* hexsight_get_lineups_json(const char* config_root, const char* mode);
+
+/// 获取阵容详情展示数据（JSON 对象）
+/// config_root: config/ 目录路径
+/// mode: 模式 ID
+/// lineup_id: 阵容 ID 或名称关键词
+/// 返回：JSON 格式详情，调用方需用 hexsight_free_string 释放
+char* hexsight_get_lineup_detail_json(const char* config_root, const char* mode, const char* lineup_id);
+
+/// 获取阵容规则/LLM 上下文（JSON 对象）
+/// config_root: config/ 目录路径
+/// mode: 模式 ID
+/// lineup_id: 阵容 ID 或名称关键词
+/// 返回：JSON 格式规则上下文，调用方需用 hexsight_free_string 释放
+char* hexsight_get_lineup_rules_context_json(const char* config_root, const char* mode, const char* lineup_id);
+
+/// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
+/// config_root: config/ 目录路径
+/// mode: 模式 ID
+/// 返回：JSON 状态，调用方需用 hexsight_free_string 释放
+char* hexsight_refresh_lineups_json(const char* config_root, const char* mode);
+
+/// 校验静态数据和阵容数据是否对齐
+/// config_root: config/ 目录路径
+/// mode: 模式 ID
+/// 返回：JSON 格式校验报告，调用方需用 hexsight_free_string 释放
+char* hexsight_validate_data_snapshot_json(const char* config_root, const char* mode);
+
 #endif /* hexsight_h */

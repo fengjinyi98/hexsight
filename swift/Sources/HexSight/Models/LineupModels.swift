@@ -47,16 +47,30 @@ struct LineupCard: Identifiable {
         self.detail = detail
     }
 
-    init?(dict: [String: Any], rawData: [String: Any]? = nil) {
-        guard let card = LineupSourceAdapter.card(from: rawData ?? dict) else { return nil }
-        self = card
+    /// 从 Rust FFI 返回的 JSON dict 初始化（snake_case key）
+    init?(rustDict: [String: Any]) {
+        let id = lineupString(rustDict["id"])
+        let name = lineupString(rustDict["name"])
+        guard !id.isEmpty, !name.isEmpty else { return nil }
+
+        let detailPayload = rustDict["detail"] as? [String: Any] ?? [:]
+        let parsedDetail = LineupDetailData(rustPayload: detailPayload)
+
+        self.init(
+            id: id,
+            name: name,
+            author: lineupString(rustDict["author"]),
+            authorAvatar: lineupString(rustDict["author_avatar"]),
+            quality: lineupString(rustDict["quality"]),
+            traits: (rustDict["traits"] as? [String]) ?? [],
+            category: rustDict["category"] as? String,
+            tags: (rustDict["tags"] as? [String]) ?? [],
+            top4Rate: rustDict["top4_rate"] as? Double ?? 0,
+            rawData: nil,
+            detail: parsedDetail
+        )
     }
 
-    static func extractBracketTraits(from name: String) -> [String] {
-        guard let start = name.firstIndex(of: "【"), let end = name.firstIndex(of: "】"), start < end else { return [] }
-        let body = String(name[name.index(after: start)..<end])
-        return body.split(whereSeparator: { $0 == " " || $0 == "/" || $0 == "、" }).map(String.init)
-    }
 }
 
 /// LineupDetailData 阵容详情解析结果
@@ -172,8 +186,51 @@ struct LineupDetailData {
         self.legendGalaxyInfo = legendGalaxyInfo
     }
 
-    init(payload: [String: Any]) {
-        self = LineupSourceAdapter.detail(from: payload)
+    /// 从 Rust FFI 返回的 JSON dict 初始化（snake_case key）
+    init(rustPayload: [String: Any]) {
+        let parsePieces: (Any?) -> [LineupPiece] = { val in
+            (val as? [[String: Any]] ?? []).compactMap { LineupPiece(dict: $0) }
+        }
+        let parseContacts: (Any?) -> [LineupTraitContact] = { val in
+            (val as? [[String: Any]] ?? []).compactMap { LineupTraitContact(dict: $0) }
+        }
+
+        self.init(
+            raw: rustPayload,
+            finalHeroes: parsePieces(rustPayload["final_heroes"]),
+            earlyHeroes: parsePieces(rustPayload["early_heroes"]),
+            midHeroes: parsePieces(rustPayload["mid_heroes"]),
+            recommendedHexIDs: rustPayload["recommended_hex_ids"] as? [String] ?? [],
+            replacementHexIDs: rustPayload["replacement_hex_ids"] as? [String] ?? [],
+            equipmentOrderIDs: rustPayload["equipment_order_ids"] as? [String] ?? [],
+            level3HeroIDs: rustPayload["level_3_hero_ids"] as? [String] ?? [],
+            heroReplacements: (rustPayload["hero_replacements"] as? [[String: Any]] ?? []).compactMap(LineupHeroReplacement.init),
+            unlockTasks: (rustPayload["unlock_tasks"] as? [[String: Any]] ?? []).compactMap(LineupUnlockTask.init),
+            godRewards: (rustPayload["god_rewards"] as? [[String: Any]] ?? []).compactMap(LineupGodReward.init),
+            officialTraits: parseContacts(rustPayload["official_traits"]),
+            earlyTraits: parseContacts(rustPayload["early_traits"]),
+            midTraits: parseContacts(rustPayload["mid_traits"]),
+            chosenContact: LineupTraitContact(dict: rustPayload["chosen_contact"] as? [String: Any] ?? [:]),
+            messengerContact: LineupTraitContact(dict: rustPayload["messenger_contact"] as? [String: Any] ?? [:]),
+            chosenBackups: (rustPayload["chosen_backups"] as? [[String: Any]] ?? []).compactMap(LineupChosenBackup.init),
+            lineFeature: lineupString(rustPayload["line_feature"]),
+            earlyInfo: lineupString(rustPayload["early_info"]),
+            dTime: lineupString(rustPayload["d_time"]),
+            locationInfo: lineupString(rustPayload["location_info"]),
+            enemyInfo: lineupString(rustPayload["enemy_info"]),
+            hexInfo: lineupString(rustPayload["hex_info"]),
+            equipmentInfo: lineupString(rustPayload["equipment_info"]),
+            godRewardInfo: lineupString(rustPayload["god_reward_info"]),
+            taskInfo: lineupString(rustPayload["task_info"]),
+            chosenInfo: lineupString(rustPayload["chosen_info"]),
+            locationInfo2: lineupString(rustPayload["location_info2"]),
+            earlyRound: lineupString(rustPayload["early_round"]),
+            midRound: lineupString(rustPayload["mid_round"]),
+            staffInfo: lineupString(rustPayload["staff_info"]),
+            goopInfo: lineupString(rustPayload["goop_info"]),
+            traitPartyInfo: lineupString(rustPayload["trait_party_info"]),
+            legendGalaxyInfo: lineupString(rustPayload["legend_galaxy_info"])
+        )
     }
 }
 
@@ -194,7 +251,12 @@ struct LineupUnlockTask: Identifiable, Equatable {
         guard !taskID.isEmpty else { return nil }
         self.taskID = taskID
         self.chessID = lineupString(dict["chess_id"])
-        self.heroID = String(taskID.dropLast(2))
+        // hero_id：Rust 直接提供，官方需从 task_id 推导
+        if let rustHeroID = nonEmptyString(dict["hero_id"]) {
+            self.heroID = rustHeroID
+        } else {
+            self.heroID = String(taskID.dropLast(2))
+        }
     }
 }
 
@@ -212,10 +274,16 @@ struct LineupGodReward: Identifiable, Equatable {
     init?(dict: [String: Any]) {
         let godID = lineupString(dict["god_id"])
         guard !godID.isEmpty else { return nil }
-        self.stage = Int(lineupString(dict["stage_num"])) ?? 0
+        // stage：官方 "stage_num"，Rust 为 "stage"
+        self.stage = Int(lineupString(dict, primary: "stage_num", fallback: "stage")) ?? 0
         self.godID = godID
+        // wishes：官方数组 "wishes"，Rust 为 "wish_ids"
         if let wishes = dict["wishes"] as? [Any] {
             self.wishIDs = wishes.map(lineupString).filter { !$0.isEmpty }
+        } else if let wishIDs = dict["wish_ids"] as? [String] {
+            self.wishIDs = wishIDs.filter { !$0.isEmpty }
+        } else if let wishIDs = dict["wish_ids"] as? [Any] {
+            self.wishIDs = wishIDs.map(lineupString).filter { !$0.isEmpty }
         } else {
             self.wishIDs = splitIDs(dict["wishes"])
         }
@@ -236,11 +304,11 @@ struct LineupTraitContact: Identifiable, Equatable, Hashable {
 
     init?(dict: [String: Any]) {
         let id = lineupString(dict["id"])
-        let type = nonEmptyString(dict["type"]) ?? ""
+        let type = nonEmptyString(dict, primary: "type", fallback: "contact_type") ?? ""
         guard !id.isEmpty || !type.isEmpty else { return nil }
         self.id = id
         self.type = type
-        self.count = Int(lineupString(dict["num"])) ?? 0
+        self.count = Int(lineupString(dict, primary: "num", fallback: "count")) ?? 0
         self.color = Int(lineupString(dict["color"])) ?? 0
         self.level = Int(lineupString(dict["level"])) ?? 0
     }
@@ -270,7 +338,8 @@ struct LineupChosenBackup: Identifiable, Equatable, Hashable {
     let type: String
 
     init?(dict: [String: Any]) {
-        let heroID = nonEmptyString(dict["hero_$key_id"]) ?? ""
+        // hero：官方 "hero_$key_id"，Rust 为 "hero_id"
+        let heroID = nonEmptyString(dict, primary: "hero_$key_id", fallback: "hero_id") ?? ""
         let traitID = nonEmptyString(dict["id"]) ?? ""
         guard !heroID.isEmpty || !traitID.isEmpty else { return nil }
         self.heroID = heroID
@@ -298,13 +367,22 @@ struct LineupPiece: Identifiable, Equatable {
     init?(dict: [String: Any]) {
         let heroID = lineupString(dict["hero_id"])
         guard !heroID.isEmpty else { return nil }
-        let location = lineupString(dict["location"])
+        // 位置：官方字段 "location"，Rust snake_case 为 "location_key"
+        let location = lineupString(dict, primary: "location", fallback: "location_key")
         let parts = location.split(separator: ",").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
         guard parts.count == 2 else { return nil }
-        self.idInLineup = Int(lineupString(dict["idInLineup"])) ?? 0
+        // idInLineup：官方 camelCase，Rust 为 id_in_lineup
+        self.idInLineup = Int(lineupString(dict, primary: "idInLineup", fallback: "id_in_lineup")) ?? 0
         self.chessType = nonEmptyString(dict["chess_type"]) ?? "hero"
         self.heroID = heroID
-        self.equipmentIDs = splitIDs(dict["equipment_id"])
+        // 装备：官方 "equipment_id"（逗号分隔字符串），Rust "equipment_ids"（数组）
+        if let equipArr = dict["equipment_ids"] as? [String] {
+            self.equipmentIDs = equipArr.filter { !$0.isEmpty && $0 != "0" }
+        } else if let equipArr = dict["equipment_ids"] as? [Any] {
+            self.equipmentIDs = equipArr.map(lineupString).filter { !$0.isEmpty && $0 != "0" }
+        } else {
+            self.equipmentIDs = splitIDs(dict["equipment_id"])
+        }
         self.isCarryHero = dict["is_carry_hero"] as? Bool ?? false
         self.row = parts[0]
         self.col = parts[1]
@@ -334,9 +412,22 @@ func lineupString(_ val: Any?) -> String {
     return ""
 }
 
+/// 从 dict 取值，优先用 primary 键，为空时回退到 fallback 键
+func lineupString(_ dict: [String: Any], primary: String, fallback: String) -> String {
+    let val = lineupString(dict[primary])
+    if !val.isEmpty { return val }
+    return lineupString(dict[fallback])
+}
+
 func nonEmptyString(_ val: Any?) -> String? {
     let value = lineupString(val)
     return value.isEmpty ? nil : value
+}
+
+/// 从 dict 取值，优先 primary，为空回退 fallback
+func nonEmptyString(_ dict: [String: Any], primary: String, fallback: String) -> String? {
+    if let val = nonEmptyString(dict[primary]) { return val }
+    return nonEmptyString(dict[fallback])
 }
 
 func splitIDs(_ val: Any?) -> [String] {

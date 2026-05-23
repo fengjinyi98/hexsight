@@ -84,39 +84,62 @@ flowchart LR
 
 ## 四、Swift 最终边界
 
-Swift 最终只保留以下职责：
+Swift 保留以下职责：
 
 | Swift 区域 | 职责 |
 |---|---|
 | `Views/` | 展示 UI、处理点击、滚动、弹窗、导航 |
 | `ViewModel / Repository` | 调用 `RustBridge`，把 JSON 解码成 Swift 展示模型 |
 | `Bridge/RustBridge.swift` | 封装 FFI 调用 |
-| `Models` | 只保留 UI 展示需要的轻量模型 |
+| `Bridge/hexsight.h` | C FFI 头文件（12 个函数声明） |
+| `Models` | UI 展示需要的轻量模型 |
 
-Swift 中应逐步移除这些职责：
+以下职责已迁移至 Rust：
 
-| 待移除职责 | 迁移目标 |
+| 已迁移职责 | Rust 模块 |
 |---|---|
-| 直接读取阵容 JSON | Rust `LineupProvider` |
-| 直接请求官方阵容 CDN | Rust `RemoteLineupSource` |
-| 解析官方 `detail` 字符串 | Rust `LineupAdapter` |
-| 根据棋子反推羁绊 | Rust `GameDataIndex` / `RulesContext` |
-| 生成规则/LLM 输入 | Rust `RulesContext` / `LLMContextBuilder` |
-| 推理阵容建议 | Rust `RuleEngine` |
+| 直接读取阵容 JSON | `game_data_loader.rs` + `lineup_loader.rs` |
+| 直接请求官方阵容 CDN | `remote_lineup_source.rs` |
+| 解析官方 `detail` 字符串 | `lineup_adapter.rs` |
+| 根据棋子反推羁绊 | `game_data_index.rs` |
+| 生成规则/LLM 输入 | `rules_context.rs` / `llm_context.rs` |
+| 远端阵容 CDN 刷新 | `remote_lineup_source.rs` |
+| 阵容数据源适配 | `lineup_adapter.rs`（已删除 Swift `LineupSourceAdapter`） |
+
+以下职责属于后续阶段：
+
+| 暂留 Swift | 说明 |
+|---|---|
+| `GameDataService` | 图鉴面板静态数据（英雄/装备/羁绊/海克斯 ID 映射），涉及多个 UI 面板重连 |
 
 ---
 
 ## 五、Rust 模块目标
 
-| 模块 | 建议路径 | 职责 |
-|---|---|---|
-| 核心类型 | `crates/hexsight-core` | `ModeProfile`、`Hero`、`Equipment`、`Trait`、`Hex`、`Lineup`、`RulesContext` |
-| 数据提供 | `crates/hexsight-engine` 或新 `hexsight-data` | 读取本地快照、远端刷新、缓存管理 |
-| 官方适配 | `crates/hexsight-engine/src/lineup_adapter.rs` | 解析 `lineup_detail_total.json` 和 `detail` 字段 |
-| 静态索引 | `crates/hexsight-engine/src/game_data_index.rs` | ID → 名称/图标/描述索引，羁绊反推 |
-| 规则上下文 | `crates/hexsight-engine/src/rules_context.rs` | 生成可读规则上下文 |
-| 推理规则 | `crates/hexsight-engine/src/rules/` | 阵容、装备、符文、过渡、站位等规则 |
-| FFI | `crates/hexsight-ffi` | 暴露 Swift 可调用 JSON API |
+| 模块 | 实际路径 | 职责 | 状态 |
+|---|---|---|---|
+| 核心类型 | `crates/hexsight-core/src/data_types.rs` | HeroData、EquipmentData、TraitData、HexData、LineupCardData、LineupDetailData 等 | ✅ |
+| 数据加载 | `crates/hexsight-engine/src/game_data_loader.rs` | 读取 `config/game_data/mode*/` 本地快照 | ✅ |
+| 阵容加载 | `crates/hexsight-engine/src/lineup_loader.rs` | 读取 `config/lineups/` 阵容缓存 | ✅ |
+| 远端刷新 | `crates/hexsight-engine/src/remote_lineup_source.rs` | CDN URL 拼装、HTTP 请求、缓存写入 | ✅ |
+| 官方适配 | `crates/hexsight-engine/src/lineup_adapter.rs` | 解析 `lineup_detail_total.json` 和 `detail` 字段 | ✅ |
+| 静态索引 | `crates/hexsight-engine/src/game_data_index.rs` | ID → 名称/图标/描述索引，羁绊反推 | ✅ |
+| 规则上下文 | `crates/hexsight-engine/src/rules_context.rs` | 生成可读规则上下文，对齐第七章 JSON Schema | ✅ |
+| LLM 上下文 | `crates/hexsight-engine/src/llm_context.rs` | 输出 LLM 可消费的精简上下文 JSON | ✅ |
+| 版本校验 | `crates/hexsight-engine/src/version_validator.rs` | 检查 hero_id/equip_id 对齐，报告缺失 | ✅ |
+| 推理规则 | `crates/hexsight-engine/src/rules.rs` | 阵容、装备、符文、过渡、站位等规则 | ⚠️ 骨架 |
+| FFI | `crates/hexsight-ffi/src/data_ffi.rs` | 6 个 C ABI JSON API 暴露给 Swift | ✅ |
+
+### Swift 侧对应模块
+
+| 模块 | 实际路径 | 职责 | 状态 |
+|---|---|---|---|
+| 数据仓库 | `Services/LineupRepository.swift` | 封装 FFI 调用，提供 `@Published` 数据流 | ✅ |
+| FFI 桥接 | `Bridge/RustBridge.swift` | C FFI 声明与封装（新增 6 个数据 API） | ✅ |
+| FFI 头文件 | `Bridge/hexsight.h` | C 头文件，12 个 FFI 函数声明 | ✅ |
+| 阵容页 | `Views/Panels/LineupPanel.swift` | 调用 `LineupRepository`，UI 布局不变 | ✅ |
+| 模式配置 | `Lineups/ModeProfile.swift` | 模式 ID/名称/赛季/能力（CDN 字段已移除） | ✅ |
+| 数据策略 | `Services/LineupCatalog.swift` | 模式集合声明、空态文案 | ✅ |
 
 ---
 
@@ -203,60 +226,64 @@ Rust 最终建议暴露 JSON 字符串接口，降低 Swift/Rust 结构体同步
 
 ## 八、分阶段落地计划
 
-### 阶段 1：Rust 读取本地数据
+### 阶段 1：Rust 读取本地数据 ✅
 
-| 交付 | 验收 |
-|---|---|
-| Rust 读取 `config/game_data` | 能解析 mode17/mode16/mode4 的英雄、装备、羁绊、海克斯 |
-| Rust 读取 `config/lineups` | 能解析三种模式阵容缓存 |
-| Rust 单测 | `cargo test --workspace` 通过 |
+| 交付 | 验收 | 状态 |
+|---|---|---|
+| Rust 读取 `config/game_data` | 能解析 mode17/mode16/mode4 的英雄、装备、羁绊、海克斯 | ✅ |
+| Rust 读取 `config/lineups` | 能解析三种模式阵容缓存 | ✅ |
+| Rust 单测 | `cargo test --workspace` 通过 | ✅ |
 
-### 阶段 2：Rust 生成规则上下文
+### 阶段 2：Rust 生成规则上下文 ✅
 
-| 交付 | 验收 |
-|---|---|
-| `GameDataIndex` | ID 能解析为名称、图标、描述 |
-| `LineupAdapter` | 官方 detail 字段归一化 |
-| `RulesContext` | 输出可读英雄、装备、羁绊、强化符文、模式特殊机制 |
-| 快照测试 | 每个支持模式至少 1 条真实阵容测试 |
+| 交付 | 验收 | 状态 |
+|---|---|---|
+| `GameDataIndex` | ID 能解析为名称、图标、描述 | ✅ |
+| `LineupAdapter` | 官方 detail 字段归一化 | ✅ |
+| `RulesContext` | 输出可读英雄、装备、羁绊、强化符文、模式特殊机制 | ✅ |
+| 快照测试 | 每个支持模式至少 1 条真实阵容测试 | ✅ |
 
-### 阶段 3：FFI 接入 Swift
+### 阶段 3：FFI 接入 Swift ✅
 
-| 交付 | 验收 |
-|---|---|
-| FFI JSON API | Swift 能拿到模式、阵容列表、详情、规则上下文 |
-| `RustBridge.swift` | 封装 FFI 调用和错误处理 |
-| `LineupRepository.swift` | Swift 只通过 Repository 获取阵容数据 |
+| 交付 | 验收 | 状态 |
+|---|---|---|
+| FFI JSON API | Swift 能拿到模式、阵容列表、详情、规则上下文 | ✅ |
+| `RustBridge.swift` | 封装 FFI 调用和错误处理 | ✅ |
+| `LineupRepository.swift` | Swift 只通过 Repository 获取阵容数据 | ✅ |
 
-### 阶段 4：Swift 数据职责收敛
+### 阶段 4：Swift 数据职责收敛 ✅
 
-| 交付 | 验收 |
-|---|---|
-| `LineupPanel.swift` 切换数据入口 | UI 布局无变化 |
-| 移除 Swift 阵容解析逻辑 | UI/Service 中无官方阵容 JSON 解析 |
-| Swift 测试 | `cd swift && swift test && swift build` 通过 |
+| 交付 | 验收 | 状态 |
+|---|---|---|
+| `LineupPanel.swift` 切换数据入口 | UI 布局无变化 | ✅ |
+| 移除 Swift 阵容解析逻辑 | `LineupSourceAdapter`/`GameDataIndex`/`LineupRulesContext` 源码已删除 | ✅ |
+| 远端刷新下沉 Rust | `URLSession` 阵容拉取已移除，CDN 由 Rust 负责 | ✅ |
+| Swift 测试 | `cd swift && swift test && swift build` 通过 | ✅ |
 
-### 阶段 5：规则引擎后端化
+### 阶段 5：规则引擎后端化 ⚠️
 
-| 交付 | 验收 |
-|---|---|
-| Rust 规则模块 | 能基于 RulesContext 输出推荐结论 |
-| LLM 上下文生成器 | 输出稳定、精简、可解释 JSON |
-| 版本校验工具 | 检查新赛季字段缺失、ID 错位、阵容可解析率 |
+| 交付 | 验收 | 状态 |
+|---|---|---|
+| LLM 上下文生成器 | 输出稳定、精简、可解释 JSON | ✅ |
+| 版本校验工具 | 检查新赛季字段缺失、ID 错位、阵容可解析率 | ✅ |
+| 远端刷新 | CDN URL 拼装、HTTP 请求、缓存写入全在 Rust | ✅ |
+| Rust 规则模块 | 能基于 RulesContext 输出推荐结论 | ⚠️ 骨架 |
 
 ---
 
 ## 九、验收标准
 
-| 验收项 | 证明方式 |
-|---|---|
-| UI 布局未改 | `LineupPanel.swift` 只改数据入口，不改列表、详情、棋盘布局函数 |
-| Swift 不直接解析阵容官方 JSON | `rg "JSONSerialization|lineup_list|lineup_detail_total" swift/Sources/HexSight/Views swift/Sources/HexSight/Services` 无阵容解析逻辑 |
-| Rust 能解析三种模式 | Rust 测试覆盖 mode17/mode16/mode4 本地缓存 |
-| 规则上下文可读 | 测试断言英雄名、装备名、羁绊名、强化符文名存在 |
-| Swift 能拿到 Rust 数据 | Swift 测试覆盖 `LineupRepository` |
-| 构建通过 | `cargo test --workspace`、`cd swift && swift test && swift build` 通过 |
-| 追版本流程清晰 | 文档写明刷新数据、更新 profile、跑测试流程 |
+| 验收项 | 证明方式 | 状态 |
+|---|---|---|
+| UI 布局未改 | `LineupPanel.swift` 只改数据入口，不改列表、详情、棋盘布局函数 | ✅ |
+| Swift 不直接解析阵容官方 JSON | `rg "LineupSourceAdapter\|lineup_detail_total" swift/Sources/HexSight/Views swift/Sources/HexSight/Services` 无阵容解析逻辑 | ✅ |
+| 远端刷新在 Rust | `rg "URLSession\|lineup_detail_total" swift/Sources/HexSight/Views swift/Sources/HexSight/Services` 无远端阵容拉取 | ✅ |
+| 旧适配层已移除 | `LineupSourceAdapter.swift`/`GameDataIndex.swift`/`LineupRulesContext.swift` 已删除 | ✅ |
+| Rust 能解析三种模式 | Rust 测试覆盖 mode17/mode16/mode4 本地缓存 | ✅ |
+| 规则上下文可读 | 测试断言英雄名、装备名、羁绊名、强化符文名存在 | ✅ |
+| Swift 能拿到 Rust 数据 | `LineupRepositoryTests` 7 个测试覆盖三模式 | ✅ |
+| 构建通过 | `cargo test --workspace`(37) + `swift test`(17) + `swift build` 通过 | ✅ |
+| FFI 头文件同步 | `hexsight.h` 包含 12 个 FFI 函数声明 | ✅ |
 
 ---
 
@@ -269,3 +296,16 @@ Rust 最终建议暴露 JSON 字符串接口，降低 Swift/Rust 结构体同步
 | 规则靠后端 | 阵容判断、装备优先级、符文推荐、过渡策略由 Rust 规则层完成 |
 | 版本靠测试追 | 每次更新赛季数据必须跑 Rust 和 Swift 回归测试 |
 | UI 不参与推理 | UI 只展示 Rust 输出的结果，避免展示逻辑影响规则判断 |
+
+---
+
+## 十一、当前阶段边界
+
+本阶段（阵容与规则上下文后端化）验收范围：
+
+| 范围 | 说明 |
+|---|---|
+| Rust 负责 | 阵容读取、解析、适配、规则上下文生成、LLM 上下文、远端 CDN 刷新 |
+| Swift 保留 | 图鉴面板静态数据（英雄/装备/羁绊/海克斯 ID 映射）仍由 `GameDataService` 管理 |
+| 下阶段迁移 | 图鉴静态数据全量下沉 Rust，规则引擎基于 RulesContext 执行推理评分 |
+
