@@ -1,0 +1,728 @@
+{
+  "version": "17.17.3",
+  "season": "S18",
+  "setId": "16",
+  "time": "2026-05-20 19:19:35",
+  "data": {
+    "12400": {
+      "heroid": 12400,
+      "mission": [
+        {
+          "id": 1240001,
+          "tasktips": "",
+          "sort": 39,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着1件装备的【佛耶戈】",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "12405": {
+      "heroid": 12405,
+      "mission": [
+        {
+          "id": 1240501,
+          "tasktips": "",
+          "sort": 40,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着1件装备的【艾希】",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "12410": {
+      "heroid": 12410,
+      "mission": [
+        {
+          "id": 1241001,
+          "tasktips": "",
+          "sort": 37,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个配备着2件装备的【皮尔特沃夫】单位",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "12412": {
+      "heroid": 12412,
+      "mission": [
+        {
+          "id": 1241201,
+          "tasktips": "",
+          "sort": 38,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个配备着2件装备的【比尔吉沃特】单位",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "12415": {
+      "heroid": 12415,
+      "mission": [
+        {
+          "id": 1241501,
+          "tasktips": "",
+          "sort": 36,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在第2阶段选秀前刷新3次",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "12420": {
+      "heroid": 12420,
+      "mission": [
+        {
+          "id": 1242001,
+          "tasktips": "",
+          "sort": 35,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个配备着2件装备的【德玛西亚】或【约德尔人】弈子",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "13329": {
+      "heroid": 13329,
+      "mission": [
+        {
+          "id": 1332901,
+          "tasktips": "",
+          "sort": 34,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着2件装备的【赛恩】",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "13330": {
+      "heroid": 13330,
+      "mission": [
+        {
+          "id": 1333001,
+          "tasktips": "",
+          "sort": 33,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：6独特星级总数的【约德尔人】、【斗士】或【神谕者】。;需求达到6级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "13331": {
+      "heroid": 13331,
+      "mission": [
+        {
+          "id": 1333101,
+          "tasktips": "",
+          "sort": 32,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：5独特星级总数的【艾欧尼亚】、【约德尔人】或【护卫】。;需求达到5级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "13333": {
+      "heroid": 13333,
+      "mission": [
+        {
+          "id": 1333301,
+          "tasktips": "完成以下任务",
+          "sort": 31,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "收集10个【暗影岛】灵魂;需求达到5级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "13337": {
+      "heroid": 13337,
+      "mission": [
+        {
+          "id": 1333701,
+          "tasktips": "",
+          "sort": 30,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着1件装备的【德莱文】;需求达到5级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14331": {
+      "heroid": 14331,
+      "mission": [
+        {
+          "id": 1433101,
+          "tasktips": "",
+          "sort": 29,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着3件装备的2星【亚索】;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14333": {
+      "heroid": 14333,
+      "mission": [
+        {
+          "id": 1433301,
+          "tasktips": "",
+          "sort": 28,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：【金克丝】和【蔚】各配备着1件装备;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14334": {
+      "heroid": 14334,
+      "mission": [
+        {
+          "id": 1433401,
+          "tasktips": "",
+          "sort": 27,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着1件【班克斯的魔法帽】的一个单位;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14337": {
+      "heroid": 14337,
+      "mission": [
+        {
+          "id": 1433701,
+          "tasktips": "",
+          "sort": 26,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个携带着至少1件【锁子甲】的术师或射手定位弈子;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14338": {
+      "heroid": 14338,
+      "mission": [
+        {
+          "id": 1433801,
+          "tasktips": "",
+          "sort": 25,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "失去35玩家生命值并在战斗中登场4个独特的【祖安】弈子或【主宰】弈子;失去10玩家生命值并在战斗中登场4个独特的【祖安】弈子或【主宰】弈子",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14340": {
+      "heroid": 14340,
+      "mission": [
+        {
+          "id": 1434001,
+          "tasktips": "完成以下任务",
+          "sort": 24,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在2场玩家对战中让【虚空】处于已激活状态。;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14341": {
+      "heroid": 14341,
+      "mission": [
+        {
+          "id": 1434101,
+          "tasktips": "",
+          "sort": 23,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "带着【阿兹尔】连续赢得2/4/5场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);带着【阿兹尔】连续赢得2/4/5场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14342": {
+      "heroid": 14342,
+      "mission": [
+        {
+          "id": 1434201,
+          "tasktips": "",
+          "sort": 21,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着3件装备的2星【妮蔻】;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14343": {
+      "heroid": 14343,
+      "mission": [
+        {
+          "id": 1434301,
+          "tasktips": "",
+          "sort": 22,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "带着【阿兹尔】连续输掉2/4/5场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);带着【阿兹尔】连续输掉2/4/5场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14347": {
+      "heroid": 14347,
+      "mission": [
+        {
+          "id": 1434701,
+          "tasktips": "完成以下任务",
+          "sort": 20,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "收集30个【暗影岛】灵魂;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14350": {
+      "heroid": 14350,
+      "mission": [
+        {
+          "id": 1435001,
+          "tasktips": "在战斗中登场",
+          "sort": 18,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：5个独特的【约德尔人】或【比尔吉沃特】单位。;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14351": {
+      "heroid": 14351,
+      "mission": [
+        {
+          "id": 1435101,
+          "tasktips": "在战斗中登场",
+          "sort": 17,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着3件装备的【蕾欧娜】;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "14360": {
+      "heroid": 14360,
+      "mission": [
+        {
+          "id": 1434801,
+          "tasktips": "在战斗中登场",
+          "sort": 19,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着2件装备的一个【狙神】单位;需求达到7级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15271": {
+      "heroid": 15271,
+      "mission": [
+        {
+          "id": 1527101,
+          "tasktips": "",
+          "sort": 16,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：配备着2件装备的一个【约德尔人】或【祖安】弈子;需求达到9级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15272": {
+      "heroid": 15272,
+      "mission": [
+        {
+          "id": 1527201,
+          "tasktips": "",
+          "sort": 15,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "带着【阿兹尔】以胜负交替的方式进行3/5/6场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);带着【阿兹尔】以胜负交替的方式进行2/4/5场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);带着【阿兹尔】以胜负交替的方式进行3/5/6场玩家战斗。 (会在你每次解锁一个【恕瑞玛】弈子后变得更困难！);需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15273": {
+      "heroid": 15273,
+      "mission": [
+        {
+          "id": 1527301,
+          "tasktips": "",
+          "sort": 14,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个在战斗开始时拥有3400【生命上限】生命值的单位;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15274": {
+      "heroid": 15274,
+      "mission": [
+        {
+          "id": 1527401,
+          "tasktips": "在战斗中登场",
+          "sort": 13,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "5独特星级总数的【暗影岛】;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15275": {
+      "heroid": 15275,
+      "mission": [
+        {
+          "id": 1527501,
+          "tasktips": "",
+          "sort": 11,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：7独特星级总数的【皮尔特沃夫】;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15276": {
+      "heroid": 15276,
+      "mission": [
+        {
+          "id": 1527601,
+          "tasktips": "完成以下任务",
+          "sort": 12,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "用掉450枚【比尔吉沃特】银蛇币;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15277": {
+      "heroid": 15277,
+      "mission": [
+        {
+          "id": 1527701,
+          "tasktips": "完成以下任务",
+          "sort": 5,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "售出1个2星【盖伦】;需求达到9级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15279": {
+      "heroid": 15279,
+      "mission": [
+        {
+          "id": 1527901,
+          "tasktips": "战斗中满足以下条件",
+          "sort": 10,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "仅1个单位处在战场的前两排进行战斗;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15280": {
+      "heroid": 15280,
+      "mission": [
+        {
+          "id": 1528001,
+          "tasktips": "完成以下任务",
+          "sort": 4,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "3个地区羁绊处于激活状态;需求达到9级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15282": {
+      "heroid": 15282,
+      "mission": [
+        {
+          "id": 1528201,
+          "tasktips": "完成以下任务",
+          "sort": 9,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "携带着一件装备的【安蓓萨】在战斗中阵亡;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15285": {
+      "heroid": 15285,
+      "mission": [
+        {
+          "id": 1528501,
+          "tasktips": "在战斗中登场",
+          "sort": 8,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：8独特星级总数的【德玛西亚】;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15288": {
+      "heroid": 15288,
+      "mission": [
+        {
+          "id": 1528801,
+          "tasktips": "",
+          "sort": 3,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在本局游戏的过程中收集500个【以绪塔尔】【太阳碎片】",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15289": {
+      "heroid": 15289,
+      "mission": [
+        {
+          "id": 1528901,
+          "tasktips": "完成以下任务",
+          "sort": 2,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "登场总数为7的独特【虚空】弈子。;需求达到10级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15291": {
+      "heroid": 15291,
+      "mission": [
+        {
+          "id": 1529101,
+          "tasktips": "",
+          "sort": 1,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：5个独特的【巨神峰】弈子",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15296": {
+      "heroid": 15296,
+      "mission": [
+        {
+          "id": 1529601,
+          "tasktips": "",
+          "sort": 7,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "在战斗中登场：一个在开始战斗时拥有30%【全能吸血】全能吸血的弈子;需求达到8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    },
+    "15304": {
+      "heroid": 15304,
+      "mission": [
+        {
+          "id": 1530401,
+          "tasktips": "",
+          "sort": 6,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "拥有【暮光试炼】强化符文并带着一个3星【赵信】进行5场战斗。;拥有【暮光试炼】强化符文并带着一个3星【赵信】进行3场战斗。",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/"
+        }
+      ]
+    }
+  }
+}

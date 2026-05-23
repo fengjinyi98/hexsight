@@ -1,0 +1,296 @@
+{
+  "version": "17.17.2",
+  "season": "S18",
+  "setId": "4",
+  "time": "2026-04-30 22:48:29",
+  "data": {
+    "12103": {
+      "heroid": 12103,
+      "mission": [
+        {
+          "id": 1210301,
+          "tasktips": "完成以下任务",
+          "sort": 1,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活3【永恒之森】羁绊;维迦通过技能永久获得5法术强度",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "13112": {
+      "heroid": 13112,
+      "mission": [
+        {
+          "id": 1311201,
+          "tasktips": "在战斗中登场",
+          "sort": 2,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活4【刺客】羁绊。",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "13122": {
+      "heroid": 13122,
+      "mission": [
+        {
+          "id": 1312201,
+          "tasktips": "在战斗中登场",
+          "sort": 3,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活5【三国猛将】羁绊。",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "14101": {
+      "heroid": 14101,
+      "mission": [
+        {
+          "id": 1410101,
+          "tasktips": "完成以下任务",
+          "sort": 4,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "【魔法师】弈子进行30次双重施法;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "14103": {
+      "heroid": 14103,
+      "mission": [
+        {
+          "id": 1410301,
+          "tasktips": "完成以下任务",
+          "sort": 5,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "一个在开始战斗时拥有200魔法抗性的弈子;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "14104": {
+      "heroid": 14104,
+      "mission": [
+        {
+          "id": 1410401,
+          "tasktips": "完成以下任务",
+          "sort": 6,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "【神射手】弈子的普通攻击或技能进行200次弹射;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "14110": {
+      "heroid": 14110,
+      "mission": [
+        {
+          "id": 1411001,
+          "tasktips": "完成以下任务",
+          "sort": 7,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活6【天神】羁绊;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "14135": {
+      "heroid": 14135,
+      "mission": [
+        {
+          "id": 1413501,
+          "tasktips": "完成以下任务",
+          "sort": 10,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "配备着3件装备的【锐雯】;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15093": {
+      "heroid": 15093,
+      "mission": [
+        {
+          "id": 1509301,
+          "tasktips": "完成以下任务",
+          "sort": 8,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活6【战神】羁绊;8级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15098": {
+      "heroid": 15098,
+      "mission": [
+        {
+          "id": 1509801,
+          "tasktips": "完成以下任务",
+          "sort": 9,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "10独特星级总数的【腥红之月】;8级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15511": {
+      "heroid": 15511,
+      "mission": [
+        {
+          "id": 1551101,
+          "tasktips": "完成以下任务",
+          "sort": 11,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "战斗结束时拥有100金币",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15513": {
+      "heroid": 15513,
+      "mission": [
+        {
+          "id": 1551301,
+          "tasktips": "完成以下任务",
+          "sort": 12,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "激活【福星】羁绊后7连败，之后获得胜利;7级起;激活6【福星】羁绊;8级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15514": {
+      "heroid": 15514,
+      "mission": [
+        {
+          "id": 1551401,
+          "tasktips": "完成以下任务",
+          "sort": 13,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "【龙魂】弈子进行30次龙焰爆裂;8级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15538": {
+      "heroid": 15538,
+      "mission": [
+        {
+          "id": 1553801,
+          "tasktips": "完成以下任务",
+          "sort": 14,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "一个在开始战斗时拥有100法术强度的弈子;7级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15539": {
+      "heroid": 15539,
+      "mission": [
+        {
+          "id": 1553901,
+          "tasktips": "完成以下任务",
+          "sort": 15,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "一个在开始战斗时拥有4000生命值的弈子;8级起",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    },
+    "15540": {
+      "heroid": 15540,
+      "mission": [
+        {
+          "id": 1554001,
+          "tasktips": "完成以下任务",
+          "sort": 16,
+          "difficulty": 0,
+          "conditionId": 0,
+          "show": 1,
+          "desc": "6个羁绊处于激活状态;8级",
+          "heroinfo": "",
+          "equipinfo": "",
+          "equipfull": "https://game.gtimg.cn/images/lol/act/jkzlk/gamedata/",
+          "herofull": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/"
+        }
+      ]
+    }
+  }
+}

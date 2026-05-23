@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Rust
+/target/
+
+# SwiftPM
+/swift/.build/
+/swift/.swiftpm/
+
+# Local tooling
+.claude/
+.vscode/
+.idea/

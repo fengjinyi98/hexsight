@@ -1,0 +1,395 @@
+{
+  "version": "17.17.2",
+  "season": "S18",
+  "setId": "4",
+  "time": "2026-04-30 22:48:29",
+  "data": {
+    "301": {
+      "id": "301",
+      "name": "迅捷蟹水潭",
+      "desc": "PVE野怪都被替换为迅捷蟹，迅捷蟹可提供额外战利品。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "302": {
+      "id": "302",
+      "name": "战利品订阅",
+      "desc": "在每个阶段开始时，每位弈士会从一个包罗万象的池子中获得随机的战利品。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "303": {
+      "id": "303",
+      "name": "心想事成",
+      "desc": "【悠米】在每个阶段，会提供一个适合你队伍的弈子！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/spatula.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "305": {
+      "id": "305",
+      "name": "恕瑞玛集市",
+      "desc": "基础装备选秀的每个英雄会携带2件(而非1件)基础装备。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "306": {
+      "id": "306",
+      "name": "黄道地库",
+      "desc": "你每次选择一个强化符文时，会获得4x你已有强化符文数的金币。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "307": {
+      "id": "307",
+      "name": "戈拉斯克工业",
+      "desc": "每当你合出一件成装时，获得3金币。 ",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "308": {
+      "id": "308",
+      "name": "聚光灯星系",
+      "desc": "2-1回合，棋盘上会出现一个【聚光灯】格子。站在【聚光灯】格子上的英雄可以获得500额外最大生命值与30护甲与魔抗。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "309": {
+      "id": "309",
+      "name": "二进制星系",
+      "desc": "战斗开始时，携带了2件装备（成装或散件都可以）的棋子会获得1件随机的临时成装。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "310": {
+      "id": "310",
+      "name": "爽歪歪星系",
+      "desc": "从2-1回合开始，每回合获得一次免费的商店刷新。在回合3-1，获得一件【金铲铲冠冕】，并且所有的小兵与野怪都会掉落战利品法球。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "311": {
+      "id": "311",
+      "name": "装备飞升星系",
+      "desc": "在阶段4-5时，获得一个【杰作升级】消耗品，它可让你的一件已携带的装备升级为该装备的光明版。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "312": {
+      "id": "312",
+      "name": "零花钱星系",
+      "desc": "从2阶段开始，每个阶段开始时，获得5金币。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "313": {
+      "id": "313",
+      "name": "招财进宝",
+      "desc": "在2-1和3-5阶段开始时提供1个【辅助装锻造器】。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "314": {
+      "id": "314",
+      "name": "量身定制",
+      "desc": "所有玩家在3-1和4-5阶段获得一个【推荐装备选择器】。将选择器拖到英雄身上会开启一个对应英雄推荐装备的4选1商店。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "315": {
+      "id": "315",
+      "name": "锻造器盛宴",
+      "desc": "这局游戏掉落的所有基础装备均变为【基础装备锻造器】。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "317": {
+      "id": "317",
+      "name": "节节高",
+      "desc": "在4-1回合开始时提供2个【装备拆卸器】，同时所有玩家备战席最右边3个格子里的英雄会变成高1费的英雄。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "318": {
+      "id": "318",
+      "name": "万事如意",
+      "desc": "在3-1或4-1时，提供一个【推荐装备选择器】、金币以及合适的高阶弈子。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "319": {
+      "id": "319",
+      "name": "长寿安康",
+      "desc": "【娜美】在首次下降到60和20时提供一个战利品法球。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/combat.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "320": {
+      "id": "320",
+      "name": "远古龙蛋",
+      "desc": "在4-7回合后，所有玩家都可以获得一个龙蛋，在5个回合后孵化。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "321": {
+      "id": "321",
+      "name": "升星之运",
+      "desc": "每回合首次升星一个英雄后，获得和该英雄费用相同的免费刷新次数。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "322": {
+      "id": "322",
+      "name": "发发赠礼",
+      "desc": "每当所有弈士的总血量减少88，获得一个战利品法球。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/combat.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "323": {
+      "id": "323",
+      "name": "步步高升",
+      "desc": "这局游戏强化符文以白银、黄金、棱彩的顺序出现。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "324": {
+      "id": "324",
+      "name": "滚滚红包",
+      "desc": "每个玩家死亡后，将会给其他玩家提供金币或其他战利品。提供的金币量将会随着场上玩家减少而增加。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "325": {
+      "id": "325",
+      "name": "没有奇遇",
+      "desc": "大家都出去庆祝了！本局游戏不会出现奇遇。 ",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/combat.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "326": {
+      "id": "326",
+      "name": "金金金",
+      "desc": "这局游戏的所有强化符文都是黄金阶。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "327": {
+      "id": "327",
+      "name": "彩彩彩",
+      "desc": "这局游戏的所有强化符文都是棱彩阶。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "328": {
+      "id": "328",
+      "name": "棱彩前奏",
+      "desc": "这局游戏供应的第一个强化符文将是棱彩阶。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "329": {
+      "id": "329",
+      "name": "基础装备锻造器",
+      "desc": "开局拥有2个【基础装备锻造器】。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "330": {
+      "id": "330",
+      "name": "神器锻造器",
+      "desc": "开局拥有一个【神器锻造器】(选择一件强力装备)。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "331": {
+      "id": "331",
+      "name": "魔像训练师",
+      "desc": "开局时提供1个携带着3个永久附着的纹章的【雕纹魔像】。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/spatula.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "332": {
+      "id": "332",
+      "name": "年货订阅",
+      "desc": "【瑟提】在每个阶段开始时，为每位弈士提供一个相同的战利品。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "333": {
+      "id": "333",
+      "name": "蟹之新春",
+      "desc": "【瑟提】舞蹈蟹会代替PVE回合并掉落额外战利品，但第5阶段及以后的舞蹈蟹会极！度！危！险！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "334": {
+      "id": "334",
+      "name": "新春大吉",
+      "desc": "【塔姆】在1-2给每个玩家发放一个非本局商店存在的新春使者，他们会在5-1和7-1回合自动成长。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "335": {
+      "id": "335",
+      "name": "福上阿狸",
+      "desc": "【阿狸】在第2阶段将出现一个额外的强化符文回合！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "336": {
+      "id": "336",
+      "name": "越刷越有",
+      "desc": "【阿狸】所有强化符文获得额外的刷新次数",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "337": {
+      "id": "337",
+      "name": "盛大终章",
+      "desc": "【阿狸】准备好迎接盛大终章，因为第三个强化符文是棱彩阶！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/augmentcards.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "338": {
+      "id": "338",
+      "name": "巅峰荣耀",
+      "desc": "【瑟庄妮】最后幸存的两名玩家分别获得70金币",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "339": {
+      "id": "339",
+      "name": "财神到",
+      "desc": "【瑟庄妮】选秀阶段的弈子额外携带红包",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "340": {
+      "id": "340",
+      "name": "好彩头",
+      "desc": "【瑟庄妮】选择一个可产生金币的神器装备。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "341": {
+      "id": "341",
+      "name": "抢红包",
+      "desc": "【瑟庄妮】在阶段3-1和4-1时获取一次抢红包的机会",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "342": {
+      "id": "342",
+      "name": "和气生财",
+      "desc": "【娜美】对局开始时获得新年礼物，小小英雄生命值提高20点。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/combat.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "343": {
+      "id": "343",
+      "name": "羁绊福袋",
+      "desc": "【悠米】开局获得三个随机纹章。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/spatula.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "344": {
+      "id": "344",
+      "name": "三阳开泰",
+      "desc": "【悠米】开局拥有一个随机的3费弈子。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/spatula.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "345": {
+      "id": "345",
+      "name": "光明武器",
+      "desc": "在3-7阶段，从5件光明武器(各个成装的超级加强版)中选出1件。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode4s18/galaxy/item.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[package]
+name = "hexsight-vision"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+hexsight-core = { path = "../hexsight-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = "0.25"

@@ -1,0 +1,233 @@
+{
+  "version": "17.17.3",
+  "season": "S18",
+  "setId": "16",
+  "time": "2026-05-20 19:19:35",
+  "data": {
+    "950": {
+      "id": "950",
+      "name": "金金金之旅",
+      "desc": "带着三个黄金阶强化符文前去夺金！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "951": {
+      "id": "951",
+      "name": "彩彩彩之旅",
+      "desc": "迎来终极大对决！这局游戏所有的强化符文都是棱彩阶。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "952": {
+      "id": "952",
+      "name": "棱彩终章",
+      "desc": "准备好迎接盛大终章，因为第三个强化符文是棱彩阶！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "953": {
+      "id": "953",
+      "name": "棱彩前奏",
+      "desc": "这场大战以一个棱彩阶强化符文开始！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "954": {
+      "id": "954",
+      "name": "3费开局",
+      "desc": "这局在开局时自带1个随机的3费弈子！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "955": {
+      "id": "955",
+      "name": "2费开局",
+      "desc": "这局在开局时自带1个随机的2费弈子！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "956": {
+      "id": "956",
+      "name": "2星开局",
+      "desc": "这局在开局拥有1个2星弈子！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "957": {
+      "id": "957",
+      "name": "基础装备锻造器",
+      "desc": "获得2个【基础装备锻造器】。选择你的武器！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "959": {
+      "id": "959",
+      "name": "迅捷蟹水潭",
+      "desc": "这个竞技场满是带着额外战利品的螃蟹。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "960": {
+      "id": "960",
+      "name": "蟹之狂欢",
+      "desc": "这个竞技场满是带着额外战利品的螃蟹。在第5阶段后，它们会变为！致！命！危！机！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "961": {
+      "id": "961",
+      "name": "战利品订阅",
+      "desc": "在每个阶段开始时获得包罗万象的战利品！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "962": {
+      "id": "962",
+      "name": "纹章剧团",
+      "desc": "这局在开局拥有三个随机纹章",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "963": {
+      "id": "963",
+      "name": "金币订阅",
+      "desc": "在每个阶段开始时收到一份现金奖励！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "964": {
+      "id": "964",
+      "name": "强化符文回合变换",
+      "desc": "嗨起来吧！这局的强化符文会提前供应。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "965": {
+      "id": "965",
+      "name": "没有奇遇",
+      "desc": "本局游戏不会出现奇遇。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "966": {
+      "id": "966",
+      "name": "嚎哭深渊",
+      "desc": "这局在开局时自带5个随机的1费弈子！",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "967": {
+      "id": "967",
+      "name": "《Silver Scrapes》战歌响起",
+      "desc": "最后幸存的两名玩家分别获得70金币",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "968": {
+      "id": "968",
+      "name": "清算人竞技场",
+      "desc": "每当一名参赛者出局后，为其他选手提供金币奖励",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "969": {
+      "id": "969",
+      "name": "侦察小队",
+      "desc": "【提莫】的侦察小队顺利完成任务，为所有强化符文提供+1刷新次数。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "970": {
+      "id": "970",
+      "name": "格温的赠礼",
+      "desc": "在最初3次选秀之后，格温为玩家们提供一个随机基础装备和一把特殊的剪子。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "972": {
+      "id": "972",
+      "name": "盖伦的草丛",
+      "desc": "盖伦为你生成一个草丛格，其中的单位造成更多伤害，并会冲锋击飞沿途敌人。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "973": {
+      "id": "973",
+      "name": "妮蔻的河蟹",
+      "desc": "妮蔻伪装备战席，你无法查看其他玩家的备战席.获得一个英雄复制器和一个次级英雄复制器。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "974": {
+      "id": "974",
+      "name": "提莫的蘑菇",
+      "desc": "获得一个蘑菇：敌人踩中后爆炸；若回合结束时未触发，获得2金币。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "975": {
+      "id": "975",
+      "name": "蒙多想去哪就去哪",
+      "desc": "祖安向你问好，你的弈子每次击杀都会获得永久成长。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    },
+    "976": {
+      "id": "976",
+      "name": "塔姆的肚子",
+      "desc": "获得一只可投喂的塔姆：出售时会根据投喂总价值获得奖励。",
+      "logo": "https://game.gtimg.cn/images/lol/act/jkzlk/mode16s18/galaxy/encounter.png",
+      "video": "",
+      "bgImage": "",
+      "country": ""
+    }
+  }
+}

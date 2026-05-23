@@ -1,0 +1,1152 @@
+{
+  "version": "17.17.3",
+  "season": "S18",
+  "setId": "17",
+  "time": "2026-05-21 10:16:45",
+  "data": [
+    {
+      "godId": 2,
+      "godName": "奥瑞利安·索尔 造物之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_aurelionsol_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "奥瑞利安·索尔提供有回报的探险",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1702010,
+              "name": "财富探险",
+              "desc": "当你积攒到50金币时，获得一个基础装备锻造器和4金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_delayedgold_stage2_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1702040,
+              "name": "羁绊探险",
+              "desc": "在一场玩家对战中登场6个非唯一羁绊后，获得1个随机【纹章】和1个【装备重铸器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_traitquest_stage2_icon.png",
+              "dragon": 0,
+              "type": "4|3"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1702020,
+              "name": "星空探险",
+              "desc": "下次你将一个弈子升星时，获得10金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_starquest_stage3_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1702040,
+              "name": "羁绊探险",
+              "desc": "在一场玩家对战中登场6个非唯一羁绊后，获得1个随机【纹章】和1个【装备重铸器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_traitquest_stage2_icon.png",
+              "dragon": 0,
+              "type": "4|3"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1702030,
+              "name": "等级探险",
+              "desc": "在你到达9级时，获得20金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_levelquest_stage4_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1702050,
+              "name": "奥瑞利安·索尔的恩赐",
+              "desc": "在3个探险中选择1个，向【奥瑞利安·索尔】证明你自己。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_godaugment_icon.png",
+              "dragon": 1,
+              "type": "4"
+            },
+            {
+              "id": 1702060,
+              "name": "低生命值探险",
+              "desc": "你首次跌至30生命值时，获得18金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_lowhpquest_stage4_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1702070,
+              "name": "刷新探险",
+              "desc": "在刷新商店15次之后，获得2个【基础装备锻造器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_aurelionsol_rerollquest_stage4_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 3,
+      "godName": "亚索 深渊之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_yasuo_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "亚索提供强化格子",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1703010,
+              "name": "烈阳格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会在5秒里持续造成15%额外魔法伤害。这个伤害在持续期间附带33%重伤和1%灼烧。  [消耗品-这个装备会在使用后消失。] 灼烧:每秒造成目标一部分最大生命值的真实伤害 重伤：降低受到的治疗效果",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_fire_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703020,
+              "name": "宇宙格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子获得10%最大生命值，并且每回合获得35永久生命值。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_wood_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703030,
+              "name": "增速格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得30%攻击速度。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_wind_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703040,
+              "name": "星光格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得3法力回复。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_socialite_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703050,
+              "name": "风暴格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子首次用技能命中一个敌人时，会使该敌人晕眩1.75|2秒。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_electric_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703060,
+              "name": "冰晶格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子在首次跌下40%生命值时，会被冻结1秒并治疗自身30%最大生命值。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_ice_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1703010,
+              "name": "烈阳格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会在5秒里持续造成15%额外魔法伤害。这个伤害在持续期间附带33%重伤和1%灼烧。  [消耗品-这个装备会在使用后消失。] 灼烧:每秒造成目标一部分最大生命值的真实伤害 重伤：降低受到的治疗效果",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_fire_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703030,
+              "name": "增速格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得30%攻击速度。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_wind_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703040,
+              "name": "星光格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得3法力回复。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_socialite_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703050,
+              "name": "风暴格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子首次用技能命中一个敌人时，会使该敌人晕眩1.75|2秒。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_electric_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703060,
+              "name": "冰晶格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子在首次跌下40%生命值时，会被冻结1秒并治疗自身30%最大生命值。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_ice_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1703010,
+              "name": "烈阳格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会在5秒里持续造成15%额外魔法伤害。这个伤害在持续期间附带33%重伤和1%灼烧。  [消耗品-这个装备会在使用后消失。] 灼烧:每秒造成目标一部分最大生命值的真实伤害 重伤：降低受到的治疗效果",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_fire_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703030,
+              "name": "增速格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得30%攻击速度。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_wind_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703040,
+              "name": "星光格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子会获得3法力回复。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_socialite_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703050,
+              "name": "风暴格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子首次用技能命中一个敌人时，会使该敌人晕眩1.75|2秒。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_electric_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703060,
+              "name": "冰晶格",
+              "desc": "将这个格子放在一个弈子上。这个格子中的友方弈子在首次跌下40%生命值时，会被冻结1秒并治疗自身30%最大生命值。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_empoweredhex_ice_icon.png",
+              "dragon": 0,
+              "type": "4|2"
+            },
+            {
+              "id": 1703070,
+              "name": "亚索的恩赐",
+              "desc": "提高50%【亚索】的绘制格的效果。如果你只有2个绘制格，获得8金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_yasuogodaugment_paintedpower_icon.png",
+              "dragon": 1,
+              "type": "1|2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 4,
+      "godName": "凯尔 秩序之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_kayle_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "凯尔提供装备",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1704010,
+              "name": "随机基础装备",
+              "desc": "获得1件随机基础装备。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomcomponent_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704020,
+              "name": "拳套",
+              "desc": "获得1个【拳套】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_glove_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704021,
+              "name": "反曲之弓",
+              "desc": "获得1个【反曲之弓】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_bow_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704022,
+              "name": "女神之泪",
+              "desc": "获得1个【女神之泪】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_tear_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1704010,
+              "name": "随机基础装备",
+              "desc": "获得1件随机基础装备。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomcomponent_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704023,
+              "name": "无用大棒",
+              "desc": "获得1个【无用大棒】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_rod_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704024,
+              "name": "锁子甲",
+              "desc": "获得1个【锁子甲】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_chain_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704025,
+              "name": "负极斗篷",
+              "desc": "获得1个【负极斗篷】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_cloak_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704026,
+              "name": "暴风大剑",
+              "desc": "获得1个【暴风大剑】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_sword_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1704010,
+              "name": "随机基础装备",
+              "desc": "获得1件随机基础装备。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomcomponent_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704011,
+              "name": "凯尔的恩赐",
+              "desc": "你的队伍每携带一件不同的成装，就会获得15生命值、1%物理加成和1%法术加成。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_augment_kaylesblessing_icon.png",
+              "dragon": 1,
+              "type": "3|2"
+            },
+            {
+              "id": 1704020,
+              "name": "拳套",
+              "desc": "获得1个【拳套】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_glove_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704021,
+              "name": "反曲之弓",
+              "desc": "获得1个【反曲之弓】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_bow_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704022,
+              "name": "女神之泪",
+              "desc": "获得1个【女神之泪】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_tear_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704023,
+              "name": "无用大棒",
+              "desc": "获得1个【无用大棒】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_rod_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704024,
+              "name": "锁子甲",
+              "desc": "获得1个【锁子甲】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_chain_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704025,
+              "name": "负极斗篷",
+              "desc": "获得1个【负极斗篷】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_cloak_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1704026,
+              "name": "暴风大剑",
+              "desc": "获得1个【暴风大剑】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_sword_kayle_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 5,
+      "godName": "阿狸 财富之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_ahri_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "阿狸提供财富",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1705010,
+              "name": "6金币",
+              "desc": "下场金币雨！",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_gold_major_stage2_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705020,
+              "name": "6经验",
+              "desc": "学习并成长",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_xp_small_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705030,
+              "name": "4次刷新",
+              "desc": "继续开D",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_rerolls_small_stage2_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705040,
+              "name": "联手致富",
+              "desc": "获得6金币。如果至少5个玩家选择此选项，则获得额外的1金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_sharedwealth_stage2_icon.png",
+              "dragon": 0,
+              "type": "1"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1705011,
+              "name": "8金币",
+              "desc": "下场金币雨！",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_gold_major_stage3_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705021,
+              "name": "8经验",
+              "desc": "学习并成长",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_xp_medium_stage3_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705031,
+              "name": "5次刷新",
+              "desc": "继续开D",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_rerolls_small_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705041,
+              "name": "联手致富+",
+              "desc": "获得8金币。如果至少5个玩家选择此选项，则获得额外的2金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_sharedwealth_stage3_icon.png",
+              "dragon": 0,
+              "type": "1"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1705012,
+              "name": "10金币",
+              "desc": "下场金币雨！",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_gold_major_stage4_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705032,
+              "name": "7次刷新",
+              "desc": "继续开D",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_rerolls_large_stage4_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705042,
+              "name": "联手致富++",
+              "desc": "获得10金币。如果至少5个玩家选择此选项，则获得额外的2金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_sharedwealth_stage4_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1705050,
+              "name": "阿狸的恩赐",
+              "desc": "你的队伍获得2%x等级数的物理加成和法术加成。这局游戏接下来的时间里，每回合获得2经验值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_augment_ahrisblessing_icon.png",
+              "dragon": 1,
+              "type": "1|2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 6,
+      "godName": "韦鲁斯 爱神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_varus_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "韦鲁斯提供弈子",
+      "stages": [
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1706010,
+              "name": "次级英雄复制器",
+              "desc": "获得1个【次级英雄复制器】和3金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_lesserduplicator_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1706020,
+              "name": "现有的3费弈子",
+              "desc": "获得你拥有的一个3费弈子的复制品和2金币。  如果你未拥有任何3费弈子，则随机获得一个。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_threecostchampion_owned_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1706041,
+              "name": "恋人+",
+              "desc": "获得拥有一个相同羁绊的一个4费弈子和一个3费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_loversplus_icon.png",
+              "dragon": 0,
+              "type": "2"
+            },
+            {
+              "id": 1706080,
+              "name": "4费商店",
+              "desc": "你的下一次商店包含全4费弈子。你购买的第一个是免费的。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_alltierfourshop_icon.png",
+              "dragon": 0,
+              "type": "1|2|4"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1706011,
+              "name": "次级英雄复制器",
+              "desc": "获得1个【次级英雄复制器】和5金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_lesserduplicator_stage4_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1706021,
+              "name": "现有的4费弈子",
+              "desc": "获得你拥有的一个4费弈子的复制品和3金币。  如果你未拥有任何4费弈子，则随机获得一个。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_fourcostchampion_owned_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1706042,
+              "name": "恋人++",
+              "desc": "获得拥有一个相同羁绊的一个5费弈子和一个4费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_loversplusplus_icon.png",
+              "dragon": 0,
+              "type": "2"
+            },
+            {
+              "id": 1706090,
+              "name": "韦鲁斯的恩赐",
+              "desc": "你的弈子们获得18x己方队伍总星级的生命值，并且你的5费概率提升2%。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_boonofstars_icon.png",
+              "dragon": 1,
+              "type": "2|4"
+            }
+          ]
+        },
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1706020,
+              "name": "现有的3费弈子",
+              "desc": "获得你拥有的一个3费弈子的复制品和2金币。  如果你未拥有任何3费弈子，则随机获得一个。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_threecostchampion_owned_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1706040,
+              "name": "恋人",
+              "desc": "获得拥有一个相同羁绊的一个3费弈子和一个2费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_lovers_icon.png",
+              "dragon": 0,
+              "type": "2"
+            },
+            {
+              "id": 1706050,
+              "name": "2个微型复制器",
+              "desc": "用在一位1费的英雄身上，即可生成一个该英雄的1星版本到你的备战区。  [消耗品-这个物品会在使用后消失]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_tinyduplicator_2_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1706070,
+              "name": "3费商店",
+              "desc": "你的下一次商店包含全3费弈子。你购买的第一个是免费的。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_alltierthreeshop_icon.png",
+              "dragon": 0,
+              "type": "1|2|4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 7,
+      "godName": "艾克 时间之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_ekko_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "艾克提供过往赛季机制",
+      "stages": [
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1707000,
+              "name": "赐福：速度",
+              "desc": "永久使一个弈子的攻击速度提升20%并使其体型缩小20%。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_shrinkconsumable_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1707011,
+              "name": "迅捷蟹派对",
+              "desc": "你的下一个PVE回合会被替换为带有额外战利品的迅捷蟹回合！",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_nextpvescuttle_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1707051,
+              "name": "2个5费弈子",
+              "desc": "在4个回合后，获得2个5费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayed5cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1707060,
+              "name": "基础装备锻造器",
+              "desc": "在3个回合后，获得1个【基础装备锻造器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayedcomponentanvil_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1707000,
+              "name": "赐福：速度",
+              "desc": "永久使一个弈子的攻击速度提升20%并使其体型缩小20%。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_shrinkconsumable_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1707041,
+              "name": "随机神器",
+              "desc": "在5个回合后，获得1个随机神器。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayedrandomartifact_stage4_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1707061,
+              "name": "成装锻造器",
+              "desc": "在5回合后，获得1个【成装锻造器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayedcompletedanvil_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1707070,
+              "name": "5费商店",
+              "desc": "在3回合后，获得一次免费商店刷新并且你的下一次商店包含所有5费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayed5costshop_icon.png",
+              "dragon": 0,
+              "type": "1|4|2"
+            },
+            {
+              "id": 1707080,
+              "name": "现金流",
+              "desc": "每个回合都会获得2金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_cashflow_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1707090,
+              "name": "艾克的恩赐",
+              "desc": "获得【突变】，一个基于单位的定位为其提供强力进化的装备。获得2个【装备拆卸器】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_augment_ekkosblessing_icon.png",
+              "dragon": 1,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1707010,
+              "name": "迅捷蟹派对",
+              "desc": "你的下一个PVE回合会被替换为带有额外战利品的迅捷蟹回合！",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_nextpvescuttle_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1707020,
+              "name": "神圣干预",
+              "desc": "在跌至30玩家生命值之后，获得一个特殊的战利品法球。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tt17_benefit_stimmy_icon.png",
+              "dragon": 0,
+              "type": "3|4"
+            },
+            {
+              "id": 1707040,
+              "name": "随机神器",
+              "desc": "在8个回合后，获得1个随机神器。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayedrandomartifact_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1707050,
+              "name": "4费弈子",
+              "desc": "在3个回合后，获得1个4费弈子。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_delayed4cost_icon.png",
+              "dragon": 0,
+              "type": "2|1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 8,
+      "godName": "锤石 契约之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_thresh_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "锤石提供随机性",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1708010,
+              "name": "随机恩赐",
+              "desc": "从任一星神处获得一个随机恩赐，以及2金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomboon_stage2_icon.png",
+              "dragon": 0,
+              "type": "1|4"
+            },
+            {
+              "id": 1708020,
+              "name": "神秘战利品",
+              "desc": "会是什么呢？",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomloot_stage2_icon.png",
+              "dragon": 0,
+              "type": "3"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1708011,
+              "name": "随机恩赐",
+              "desc": "从任一星神处获得一个随机恩赐，以及3金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomboon_stage3_icon.png",
+              "dragon": 0,
+              "type": "1|4"
+            },
+            {
+              "id": 1708021,
+              "name": "神秘战利品",
+              "desc": "会是什么呢？",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomloot_stage3_icon.png",
+              "dragon": 0,
+              "type": "3"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1708012,
+              "name": "随机恩赐",
+              "desc": "从任一星神处获得一个随机恩赐，以及5金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomboon_stage4_icon.png",
+              "dragon": 0,
+              "type": "1|4"
+            },
+            {
+              "id": 1708022,
+              "name": "神秘战利品",
+              "desc": "会是什么呢？",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomloot_stage4_icon.png",
+              "dragon": 0,
+              "type": "3"
+            },
+            {
+              "id": 1708030,
+              "name": "掷骰子",
+              "desc": "投掷3个骰子。获得相当于投掷结果总和的金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_rollthebones_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1708040,
+              "name": "锤石的恩赐",
+              "desc": "每回合，投掷一个骰子。基于该次投掷，获得一个加成。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_augment_threshsblessing_icon.png",
+              "dragon": 1,
+              "type": "2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 9,
+      "godName": "索拉卡 众星之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_soraka_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "索拉卡提供生命值",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1709010,
+              "name": "12小小英雄生命值",
+              "desc": "12小小英雄生命值",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_health_minor_icon.png",
+              "dragon": 0,
+              "type": "4"
+            },
+            {
+              "id": 1709020,
+              "name": "在一起更好",
+              "desc": "获得6小小英雄生命值。如果至少5个玩家选择此选项，则获得2金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_grouphug_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1709040,
+              "name": "巨人腰带",
+              "desc": "获得1个【巨人腰带】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_belt_soraka_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1709010,
+              "name": "12小小英雄生命值",
+              "desc": "12小小英雄生命值",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_health_minor_icon.png",
+              "dragon": 0,
+              "type": "4"
+            },
+            {
+              "id": 1709021,
+              "name": "在一起更好+",
+              "desc": "获得6小小英雄生命值。如果至少5个玩家选择此选项，则获得3金币。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_grouphugplus_icon.png",
+              "dragon": 0,
+              "type": "1|2"
+            },
+            {
+              "id": 1709030,
+              "name": "赐福：体型",
+              "desc": "永久使一个弈子的生命值提升350并且体型提升20%。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_implantsize_icon.png",
+              "dragon": 0,
+              "type": "2|3"
+            },
+            {
+              "id": 1709040,
+              "name": "巨人腰带",
+              "desc": "获得1个【巨人腰带】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_belt_soraka_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1709010,
+              "name": "12小小英雄生命值",
+              "desc": "12小小英雄生命值",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_health_minor_icon.png",
+              "dragon": 0,
+              "type": "4"
+            },
+            {
+              "id": 1709030,
+              "name": "赐福：体型",
+              "desc": "永久使一个弈子的生命值提升350并且体型提升20%。  [消耗品-这个装备会在使用后消失。]",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_implantsize_icon.png",
+              "dragon": 0,
+              "type": "2|3"
+            },
+            {
+              "id": 1709040,
+              "name": "巨人腰带",
+              "desc": "获得1个【巨人腰带】。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_component_belt_soraka_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1709050,
+              "name": "索拉卡的恩赐",
+              "desc": "你每损失1玩家生命值，你的队伍就会获得2生命值。在每场玩家对战开始时，回复额外的1玩家生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_augment_boonofrestoration_icon.png",
+              "dragon": 1,
+              "type": "2|4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "godId": 10,
+      "godName": "伊芙琳 诱惑之神",
+      "tex": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_god_evelynn_neutral_splash.png",
+      "godIcon": "",
+      "godTips": "伊芙琳提供致命交易",
+      "stages": [
+        {
+          "num": 2,
+          "wishes": [
+            {
+              "id": 1710010,
+              "name": "2星2费",
+              "desc": "获得1个随机2星2费弈子。失去3小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_2star2cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1710014,
+              "name": "1星4费",
+              "desc": "获得1个随机1星4费弈子。失去4小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_1star4cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1710040,
+              "name": "猩红契约",
+              "desc": "获得8金币。每有一名玩家选择此项，失去2弈士生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_bloodpact_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1710050,
+              "name": "碾压之势",
+              "desc": "获得1个随机2费和1金币。在每次玩家对战后重复此效果，直至你输掉一次为止。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_steamroll_icon.png",
+              "dragon": 0,
+              "type": "2"
+            }
+          ]
+        },
+        {
+          "num": 3,
+          "wishes": [
+            {
+              "id": 1710011,
+              "name": "2星3费",
+              "desc": "获得1个随机2星3费弈子。失去3小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_2star3cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1710012,
+              "name": "3星1费",
+              "desc": "获得1个随机3星1费弈子。失去3小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_3star1cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1710020,
+              "name": "随机纹章",
+              "desc": "获得1个随机纹章。失去3小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomemblem_icon.png",
+              "dragon": 0,
+              "type": "3|4"
+            },
+            {
+              "id": 1710041,
+              "name": "猩红契约+",
+              "desc": "获得10金币。每有一名玩家选择此项，失去2弈士生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_bloodpactplus_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1710051,
+              "name": "碾压之势+",
+              "desc": "获得1个随机3费和1金币。在每次玩家对战后重复此效果，直至你输掉一次为止。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_steamrollplus_icon.png",
+              "dragon": 0,
+              "type": "2"
+            },
+            {
+              "id": 1710060,
+              "name": "12金币",
+              "desc": "获得12金币。你无法购买弈子，持续2回合。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_gold_stage3_eve_icon.png",
+              "dragon": 0,
+              "type": "1"
+            }
+          ]
+        },
+        {
+          "num": 4,
+          "wishes": [
+            {
+              "id": 1710013,
+              "name": "2星4费",
+              "desc": "获得1个随机2星4费弈子。失去3小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_2star4cost_icon.png",
+              "dragon": 0,
+              "type": "2|4"
+            },
+            {
+              "id": 1710015,
+              "name": "2个1星5费",
+              "desc": "获得2个随机1星5费弈子。失去1小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_1star5cost_icon.png",
+              "dragon": 0,
+              "type": "2"
+            },
+            {
+              "id": 1710030,
+              "name": "随机成装",
+              "desc": "获得1个随机成装。失去5小小英雄生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_randomcompleted_icon.png",
+              "dragon": 0,
+              "type": "3|2"
+            },
+            {
+              "id": 1710042,
+              "name": "猩红契约++",
+              "desc": "获得13金币。每有一名玩家选择此项，失去1弈士生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_bloodpactplusplus_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1710061,
+              "name": "18金币",
+              "desc": "获得18金币。你无法购买弈子，持续2回合。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_gold_stage4_eve_icon.png",
+              "dragon": 0,
+              "type": "1"
+            },
+            {
+              "id": 1710070,
+              "name": "伊芙琳的恩赐",
+              "desc": "你的队伍获得10%伤害减免。在你输掉对战回合时，额外失去1玩家生命值。",
+              "icon": "https://game.gtimg.cn/images/lol/act/jkzlk/mode17s18/godreward/tft17_benefit_evelynngodaugment_icon.png",
+              "dragon": 1,
+              "type": "2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

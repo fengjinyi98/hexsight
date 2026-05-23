@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/hexsight-core",
+    "crates/hexsight-vision",
+    "crates/hexsight-memory",
+    "crates/hexsight-engine",
+    "crates/hexsight-llm",
+    "crates/hexsight-ffi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
