@@ -1,194 +1,442 @@
+//
+//  TraitPanel.swift
+//  HexSight
+//
+//  Created by Antigravity on 2026-05-24.
+//  职责：展示羁绊图鉴，提供版本切换、分类筛选与模糊搜索，点击卡片后弹出全屏磨砂玻璃详情面板。
+//
+
 import SwiftUI
 
-/// 羁绊图鉴面板（对齐官网布局）
-/// 顶部：种族/职业 子tab
-/// 左侧：图标网格
-/// 右侧：详情面板（分级效果 + 协同英雄）
 struct TraitPanel: View {
     @StateObject private var data = GameDataService.shared
     @State private var selected: TraitModel?
-    @State private var filterType: FilterType = .race
+    @State private var searchQuery: String = ""
+    @State private var selectedType: String? = nil // nil = 全部, "race" = 种族, "job" = 职业
 
-    enum FilterType: String, CaseIterable {
-        case race = "种族"
-        case job = "职业"
-    }
-
-    /// 去重后的羁绊列表
+    /// 去重后的羁绊图鉴展示列表
     private var displayTraits: [TraitModel] {
         let grouped = Dictionary(grouping: data.traits) { $0.checkId }
+        // 按 checkId 折叠，取最小 level 的记录作为基本图鉴
         let unique = grouped.values.compactMap { $0.min { $0.level < $1.level } }
-        return unique
-            .filter { $0.traitType == filterType.ordinal }
-            .sorted { $0.name < $1.name }
-    }
-
-    private var filteredTypes: [Int] {
-        [FilterType.race.ordinal, FilterType.job.ordinal]
+        
+        return unique.filter { trait in
+            // 类别过滤 (traitType: 0 = 种族, 1 = 职业)
+            if let type = selectedType {
+                let isRace = trait.traitType == 0
+                if type == "race" && !isRace { return false }
+                if type == "job" && isRace { return false }
+            }
+            
+            // 搜索框过滤
+            if !searchQuery.isEmpty {
+                let matchesName = trait.name.localizedCaseInsensitiveContains(searchQuery)
+                let matchesDesc = trait.desc.localizedCaseInsensitiveContains(searchQuery) || trait.realDesc.localizedCaseInsensitiveContains(searchQuery)
+                if !matchesName && !matchesDesc { return false }
+            }
+            return true
+        }
+        .sorted { $0.name < $1.name }
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // 子 tab
-            HStack(spacing: 0) {
-                ForEach(FilterType.allCases, id: \.self) { ft in
-                    Button(ft.rawValue) { filterType = ft }
-                        .font(.system(size: 11, weight: filterType == ft ? .bold : .regular))
-                        .foregroundStyle(filterType == ft ? .primary : .secondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6)
-                        .background(filterType == ft ? Color.white.opacity(0.08) : Color.clear)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                }
-            }
-            .padding(.horizontal, 10).padding(.top, 8)
+        ZStack {
+            VStack(spacing: 0) {
+                // 顶部控制Header
+                topHeaderView
+                
+                Divider().background(Color.white.opacity(0.1))
 
-            Divider().background(Color.white.opacity(0.1))
-
-            HSplitView {
-                // 左侧图标网格
-                traitGrid.frame(minWidth: 220, idealWidth: 260)
-
-                // 右侧详情
-                if let trait = selected {
-                    traitDetail(trait)
-                } else {
-                    emptyHint
-                }
-            }
-        }
-    }
-
-    // MARK: - 网格
-
-    private var traitGrid: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 56), spacing: 4)], spacing: 4) {
-                ForEach(displayTraits) { trait in
-                    VStack(spacing: 3) {
-                        AsyncImage(url: URL(string: trait.picture)) { img in
-                            img.resizable().aspectRatio(contentMode: .fit)
-                        } placeholder: { Color.gray.opacity(0.15) }
-                        .frame(width: 32, height: 32)
-                        .clipShape(RoundedRectangle(cornerRadius: 5))
-                        .background(
-                            RoundedRectangle(cornerRadius: 5)
-                                .fill(selected?.checkId == trait.checkId ? Color.white.opacity(0.12) : Color.clear)
-                        )
-                        Text(trait.name)
-                            .font(.system(size: 9))
-                            .foregroundStyle(selected?.checkId == trait.checkId ? .primary : .secondary)
-                            .lineLimit(1)
+                // 宫格磁贴卡片区域
+                ZStack {
+                    if displayTraits.isEmpty {
+                        emptyView
+                    } else {
+                        ScrollView {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 108, maximum: 108), spacing: 8)],
+                                spacing: 8
+                            ) {
+                                ForEach(displayTraits) { trait in
+                                    Button {
+                                        selected = trait
+                                    } label: {
+                                        VStack(spacing: 10) {
+                                            Spacer(minLength: 0)
+                                            
+                                            // 羁绊圆形勋章底座与图标
+                                            ZStack {
+                                                AsyncImage(url: URL(string: trait.picture)) { phase in
+                                                    switch phase {
+                                                    case .success(let image):
+                                                        image.resizable()
+                                                            .aspectRatio(contentMode: .fit)
+                                                            .frame(width: 32, height: 32)
+                                                    case .failure, .empty:
+                                                        Image(systemName: "shield.fill")
+                                                            .font(.system(size: 18))
+                                                            .foregroundStyle(.white.opacity(0.3))
+                                                    @unknown default:
+                                                        Color.clear
+                                                    }
+                                                }
+                                                .frame(width: 32, height: 32)
+                                            }
+                                            .frame(width: 44, height: 44)
+                                            .background(Color.white.opacity(0.04))
+                                            .clipShape(Circle())
+                                            .overlay(Circle().stroke(Color.white.opacity(0.1), lineWidth: 1))
+                                            
+                                            // 羁绊名称
+                                            Text(trait.name)
+                                                .font(Theme.Font.caption.weight(.bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                                .multilineTextAlignment(.center)
+                                            
+                                            Spacer(minLength: 0)
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .frame(width: 108, height: 120)
+                                    .background(
+                                        selected?.checkId == trait.checkId
+                                        ? Color(red: 0.28, green: 0.18, blue: 0.52)
+                                        : Color(red: 0.18, green: 0.12, blue: 0.36)
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(selected?.checkId == trait.checkId ? Theme.Color.gold.opacity(0.8) : Color.white.opacity(0.06), lineWidth: 1)
+                                    )
+                                    .shadow(color: Color.black.opacity(0.2), radius: 3, y: 1)
+                                }
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.top, 10)
+                            .padding(.bottom, 32)
+                        }
                     }
-                    .frame(width: 56)
-                    .padding(.vertical, 4)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selected = trait }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .padding(.horizontal, 8)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+
+            // 详情浮层
+            if let trait = selected {
+                traitDetailOverlay(trait)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: selected != nil)
     }
 
-    // MARK: - 详情
+    // MARK: - 顶栏 Header
 
-    private func traitDetail(_ trait: TraitModel) -> some View {
+    private var topHeaderView: some View {
+        HStack(alignment: .center, spacing: Theme.Spacing.medium) {
+            // 左侧：游戏版本药丸按钮切换组
+            HStack(spacing: 8) {
+                ForEach(data.availableModes, id: \.id) { mode in
+                    Button {
+                        data.switchMode(mode.id)
+                        selected = nil
+                        selectedType = nil
+                    } label: {
+                        Text(mode.name)
+                            .font(Theme.Font.caption.weight(.bold))
+                            .foregroundStyle(data.selectedMode == mode.id ? .white : Theme.Color.textSecondary)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                ZStack {
+                                    if data.selectedMode == mode.id {
+                                        if mode.id == "17" {
+                                            LinearGradient(colors: [Color.gray.opacity(0.8), Color.black.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                        } else if mode.id == "4" {
+                                            LinearGradient(colors: [Color.purple.opacity(0.8), Color(red: 0.19, green: 0.12, blue: 0.37)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                        } else {
+                                            LinearGradient(colors: [Color(red: 0.2, green: 0.25, blue: 0.35), Color.black.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                        }
+                                    } else {
+                                        Color.white.opacity(0.04)
+                                    }
+                                }
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(data.selectedMode == mode.id ? (mode.id == "4" ? Color.purple : Color.white.opacity(0.4)) : Color.white.opacity(0.08), lineWidth: 1)
+                            )
+                            .shadow(color: data.selectedMode == mode.id && mode.id == "4" ? Color.purple.opacity(0.4) : Color.clear, radius: 4)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Spacer()
+
+            // 右侧：下拉筛选 + 搜索
+            HStack(spacing: 8) {
+                // 类别下拉筛选
+                Menu {
+                    Button("全部羁绊") { selectedType = nil }
+                    Button("种族") { selectedType = "race" }
+                    Button("职业") { selectedType = "job" }
+                } label: {
+                    dropdownLabel(text: selectedType == nil ? "类别" : (selectedType == "race" ? "种族" : "职业"))
+                }
+                .menuStyle(.borderlessButton)
+
+                // 搜索框
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(Theme.Color.textTertiary)
+                    
+                    TextField("搜索羁绊", text: $searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(Theme.Font.caption)
+                        .foregroundStyle(Theme.Color.textPrimary)
+                        .frame(width: 100)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color.white.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.12), lineWidth: 1))
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+    }
+
+    private func dropdownLabel(text: String) -> some View {
+        HStack(spacing: 4) {
+            Text(text)
+                .font(Theme.Font.caption)
+                .foregroundStyle(Theme.Color.textPrimary)
+            Image(systemName: "chevron.down")
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(Theme.Color.textSecondary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.12), lineWidth: 1))
+    }
+
+    // MARK: - 详情仪表盘浮层
+
+    private func traitDetailOverlay(_ trait: TraitModel) -> some View {
         let levels = data.traitLevels(for: trait.checkId)
         let isRace = trait.traitType == 0
         let heroes = data.heroesForTrait(traitId: trait.checkId, isRace: isRace)
 
-        return ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                // 图标 + 名称
-                HStack(spacing: 12) {
-                    AsyncImage(url: URL(string: trait.picture)) { img in
-                        img.resizable().aspectRatio(contentMode: .fit)
-                    } placeholder: { Color.gray.opacity(0.2) }
-                    .frame(width: 48, height: 48).clipShape(RoundedRectangle(cornerRadius: 8))
-                    .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.05)))
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(trait.name).font(.title3).foregroundStyle(.primary)
-                        Text(filterType.rawValue).font(.system(size: 11)).foregroundStyle(.tertiary)
-                    }
-                    Spacer()
-                }
-
-                // 概述（取第一级的 realDesc 作为摘要）
-                if let firstLevel = levels.first, !firstLevel.realDesc.isEmpty {
-                    Divider().background(Color.white.opacity(0.1))
-                    Text(firstLevel.realDesc)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .lineSpacing(4)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                // 分级效果
-                if !levels.isEmpty {
-                    Divider().background(Color.white.opacity(0.1))
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(levels) { lv in
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack(spacing: 6) {
-                                    Text("(\(lv.num))")
-                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                                        .foregroundStyle(.tint)
-                                    Text("级")
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.tertiary)
-                                }
-                                if !lv.realDesc.isEmpty {
-                                    Text(lv.realDesc)
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(.secondary)
-                                        .lineSpacing(3)
-                                        .fixedSize(horizontal: false, vertical: true)
+        return ZStack(alignment: .bottom) {
+            HStack(alignment: .top, spacing: 32) {
+                // 左侧栏：羁绊名、简介、人数分级表
+                VStack(alignment: .leading, spacing: 18) {
+                    // 头部基本信息
+                    HStack(spacing: 12) {
+                        ZStack {
+                            AsyncImage(url: URL(string: trait.picture)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image.resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 36, height: 36)
+                                case .failure, .empty:
+                                    Image(systemName: "shield.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(.white.opacity(0.3))
+                                @unknown default:
+                                    Color.clear
                                 }
                             }
-                            .padding(8)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white.opacity(0.03))
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .frame(width: 36, height: 36)
+                        }
+                        .frame(width: 52, height: 52)
+                        .background(Color.white.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.Color.gold.opacity(0.4), lineWidth: 1))
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(trait.name)
+                                .font(Theme.Font.title2.weight(.black))
+                                .foregroundStyle(Theme.Color.textPrimary)
+                            
+                            Text(isRace ? "种族" : "职业")
+                                .font(Theme.Font.micro.weight(.semibold))
+                                .foregroundStyle(Theme.Color.gold)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(Theme.Color.gold.opacity(0.12))
+                                .clipShape(Capsule())
+                        }
+                        Spacer()
+                    }
+                    
+                    Divider().background(Color.white.opacity(0.08))
+
+                    // 综合描述摘要
+                    if let firstLevel = levels.first, !firstLevel.realDesc.isEmpty {
+                        Text(firstLevel.realDesc)
+                            .font(Theme.Font.body)
+                            .foregroundStyle(Theme.Color.textSecondary)
+                            .lineSpacing(4)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else if !trait.desc.isEmpty {
+                        Text(trait.desc)
+                            .font(Theme.Font.body)
+                            .foregroundStyle(Theme.Color.textSecondary)
+                            .lineSpacing(4)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    // 分级人数效果表
+                    if !levels.isEmpty {
+                        ScrollView {
+                            VStack(spacing: 8) {
+                                ForEach(levels) { lv in
+                                    HStack(alignment: .top, spacing: 10) {
+                                        Text("\(lv.num) 人")
+                                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                            .foregroundStyle(Theme.Color.gold)
+                                            .frame(width: 44, alignment: .leading)
+                                            .padding(.top, 1)
+                                        
+                                        Text(lv.realDesc)
+                                            .font(Theme.Font.caption)
+                                            .foregroundStyle(Theme.Color.textSecondary)
+                                            .lineSpacing(3)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                    .padding(10)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.white.opacity(0.02))
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.04), lineWidth: 0.8))
+                                }
+                            }
                         }
                     }
                 }
+                .frame(width: 460)
+                .padding(20)
+                .background(Theme.Color.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+                .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.08), lineWidth: 1))
 
-                // 协同英雄
-                if !heroes.isEmpty {
-                    Divider().background(Color.white.opacity(0.1))
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("协同英雄 (\(heroes.count))").font(.headline).foregroundStyle(.primary)
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 56))], spacing: 4) {
-                            ForEach(heroes) { hero in
-                                VStack(spacing: 2) {
-                                    AsyncImage(url: URL(string: hero.picture)) { img in
-                                        img.resizable().aspectRatio(contentMode: .fit)
-                                    } placeholder: { Color.gray.opacity(0.2) }
-                                    .frame(width: 32, height: 32).clipShape(RoundedRectangle(cornerRadius: 4))
-                                    Text(hero.name).font(.system(size: 8)).foregroundStyle(.secondary).lineLimit(1)
-                                }.frame(width: 56)
+                // 右侧栏：协同英雄平铺一览
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("协同英雄 (\(heroes.count))")
+                        .font(Theme.Font.title3)
+                        .foregroundStyle(Theme.Color.textPrimary)
+                    
+                    Divider().background(Color.white.opacity(0.08))
+
+                    if heroes.isEmpty {
+                        VStack(spacing: 8) {
+                            Spacer()
+                            Image(systemName: "person.slash")
+                                .font(.system(size: 24))
+                                .foregroundStyle(Theme.Color.textTertiary)
+                            Text("无协同英雄数据")
+                                .font(Theme.Font.caption)
+                                .foregroundStyle(Theme.Color.textTertiary)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        ScrollView {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 68), spacing: 12)],
+                                spacing: 14
+                            ) {
+                                ForEach(heroes) { hero in
+                                    VStack(spacing: 6) {
+                                        // 费用着色描边圆形头像
+                                        AsyncImage(url: URL(string: hero.picture)) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image.resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 44, height: 44)
+                                                    .clipped()
+                                            case .failure, .empty:
+                                                Color.white.opacity(0.05)
+                                                    .overlay(Image(systemName: "person.fill").font(.system(size: 16)).foregroundStyle(.secondary))
+                                            @unknown default:
+                                                Color.clear
+                                            }
+                                        }
+                                        .frame(width: 44, height: 44)
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(costColor(for: hero.cost), lineWidth: 2))
+                                        .shadow(color: costColor(for: hero.cost).opacity(0.3), radius: 3)
+                                        
+                                        // 名字
+                                        Text(hero.name)
+                                            .font(Theme.Font.micro.weight(.medium))
+                                            .foregroundStyle(Theme.Color.textSecondary)
+                                            .lineLimit(1)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                    .frame(width: 68)
+                                }
                             }
+                            .padding(.top, 4)
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(20)
+                .background(Theme.Color.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+                .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.08), lineWidth: 1))
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 76)
+
+            // 底部 X 关闭按钮
+            Button {
+                selected = nil
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(Theme.Color.textSecondary)
+                    .frame(width: 44, height: 44)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.white.opacity(0.12), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 16)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.05, green: 0.05, blue: 0.12).opacity(0.85))
+        .background(.ultraThinMaterial)
+    }
+
+    /// 费用描边着色
+    private func costColor(for cost: Int) -> Color {
+        switch cost {
+        case 1: Color.gray
+        case 2: Color(red: 0.12, green: 0.6, blue: 0.3)
+        case 3: Color(red: 0.1, green: 0.45, blue: 0.9)
+        case 4: Color.purple
+        case 5: Color(red: 0.9, green: 0.65, blue: 0.0)
+        default: Color.white
         }
     }
 
-    private var emptyHint: some View {
-        VStack {
-            Image(systemName: "link").font(.system(size: 36)).foregroundStyle(.tertiary)
-            Text("选择羁绊查看详情").font(.system(size: 13)).foregroundStyle(.tertiary)
-        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+    private var emptyView: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "link").font(.system(size: 32)).foregroundStyle(.tertiary)
+            Text("没有找到符合条件的羁绊").font(Theme.Font.body).foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-}
-
-private extension TraitPanel.FilterType {
-    var ordinal: Int { self == .race ? 0 : 1 }
 }

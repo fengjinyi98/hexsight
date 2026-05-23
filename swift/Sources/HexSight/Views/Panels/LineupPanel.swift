@@ -14,6 +14,7 @@ struct LineupPanel: View {
     @State private var selectedCategory: String?
     @State private var detailLineup: LineupCard?
     @State private var isLoading = false
+    @State private var searchQuery: String = ""
     @State private var loadToken = 0
 
     private let categories = ["新手推荐", "高手进阶", "趣味娱乐"]
@@ -60,33 +61,101 @@ struct LineupPanel: View {
     }
 
     private var topFilters: some View {
-        VStack(spacing: 6) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    FilterPill("全部", isSelected: selectedCategory == nil) { selectedCategory = nil }
-                    ForEach(categories, id: \.self) { cat in
-                        FilterPill(cat, isSelected: selectedCategory == cat) {
-                            selectedCategory = selectedCategory == cat ? nil : cat
-                        }
+        HStack(alignment: .center, spacing: Theme.Spacing.medium) {
+            // 左侧：版本大卡片切换组 (仿官网大卡片设计)
+            HStack(spacing: 12) {
+                ForEach(data.availableModes, id: \.id) { mode in
+                    Button {
+                        data.switchMode(mode.id)
+                        selectedTrait = nil
+                        selectedCategory = nil
+                        searchQuery = ""
+                    } label: {
+                        SeasonTabCard(name: mode.name, id: mode.id, isSelected: data.selectedMode == mode.id)
                     }
+                    .buttonStyle(.plain)
+                }
+            }
+            
+            Spacer()
+            
+            // 右侧：大类过滤组 + 下拉筛选 + 搜索
+            HStack(spacing: 8) {
+                // 大类横向选项卡组
+                HStack(spacing: 6) {
+                    ForEach(["全部"] + categories, id: \.self) { cat in
+                        Button {
+                            selectedCategory = cat == "全部" ? nil : cat
+                        } label: {
+                            Text(cat)
+                                .font(.system(size: 11, weight: (selectedCategory == cat || (cat == "全部" && selectedCategory == nil)) ? .bold : .medium))
+                                .foregroundStyle((selectedCategory == cat || (cat == "全部" && selectedCategory == nil)) ? Color(red: 0.05, green: 0.05, blue: 0.1) : Theme.Color.textSecondary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    (selectedCategory == cat || (cat == "全部" && selectedCategory == nil))
+                                    ? Theme.Color.gold
+                                    : Color.white.opacity(0.04)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke((selectedCategory == cat || (cat == "全部" && selectedCategory == nil)) ? Theme.Color.gold : Color.white.opacity(0.08), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                
+                // 下拉羁绊筛选 Menu
+                Menu {
+                    Button("全部羁绊") { selectedTrait = nil }
+                    ForEach(traitFilters, id: \.self) { trait in
+                        Button(trait) { selectedTrait = trait }
+                    }
+                } label: {
+                    dropdownLabel(text: selectedTrait == nil ? "筛选" : selectedTrait!)
+                }
+                .menuStyle(.borderlessButton)
+                
+                // 模糊搜索输入框 (仿官网，搜索放大镜在右侧)
+                HStack(spacing: 6) {
+                    TextField("搜索", text: $searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.Color.textPrimary)
+                        .frame(width: 110)
+                    
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.Color.textSecondary)
                 }
                 .padding(.horizontal, 10)
-            }
-
-            if !traitFilters.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 4) {
-                        ForEach(traitFilters, id: \.self) { trait in
-                            FilterPill(trait, isSelected: selectedTrait == trait) {
-                                selectedTrait = selectedTrait == trait ? nil : trait
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 10)
-                }
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.12), lineWidth: 1))
             }
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .padding(.top, 14)
+        .padding(.bottom, 10)
+    }
+    
+    private func dropdownLabel(text: String) -> some View {
+        HStack(spacing: 6) {
+            Text(text)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(selectedTrait == nil ? Theme.Color.textSecondary : .white)
+            Image(systemName: "chevron.down")
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(Theme.Color.textSecondary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.12), lineWidth: 1))
     }
 
     private func lineupRow(_ card: LineupCard) -> some View {
@@ -186,6 +255,21 @@ struct LineupPanel: View {
         var result = lineups
         if let cat = selectedCategory { result = result.filter { $0.category == cat } }
         if let trait = selectedTrait { result = result.filter { $0.traits.contains(trait) } }
+        
+        if !searchQuery.isEmpty {
+            result = result.filter { card in
+                let nameMatch = card.name.localizedCaseInsensitiveContains(searchQuery)
+                let authorMatch = card.author.localizedCaseInsensitiveContains(searchQuery)
+                let tagMatch = card.tags.contains { $0.localizedCaseInsensitiveContains(searchQuery) }
+                let heroMatch = card.heroPreview.contains { piece in
+                    if let hero = data.heroes.first(where: { $0.id == piece.heroID }) {
+                        return hero.name.localizedCaseInsensitiveContains(searchQuery)
+                    }
+                    return false
+                }
+                return nameMatch || authorMatch || tagMatch || heroMatch
+            }
+        }
         return result
     }
 
@@ -1047,5 +1131,142 @@ private extension Text {
             .padding(.vertical, 2)
             .background(Color.white.opacity(0.06))
             .clipShape(Capsule())
+    }
+}
+
+// MARK: - 仿官网大卡片设计 SeasonTabCard
+private struct SeasonTabCard: View {
+    let name: String
+    let id: String
+    let isSelected: Bool
+    
+    private var iconName: String {
+        switch id {
+        case "17": return "sparkles"
+        case "4": return "crown.fill"
+        case "16": return "shield.fill"
+        default: return "star.fill"
+        }
+    }
+    
+    private var backgroundGradient: LinearGradient {
+        if isSelected {
+            switch id {
+            case "17": // 星神
+                return LinearGradient(
+                    colors: [Color(red: 0.2, green: 0.28, blue: 0.38), Color(red: 0.08, green: 0.1, blue: 0.15)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            case "4": // 天选福星
+                return LinearGradient(
+                    colors: [Color(red: 0.55, green: 0.12, blue: 0.12), Color(red: 0.18, green: 0.04, blue: 0.04)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            case "16": // 英雄联盟传奇
+                return LinearGradient(
+                    colors: [Color(red: 0.28, green: 0.12, blue: 0.55), Color(red: 0.08, green: 0.04, blue: 0.2)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            default:
+                return LinearGradient(
+                    colors: [Color(red: 0.2, green: 0.2, blue: 0.25), Color.black],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+        } else {
+            return LinearGradient(
+                colors: [Color.white.opacity(0.04), Color.white.opacity(0.01)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+    
+    private var borderGradient: LinearGradient {
+        if isSelected {
+            switch id {
+            case "17": // 星神 (Cyan / Silver)
+                return LinearGradient(
+                    colors: [Color(red: 0.7, green: 0.85, blue: 1.0), Color(red: 0.3, green: 0.45, blue: 0.6)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case "4": // 天选福星 (Gold / Orange)
+                return LinearGradient(
+                    colors: [Color(red: 1.0, green: 0.8, blue: 0.3), Color(red: 0.9, green: 0.2, blue: 0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case "16": // 英雄联盟传奇 (Purple / Gold)
+                return LinearGradient(
+                    colors: [Color(red: 0.85, green: 0.4, blue: 0.95), Color(red: 0.5, green: 0.1, blue: 0.7)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            default:
+                return LinearGradient(
+                    colors: [Theme.Color.gold, Color.orange],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        } else {
+            return LinearGradient(
+                colors: [Color.white.opacity(0.12), Color.white.opacity(0.06)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+    
+    private var glowColor: Color {
+        guard isSelected else { return .clear }
+        switch id {
+        case "17": return Color(red: 0.5, green: 0.7, blue: 1.0).opacity(0.3)
+        case "4": return Color(red: 1.0, green: 0.6, blue: 0.2).opacity(0.3)
+        case "16": return Color(red: 0.8, green: 0.3, blue: 1.0).opacity(0.3)
+        default: return .clear
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: iconName)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(
+                    isSelected ? 
+                    (id == "4" ? Color(red: 1.0, green: 0.8, blue: 0.3) : (id == "17" ? Color(red: 0.7, green: 0.95, blue: 1.0) : Color(red: 0.9, green: 0.6, blue: 1.0))) : 
+                    Theme.Color.textSecondary
+                )
+            
+            Text(name)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(isSelected ? .white : Theme.Color.textSecondary)
+                .tracking(1.0)
+            
+            Image(systemName: iconName)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(
+                    isSelected ? 
+                    (id == "4" ? Color(red: 1.0, green: 0.8, blue: 0.3) : (id == "17" ? Color(red: 0.7, green: 0.95, blue: 1.0) : Color(red: 0.9, green: 0.6, blue: 1.0))) : 
+                    Theme.Color.textSecondary
+                )
+        }
+        .frame(width: 140, height: 42)
+        .background(
+            ZStack {
+                backgroundGradient
+                
+                // Add texture overlay
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(borderGradient, lineWidth: isSelected ? 1.5 : 1)
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .shadow(color: glowColor, radius: 8, x: 0, y: 0)
     }
 }
