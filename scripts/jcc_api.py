@@ -42,6 +42,7 @@ CDN_GAME_DATA = "https://game.gtimg.cn/images/lol/act/jkzlk/js"
 # API 端点
 API_LINEUP_RECOMM = "https://mlol.qt.qq.com/go/jgame/get_lineup_recomm"
 API_LINEUP_DETAIL = "https://mlol.qt.qq.com/go/jgame/get_lineup_detail"
+BASIC_CONFIG_URL = "https://jcc.qq.com/data-js/basicConfig.js"
 
 # URL key → 文件名 映射
 DATA_TYPES: dict[str, str] = {
@@ -68,6 +69,7 @@ class GameDataFetcher:
     season: str = "S18"
     output_dir: str = "config/game_data"
     _fetcher: HTTPFetcher | None = field(default=None, repr=False)
+    lineup_channel: str = "11"
 
     async def __aenter__(self) -> "GameDataFetcher":
         self._fetcher = HTTPFetcher()
@@ -88,6 +90,13 @@ class GameDataFetcher:
     async def get_version_config(self) -> list[dict]:
         """获取版本配置（含所有赛季模式的 URL 映射）"""
         return await self._fetch_json(f"{CDN_GAME_DATA}/config/versiondataconfig.js")
+
+    async def get_basic_config_text(self) -> str:
+        assert self._fetcher is not None
+        r = await self._fetcher.fetch(BASIC_CONFIG_URL)
+        if r.status != 200:
+            raise RuntimeError(f"请求失败: {BASIC_CONFIG_URL}, status={r.status}")
+        return r.html
 
     async def fetch_all_gamedata(self, modes: list[str] | None = None) -> dict[str, dict]:
         """拉取指定模式的所有游戏数据"""
@@ -136,39 +145,34 @@ class GameDataFetcher:
 
         return results
 
-    async def fetch_lineups(self) -> list[dict]:
-        """拉取阵容推荐数据"""
-        async with HTTPFetcher() as f:
-            r = await f.fetch(
-                API_LINEUP_RECOMM,
-                method="POST",
-                body=json.dumps({"mode": "17", "season": self.season}).encode(),
-                headers={"Content-Type": "application/json"},
-            )
-            ids = json.loads(r.html)["data"]["client_data"]["lineid"]
-            print(f"阵容ID: {len(ids)} 个")
+    async def fetch_lineups(self, modes: list[str] | None = None) -> dict[str, dict]:
+        """拉取官网阵容总表 JSON"""
+        config_text = await self.get_basic_config_text()
+        requested_modes = modes or ["17", "16", "4"]
 
-            lineups = []
-            for lid in ids:
-                r2 = await f.fetch(
-                    API_LINEUP_DETAIL,
-                    method="POST",
-                    body=json.dumps({"lineup_id": lid}).encode(),
-                    headers={"Content-Type": "application/json"},
-                )
-                data = json.loads(r2.html)
-                if data.get("result") == 0:
-                    d = data["data"]
-                    lineups.append(d[0] if isinstance(d, list) else d)
+        id_to_url: dict[str, str] = {}
+        for mode in requested_modes:
+            key = f"{mode}_{self.season}"
+            pattern = rf"'{re.escape(key)}':`([^`]+)`"
+            match = re.search(pattern, config_text)
+            if not match:
+                print(f"未找到阵容地址: {key}")
+                continue
+            id_to_url[mode] = match.group(1).replace("${channel}", self.lineup_channel)
 
-            # 保存
-            out_dir = Path("config/lineups")
-            out_dir.mkdir(parents=True, exist_ok=True)
-            (out_dir / f"raw_{self.season}.json").write_text(
-                json.dumps(lineups, ensure_ascii=False, indent=2), encoding="utf-8")
+        results: dict[str, dict] = {}
+        out_dir = Path("config/lineups")
+        out_dir.mkdir(parents=True, exist_ok=True)
 
-            print(f"保存 {len(lineups)} 个阵容")
-            return lineups
+        for mode, url in id_to_url.items():
+            data = await self._fetch_json(url)
+            lineup_list = data.get("lineup_list", [])
+            out_path = out_dir / f"mode{mode}_{self.season}.json"
+            out_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"mode {mode}: 保存 {len(lineup_list)} 个阵容 -> {out_path.name}")
+            results[mode] = data
+
+        return results
 
 
 async def cmd_fetch_gamedata():

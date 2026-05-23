@@ -22,7 +22,23 @@ final class GameDataService: ObservableObject {
         ("4", "天选福星"),
     ]
 
+    /// 全模式英雄名 → 头像 URL 缓存
+    private var allHeroPictures: [String: String] = [:]
+    /// 全模式 hero_id → 英雄数据缓存
+    private var allHeroesByMode: [String: [String: HeroModel]] = [:]
+
     private init() {
+        // 预加载所有模式的头像缓存
+        for modeId in ["17", "16", "4"] {
+            let dir = ProjectPaths.gameDataDirectory(mode: modeId).path
+            let h: [HeroModel] = loadArray("\(dir)/chess.json", key: "data")
+            var heroMap: [String: HeroModel] = [:]
+            for hero in h where !hero.name.isEmpty && !hero.picture.isEmpty {
+                allHeroPictures[hero.name] = hero.picture
+                heroMap[hero.id] = hero
+            }
+            allHeroesByMode[modeId] = heroMap
+        }
         loadMode("17")
     }
 
@@ -35,12 +51,10 @@ final class GameDataService: ObservableObject {
     func loadMode(_ modeId: String) {
         let dir = ProjectPaths.gameDataDirectory(mode: modeId).path
 
-        // 先加载映射表
         raceNames = loadMapping("\(dir)/race.json", key: "data")
         jobNames = loadMapping("\(dir)/job.json", key: "data")
         equipNames = loadMapping("\(dir)/equip.json", key: "data")
 
-        // 再加载主数据
         heroes = loadArray("\(dir)/chess.json", key: "data")
         equipment = loadArray("\(dir)/equip.json", key: "data")
         traits = loadArray("\(dir)/trait.json", key: "data")
@@ -48,6 +62,26 @@ final class GameDataService: ObservableObject {
     }
 
     // MARK: - 查询方法
+
+    /// 按名称查找英雄头像（跨所有模式）
+    func heroPicture(named name: String) -> String {
+        allHeroPictures[name] ?? ""
+    }
+
+    /// 按 hero_id 查找当前模式英雄
+    func hero(for id: String, mode: String) -> HeroModel? {
+        allHeroesByMode[mode]?[id]
+    }
+
+    /// 按 hero_id 查找当前模式英雄名称
+    func heroName(for id: String, mode: String) -> String {
+        hero(for: id, mode: mode)?.name ?? ""
+    }
+
+    /// 按 hero_id 查找当前模式英雄头像
+    func heroPicture(for id: String, mode: String) -> String {
+        hero(for: id, mode: mode)?.picture ?? ""
+    }
 
     /// 英雄的种族名称
     func raceName(for speciesId: String) -> String {

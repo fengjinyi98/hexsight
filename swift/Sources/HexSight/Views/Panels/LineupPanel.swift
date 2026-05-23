@@ -1,24 +1,79 @@
-import Foundation
 import SwiftUI
 
-/// 阵容攻略面板（对齐官网布局）
-/// 顶部：筛选标签（羁绊分类）
-/// 内容：阵容卡片网格
+// MARK: - 阵容列表
+
+/// LineupPanel 阵容推荐面板
+/// 核心职责：
+/// - 加载并筛选官方阵容推荐数据
+/// - 按官网信息密度展示品质、符文、棋子与装备预览
+/// - 承载阵容详情页切换
 struct LineupPanel: View {
     @StateObject private var data = GameDataService.shared
     @State private var lineups: [LineupCard] = []
-    @State private var selectedTrait: String? = nil
-    @State private var expandedLineup: LineupCard?
+    @State private var selectedTrait: String?
+    @State private var selectedCategory: String?
+    @State private var detailLineup: LineupCard?
+    @State private var isLoading = false
+    @State private var loadToken = 0
+
+    private let categories = ["新手推荐", "高手进阶", "趣味娱乐"]
 
     var body: some View {
+        ZStack {
+            lineupList
+
+            if let card = detailLineup {
+                LineupDetailView(card: card) {
+                    detailLineup = nil
+                }
+                .id(card.id)
+                .transition(.move(edge: .trailing))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: detailLineup != nil)
+    }
+
+    // MARK: - 列表
+
+    private var lineupList: some View {
         VStack(spacing: 0) {
-            // 筛选标签
+            topFilters
+            Divider().background(Color.white.opacity(0.1))
+
+            if filteredLineups.isEmpty {
+                emptyView
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(filteredLineups) { card in lineupRow(card) }
+                    }
+                    .padding(10)
+                }
+            }
+        }
+        .task { await loadLineups() }
+        .onChange(of: data.selectedMode) { _, _ in
+            Task { await loadLineups() }
+        }
+    }
+
+    private var topFilters: some View {
+        VStack(spacing: 6) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    FilterPill("全部", isSelected: selectedCategory == nil) { selectedCategory = nil }
+                    ForEach(categories, id: \.self) { cat in
+                        FilterPill(cat, isSelected: selectedCategory == cat) {
+                            selectedCategory = selectedCategory == cat ? nil : cat
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
+            }
+
             if !traitFilters.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 4) {
-                        FilterPill("全部", isSelected: selectedTrait == nil) {
-                            selectedTrait = nil
-                        }
                         ForEach(traitFilters, id: \.self) { trait in
                             FilterPill(trait, isSelected: selectedTrait == trait) {
                                 selectedTrait = selectedTrait == trait ? nil : trait
@@ -27,175 +82,593 @@ struct LineupPanel: View {
                     }
                     .padding(.horizontal, 10)
                 }
-                .padding(.vertical, 8)
-                Divider().background(Color.white.opacity(0.1))
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
+    private func lineupRow(_ card: LineupCard) -> some View {
+        Button { detailLineup = card } label: {
+            HStack(spacing: 14) {
+                lineupIdentity(card)
+                    .frame(width: 210, alignment: .leading)
+
+                HStack(spacing: 10) {
+                    QualityBadge(quality: card.quality)
+                    augmentPreview(ids: card.augmentIDs)
+                }
+                .frame(width: 150, alignment: .leading)
+
+                heroPreview(card)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(LineupRowBackground())
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func lineupIdentity(_ card: LineupCard) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(card.name)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+
+            HStack(spacing: 6) {
+                RemoteIcon(url: card.authorAvatar, size: 20, cornerRadius: 10)
+                Text(card.author)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                Spacer(minLength: 0)
             }
 
-            // 卡片网格
-            if filteredLineups.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "square.grid.2x2").font(.system(size: 32)).foregroundStyle(.tertiary)
-                    Text("加载中...").font(.system(size: 12)).foregroundStyle(.tertiary)
-                    Text("运行 python3 scripts/jcc_api.py fetch-lineups")
-                        .font(.system(size: 10, design: .monospaced)).foregroundStyle(.tertiary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 8)], spacing: 8) {
-                        ForEach(filteredLineups) { card in
-                            lineupCard(card)
-                        }
-                    }
-                    .padding(10)
+            if let tag = card.tags.first {
+                Text(tag)
+                    .font(.system(size: 9))
+                    .foregroundStyle(.white.opacity(0.86))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.white.opacity(0.06))
+                    .overlay(RoundedRectangle(cornerRadius: 2).stroke(Color.white.opacity(0.12), lineWidth: 1))
+            }
+        }
+    }
+
+    private func augmentPreview(ids: [String]) -> some View {
+        HStack(spacing: 8) {
+            ForEach(ids, id: \.self) { id in
+                if let hex = data.hexes.first(where: { $0.id == id }) {
+                    RemoteIcon(url: hex.icon, size: 34, cornerRadius: 17)
+                        .overlay(Circle().stroke(Color.yellow.opacity(0.75), lineWidth: 1.4))
+                        .help(hex.name)
                 }
             }
         }
-        .onAppear { loadLineups() }
+    }
+
+    private func heroPreview(_ card: LineupCard) -> some View {
+        HStack(spacing: 8) {
+            ForEach(card.heroPreview) { piece in
+                LineupHeroChip(piece: piece, mode: data.selectedMode, compact: true)
+            }
+        }
     }
 
     // MARK: - 数据
 
     private var traitFilters: [String] {
-        let allTraits = Set(lineups.flatMap { $0.traits })
-        return allTraits.sorted()
+        Array(Set(lineups.flatMap(\.traits))).sorted()
     }
 
     private var filteredLineups: [LineupCard] {
-        guard let trait = selectedTrait else { return lineups }
-        return lineups.filter { $0.traits.contains(trait) }
+        var result = lineups
+        if let cat = selectedCategory { result = result.filter { $0.category == cat } }
+        if let trait = selectedTrait { result = result.filter { $0.traits.contains(trait) } }
+        return result
     }
 
-    private func loadLineups() {
-        let path = ProjectPaths.lineupDirectory().appendingPathComponent("raw_S18.json").path
+    private func loadLineups() async {
+        let mode = data.selectedMode
+        loadToken += 1
+        let token = loadToken
+
+        isLoading = true
+        detailLineup = nil
+        selectedTrait = nil
+        selectedCategory = nil
+        lineups = []
+
+        if let cached = loadLocalCache(mode: mode), shouldApply(mode: mode, token: token) {
+            lineups = cached
+        }
+
+        guard LineupCatalog.supportsRemoteFetch(for: mode) else {
+            if shouldApply(mode: mode, token: token) {
+                isLoading = false
+            }
+            return
+        }
+
+        let fetched = await fetchFromAPI(mode: mode)
+        if shouldApply(mode: mode, token: token) {
+            if !fetched.isEmpty {
+                lineups = fetched
+            }
+            isLoading = false
+        }
+    }
+
+    private func loadLocalCache(mode: String) -> [LineupCard]? {
+        guard let fileName = LineupCatalog.cacheFileName(for: mode) else { return nil }
+        let path = ProjectPaths.lineupDirectory().appendingPathComponent(fileName).path
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]
-        else { return }
-
-        lineups = json.compactMap { LineupCard(dict: $0) }
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let json = payload["lineup_list"] as? [[String: Any]]
+        else { return nil }
+        return json.compactMap { LineupCard(dict: $0, rawData: $0) }
     }
 
-    // MARK: - 卡片
+    private func fetchFromAPI(mode: String) async -> [LineupCard] {
+        guard let url = LineupCatalog.remoteURL(for: mode),
+              let (data, _) = try? await URLSession.shared.data(from: url),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let details = payload["lineup_list"] as? [[String: Any]]
+        else { return [] }
 
-    private func lineupCard(_ card: LineupCard) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // 阵容名
-            Text(card.name)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(2)
+        let fetched = details.compactMap { LineupCard(dict: $0, rawData: $0) }
+        persistRemoteCache(data: data, mode: mode)
+        return fetched.sorted { lhs, rhs in
+            if lhs.category == rhs.category { return lhs.name < rhs.name }
+            return (lhs.category ?? "") < (rhs.category ?? "")
+        }
+    }
 
-            // 羁绊标签
-            if !card.traits.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 3) {
-                        ForEach(card.traits.prefix(4), id: \.self) { t in
-                            Text(t)
-                                .font(.system(size: 8))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 4).padding(.vertical, 1)
-                                .background(Color.white.opacity(0.06))
-                                .clipShape(Capsule())
+    private func shouldApply(mode: String, token: Int) -> Bool {
+        data.selectedMode == mode && loadToken == token
+    }
+
+    private func persistRemoteCache(data: Data, mode: String) {
+        guard let fileName = LineupCatalog.cacheFileName(for: mode) else { return }
+        let url = ProjectPaths.lineupDirectory().appendingPathComponent(fileName)
+        try? FileManager.default.createDirectory(
+            at: ProjectPaths.lineupDirectory(),
+            withIntermediateDirectories: true
+        )
+        try? data.write(to: url, options: .atomic)
+    }
+
+    private var emptyView: some View {
+        let state = LineupCatalog.emptyState(for: data.selectedMode)
+        return VStack(spacing: 8) {
+            if isLoading {
+                ProgressView()
+                Text("正在加载阵容数据...").font(.system(size: 12)).foregroundStyle(.tertiary)
+            } else {
+                Image(systemName: "square.grid.2x2").font(.system(size: 32)).foregroundStyle(.tertiary)
+                Text(state.title).font(.system(size: 12)).foregroundStyle(.tertiary)
+                Text(state.hint).font(.system(size: 10, design: .monospaced)).foregroundStyle(.tertiary)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - 阵容详情
+
+/// LineupDetailView 阵容详情页
+/// 核心职责：
+/// - 展示最终站位、过渡阵容、推荐符文与装备顺序
+/// - 展示官方运营、站位、对位和装备说明
+/// - 提供与列表一致的棋子头像和装备图标
+private struct LineupDetailView: View {
+    let card: LineupCard
+    let onClose: () -> Void
+    @StateObject private var data = GameDataService.shared
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                header
+                Divider().background(Color.white.opacity(0.1))
+
+                sectionTitle("最终阵容")
+                ChessboardView(pieces: card.detail.finalHeroes, mode: data.selectedMode)
+
+                if !card.traits.isEmpty {
+                    traitSection
+                }
+
+                detailIconSection(title: "推荐强化", ids: card.detail.recommendedHexIDs) { id in
+                    if let hex = data.hexes.first(where: { $0.id == id }) {
+                        IconTextItem(icon: hex.icon, title: hex.name, subtitle: "\(hex.level)级")
+                    }
+                }
+
+                detailIconSection(title: "可替换强化", ids: card.detail.replacementHexIDs) { id in
+                    if let hex = data.hexes.first(where: { $0.id == id }) {
+                        IconTextItem(icon: hex.icon, title: hex.name, subtitle: "\(hex.level)级")
+                    }
+                }
+
+                detailIconSection(title: "装备优先级", ids: card.detail.equipmentOrderIDs) { id in
+                    if let equip = data.getEquip(id) {
+                        IconTextItem(icon: equip.picture, title: equip.name, subtitle: equip.type)
+                    }
+                }
+
+                if !card.detail.earlyHeroes.isEmpty || !card.detail.midHeroes.isEmpty {
+                    transitionSection
+                }
+
+                textSection("站位说明", card.detail.locationInfo)
+                textSection("装备分析", card.detail.equipmentInfo)
+                textSection("强化思路", card.detail.hexInfo)
+                textSection("前期过渡", card.detail.earlyInfo)
+                textSection("搜牌节奏", card.detail.dTime)
+                textSection("克制与变阵", card.detail.enemyInfo)
+            }
+            .padding(16)
+        }
+        .background(.ultraThinMaterial)
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Button { onClose() } label: {
+                    HStack(spacing: 4) { Image(systemName: "chevron.left"); Text("返回") }
+                }
+                .buttonStyle(.glass)
+                .font(.system(size: 11))
+                Spacer()
+                QualityBadge(quality: card.quality)
+            }
+
+            HStack(spacing: 10) {
+                RemoteIcon(url: card.authorAvatar, size: 34, cornerRadius: 17)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(card.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 8) {
+                        if let tag = card.tags.first { Text(tag).badgeStyle() }
+                        Text(card.author).font(.system(size: 11)).foregroundStyle(.secondary)
+                    }
+                }
+                Spacer()
+            }
+        }
+    }
+
+    private var traitSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("羁绊组成")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 6)], spacing: 6) {
+                ForEach(card.traits, id: \.self) { trait in
+                    Text(trait)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.white.opacity(0.05))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
+    private var transitionSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("过渡阵容")
+            if !card.detail.earlyHeroes.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("前期").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
+                    ChessboardView(pieces: card.detail.earlyHeroes, mode: data.selectedMode, compact: true)
+                }
+            }
+            if !card.detail.midHeroes.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("中期").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
+                    ChessboardView(pieces: card.detail.midHeroes, mode: data.selectedMode, compact: true)
+                }
+            }
+        }
+    }
+
+    private func detailIconSection<Content: View>(
+        title: String,
+        ids: [String],
+        @ViewBuilder item: @escaping (String) -> Content?
+    ) -> some View {
+        Group {
+            if !ids.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    sectionTitle(title)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 116), spacing: 8)], spacing: 8) {
+                        ForEach(ids, id: \.self) { id in
+                            item(id)
                         }
                     }
                 }
             }
+        }
+    }
 
-            Spacer(minLength: 4)
-
-            // 作者 + 标签
-            HStack {
-                Text(card.author)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-                Spacer()
-                if !card.tags.isEmpty {
-                    Text(card.tags.first ?? "")
-                        .font(.system(size: 8))
-                        .foregroundStyle(.tint)
-                        .padding(.horizontal, 4).padding(.vertical, 1)
-                        .background(Color.accentColor.opacity(0.1))
-                        .clipShape(Capsule())
+    private func textSection(_ title: String, _ text: String) -> some View {
+        Group {
+            if !text.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    sectionTitle(title)
+                    Text(text)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.white.opacity(0.035))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
+        }
+    }
 
-            // 胜率 + 详情按钮
-            HStack {
-                if card.top4Rate > 0 {
-                    HStack(spacing: 4) {
-                        Text("前四率")
-                            .font(.system(size: 8)).foregroundStyle(.tertiary)
-                        Text(String(format: "%.1f%%", card.top4Rate))
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.green)
+    private func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 13, weight: .bold))
+            .foregroundStyle(.primary)
+    }
+}
+
+// MARK: - 棋盘
+
+/// ChessboardView 阵容棋盘视图
+/// 核心职责：
+/// - 按金铲铲 4×7 错列棋盘展示站位
+/// - 按 hero_id 回查棋子头像与名称
+/// - 在棋子下方展示携带装备图标
+private struct ChessboardView: View {
+    let pieces: [LineupPiece]
+    let mode: String
+    var compact = false
+
+    private let rows = [4, 3, 2, 1]
+    private let cols = Array(1...7)
+
+    private var cellWidth: CGFloat { compact ? 40 : 50 }
+    private var cellHeight: CGFloat { compact ? 46 : 58 }
+    private var avatarSize: CGFloat { compact ? 26 : 34 }
+
+    private var board: [String: LineupPiece] {
+        Dictionary(uniqueKeysWithValues: pieces.map { ($0.locationKey, $0) })
+    }
+
+    var body: some View {
+        VStack(spacing: compact ? -2 : -1) {
+            ForEach(rows, id: \.self) { row in
+                HStack(spacing: compact ? 1 : 2) {
+                    ForEach(cols, id: \.self) { col in
+                        let key = "\(row),\(col)"
+                        if let piece = board[key] {
+                            LineupHeroChip(piece: piece, mode: mode, compact: compact)
+                                .frame(width: cellWidth, height: cellHeight)
+                                .background(HexTile(fill: piece.isCarryHero ? Color.yellow.opacity(0.14) : Color.white.opacity(0.035)))
+                                .overlay(HexTile(stroke: piece.isCarryHero ? Color.yellow.opacity(0.9) : Color.white.opacity(0.08), lineWidth: piece.isCarryHero ? 1.5 : 1))
+                        } else {
+                            HexTile(fill: Color.white.opacity(0.014))
+                                .frame(width: cellWidth, height: cellHeight)
+                                .overlay(HexTile(stroke: Color.white.opacity(0.04), lineWidth: 1))
+                        }
                     }
                 }
-                Spacer()
-                Button("查看详情") {
-                    expandedLineup = expandedLineup?.id == card.id ? nil : card
-                }
-                .buttonStyle(.glass)
-                .font(.system(size: 9))
+                .padding(.leading, rowOffset(for: row))
             }
         }
-        .padding(10)
-        .background(Color.white.opacity(0.04))
+        .padding(compact ? 8 : 12)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .background(
+            LinearGradient(
+                colors: [Color.black.opacity(0.18), Color.purple.opacity(0.12)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.06), lineWidth: 1))
+    }
+
+    private func rowOffset(for row: Int) -> CGFloat {
+        row.isMultiple(of: 2) ? cellWidth * 0.5 : 0
     }
 }
 
-// MARK: - 阵容卡片模型
+/// LineupHeroChip 阵容棋子头像组件
+/// 核心职责：
+/// - 展示棋子头像、名称与装备
+/// - 标记主 C 与召唤物
+/// - 复用在列表预览和详情棋盘
+private struct LineupHeroChip: View {
+    let piece: LineupPiece
+    let mode: String
+    var compact = false
+    @StateObject private var data = GameDataService.shared
 
-private struct LineupCard: Identifiable {
-    let id: String
-    let name: String
-    let author: String
-    let traits: [String]
-    let tags: [String]
-    let top4Rate: Double
-    let rank: Double
+    private var hero: HeroModel? { data.hero(for: piece.heroID, mode: mode) }
+    private var avatarSize: CGFloat { compact ? 30 : 34 }
+    private var equipSize: CGFloat { compact ? 10 : 12 }
 
-    init?(dict: [String: Any]) {
-        let rawId = lineupStringValue(dict["id"]).trimmingCharacters(in: .whitespacesAndNewlines)
-        let queueId = lineupStringValue(dict["queue_id"]).trimmingCharacters(in: .whitespacesAndNewlines)
-        self.name = dict["name"] as? String ?? "未知阵容"
-        self.id = [rawId, queueId, self.name].first(where: { !$0.isEmpty }) ?? UUID().uuidString
+    var body: some View {
+        VStack(spacing: compact ? 1 : 2) {
+            ZStack(alignment: .topTrailing) {
+                RemoteIcon(url: hero?.picture ?? "", size: avatarSize, cornerRadius: compact ? 15 : 5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: compact ? 15 : 5)
+                            .stroke(piece.isCarryHero ? Color.yellow.opacity(0.95) : Color.white.opacity(0.14), lineWidth: piece.isCarryHero ? 1.6 : 1)
+                    )
+                if piece.chessType == "pet" {
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 7))
+                        .foregroundStyle(.white)
+                        .padding(2)
+                        .background(Color.black.opacity(0.55))
+                        .clipShape(Circle())
+                        .offset(x: 3, y: -3)
+                }
+            }
 
-        let authorData = dict["lineupauthor_data"] as? [String: Any]
-        self.author = (dict["author"] as? String).flatMap { $0.isEmpty ? nil : $0 }
-            ?? authorData?["name"] as? String
-            ?? "未知作者"
+            if !compact {
+                Text(hero?.name ?? "?")
+                    .font(.system(size: 7))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
 
-        let detailRaw = dict["detail"] as? String ?? "{}"
-        let detail = (try? JSONSerialization.jsonObject(with: Data(detailRaw.utf8))) as? [String: Any]
-        let contacts = detail?["contact"] as? [[String: Any]] ?? []
-        self.traits = contacts.compactMap { $0["name"] as? String }
-
-        let smarTag = detail?["smar_lineup_tag"] as? [String: Any]
-        let allTag = smarTag?["all"] as? [String: Any]
-        if let tags = allTag?["tag"] as? [String] {
-            self.tags = tags
-        } else if let tag = allTag?["tag"] as? String, !tag.isEmpty {
-            self.tags = [tag]
-        } else {
-            self.tags = []
+            HStack(spacing: 1) {
+                ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
+                    if let equip = data.getEquip(id) {
+                        RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 2)
+                    }
+                }
+            }
+            .frame(height: equipSize)
         }
-
-        let rate = allTag?["rate"] as? [String: Any]
-        self.top4Rate = (rate?["top4_rate"] as? Double ?? 0) * 100
-        self.rank = rate?["rank"] as? Double ?? 0
+        .help(hero?.name ?? piece.heroID)
     }
 }
 
-private func lineupStringValue(_ val: Any?) -> String {
-    if let s = val as? String { return s }
-    if let i = val as? Int { return String(i) }
-    if let d = val as? Double { return String(d) }
-    return ""
+private struct HexTile: View {
+    var fill: Color? = nil
+    var stroke: Color? = nil
+    var lineWidth: CGFloat = 0
+
+    var body: some View {
+        HexagonShape()
+            .fill(fill ?? .clear)
+            .overlay(
+                HexagonShape()
+                    .stroke(stroke ?? .clear, lineWidth: lineWidth)
+            )
+    }
 }
 
-// MARK: - 筛选标签
+private struct HexagonShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let insetX = rect.width * 0.18
+        let midY = rect.midY
+        var path = Path()
+        path.move(to: CGPoint(x: insetX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX - insetX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: midY))
+        path.addLine(to: CGPoint(x: rect.maxX - insetX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: insetX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: midY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+// MARK: - 通用组件
+
+private struct LineupRowBackground: View {
+    var body: some View {
+        LinearGradient(
+            colors: [
+                Color(red: 0.19, green: 0.12, blue: 0.37).opacity(0.86),
+                Color(red: 0.12, green: 0.10, blue: 0.22).opacity(0.72),
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+}
+
+private struct QualityBadge: View {
+    let quality: String
+
+    var body: some View {
+        Text(quality)
+            .font(.system(size: 16, weight: .black, design: .rounded))
+            .foregroundStyle(textColor)
+            .frame(width: 38, height: 42)
+            .background(HexTile(fill: fillColor.opacity(0.92)))
+            .overlay(HexTile(stroke: Color.white.opacity(0.22), lineWidth: 1))
+    }
+
+    private var fillColor: Color {
+        switch quality.uppercased() {
+        case "S": return .yellow
+        case "A": return Color(red: 0.62, green: 0.78, blue: 1.0)
+        default: return .gray
+        }
+    }
+
+    private var textColor: Color {
+        quality.uppercased() == "S" ? .black.opacity(0.72) : .white.opacity(0.92)
+    }
+}
+
+private struct RemoteIcon: View {
+    let url: String
+    let size: CGFloat
+    let cornerRadius: CGFloat
+
+    var body: some View {
+        AsyncImage(url: URL(string: url)) { phase in
+            switch phase {
+            case .success(let image):
+                image.resizable().aspectRatio(contentMode: .fill)
+            case .failure:
+                Image(systemName: "photo")
+                    .font(.system(size: size * 0.38))
+                    .foregroundStyle(.secondary)
+                    .frame(width: size, height: size)
+                    .background(Color.white.opacity(0.05))
+            case .empty:
+                Color.white.opacity(0.05)
+            @unknown default:
+                Color.white.opacity(0.05)
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+}
+
+private struct IconTextItem: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            RemoteIcon(url: icon, size: 28, cornerRadius: 5)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.system(size: 10, weight: .semibold)).foregroundStyle(.primary).lineLimit(1)
+                Text(subtitle).font(.system(size: 8)).foregroundStyle(.tertiary).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(8)
+        .background(Color.white.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+    }
+}
 
 private struct FilterPill: View {
     let text: String
@@ -212,11 +685,23 @@ private struct FilterPill: View {
         Button(action: action) {
             Text(text)
                 .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                .foregroundStyle(isSelected ? .white : .secondary)
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(isSelected ? Color.accentColor : Color.white.opacity(0.06))
+                .foregroundStyle(isSelected ? .black : .secondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(isSelected ? Color.yellow.opacity(0.9) : Color.white.opacity(0.06))
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+    }
+}
+
+private extension Text {
+    func badgeStyle() -> some View {
+        self.font(.system(size: 10))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color.white.opacity(0.06))
+            .clipShape(Capsule())
     }
 }
