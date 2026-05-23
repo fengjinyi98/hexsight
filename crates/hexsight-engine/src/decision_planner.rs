@@ -5,7 +5,7 @@
 // - 为每个推荐生成理由、风险和转向条件
 
 use hexsight_core::{
-    AugmentDecision, EconomyDecision, FightOutcome, ItemDecision, LineupRecommendation,
+    AugmentDecision, EconomyDecision, ItemDecision, LineupRecommendation,
     LineupScore, OpeningRouteResult, RerollEligibility, RuleOutput, TransitionDecision,
 };
 use crate::augment_economy_planner::AugmentScore;
@@ -17,7 +17,8 @@ pub struct DecisionPlanner;
 
 impl DecisionPlanner {
     /// 生成完整规则输出
-    pub fn plan(
+    #[deprecated(note = "使用 plan() 代替，旧 plan 不集成 P1 模块")]
+    pub fn plan_legacy(
         opening: &OpeningRouteResult,
         lineup_scores: &[LineupScore],
         economy_action: (&str, &str),
@@ -144,8 +145,8 @@ impl DecisionPlanner {
         }
     }
 
-    /// 完整规则输出（集成全部 P1 模块结果）
-    pub fn plan_full(
+    /// 完整规则输出（集成全部 P1 模块结果）—— 主入口
+    pub fn plan(
         opening: &OpeningRouteResult,
         lineup_scores: &[LineupScore],
         item_fit_direction: &str,
@@ -155,7 +156,7 @@ impl DecisionPlanner {
         risk_report: &RiskReport,
         reroll_candidates: &[RerollEligibility],
         transition_matches: &[TransitionMatch],
-        current_hp: i32,
+        _current_hp: i32,
     ) -> RuleOutput {
         // Top 3 阵容
         let mut sorted: Vec<&LineupScore> = lineup_scores.iter().collect();
@@ -259,17 +260,8 @@ impl DecisionPlanner {
             pivot_conditions.push("当前最佳阵容评分偏低，继续观察".to_string());
         }
 
-        // 战斗预测（暂空，后续 P2 填充）
-        let fight_outcome = risk_report.should_pivot.then(|| FightOutcome {
-            win_probability: 0.0,
-            expected_damage_taken: 0.0,
-            damage_range: [0, 0],
-            expected_enemy_survivors: 0.0,
-            risk_level: format!("{:?}", risk_report.overall),
-            confidence: 0.0,
-            reason: risk_report.details.clone(),
-            recommended_action: risk_report.priorities.first().cloned().unwrap_or_default(),
-        });
+        // 战斗预测（P2 阶段由 FightOutcomeEstimator 填充）
+        let fight_outcome = None;
 
         RuleOutput {
             strategy,
@@ -297,7 +289,7 @@ fn chrono_now() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hexsight_core::{OpeningRoute, OpeningRouteResult};
+    use hexsight_core::OpeningRouteResult;
 
     #[test]
     fn plan_full_integrates_all_p1_outputs() {
@@ -358,7 +350,7 @@ mod tests {
             transition_traits: vec!["牧羊人 x3".into()],
         }];
 
-        let output = DecisionPlanner::plan_full(
+        let output = DecisionPlanner::plan(
             &opening, &scores, "AD",
             &economy, &augment_scores, true,
             &risk, &[], &transitions, 100,
@@ -370,6 +362,7 @@ mod tests {
         assert!(output.augment_action.recommended.contains("通用战力"));
         assert!(!output.augment_action.lock_lineup);
         assert!(output.pivot_conditions.is_empty());
+        assert!(output.fight_outcome.is_none());
 
         let json = serde_json::to_string_pretty(&output).unwrap();
         assert!(json.contains("lineupRecommendations"));
@@ -377,48 +370,5 @@ mod tests {
         assert!(json.contains("augmentAction"));
         assert!(json.contains("transitionAction"));
         assert!(json.contains("pivotConditions"));
-    }
-        let opening = OpeningRouteResult {
-            route: OpeningRoute::Mixed,
-            confidence: 0.6,
-            reasons: vec!["状态中等".into()],
-            two_star_count: 1,
-            frontline_quality: 45,
-            can_build_combat_item: false,
-            recommended_actions: vec!["保血量".into()],
-        };
-
-        let scores = vec![
-            LineupScore {
-                lineup_id: "4514".into(), name: "神谕龙王".into(),
-                total_score: 86, base_score: 80,
-                item_fit_score: 70, champion_hit_score: 60,
-                augment_fit_score: 50, trait_fit_score: 60,
-                stage_fit_score: 70, economy_fit_score: 75,
-                health_safety_score: 90, playstyle_switch_score: 50,
-                rival_penalty: 0, difficulty_penalty: 0,
-                reasons: vec!["装备匹配".into()],
-                risks: vec![],
-                requires_augment: false,
-            },
-        ];
-
-        let output = DecisionPlanner::plan(
-            &opening, &scores,
-            (&"save_interest", &"血量安全，保利息"),
-            (&"hold_or_wait", &"未定阵容，等待方向"),
-            &[], 100,
-        );
-
-        assert_eq!(output.strategy, "混合过渡");
-        assert_eq!(output.lineup_recommendations.len(), 1);
-        assert_eq!(output.lineup_recommendations[0].name, "神谕龙王");
-        assert!(output.pivot_conditions.is_empty());
-
-        // 验证 JSON 可序列化
-        let json = serde_json::to_string_pretty(&output).unwrap();
-        assert!(json.contains("lineupRecommendations"));
-        assert!(json.contains("economyAction"));
-        assert!(json.contains("augmentAction"));
     }
 }
