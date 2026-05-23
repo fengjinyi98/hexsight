@@ -16,11 +16,7 @@ final class GameDataService: ObservableObject {
     private(set) var jobNames: [String: String] = [:]
     private(set) var equipNames: [String: String] = [:]
 
-    let availableModes: [(id: String, name: String)] = [
-        ("17", "星神"),
-        ("16", "英雄联盟传奇"),
-        ("4", "天选福星"),
-    ]
+    let availableModes: [(id: String, name: String)] = ModeProfile.supported.map { ($0.id, $0.name) }
 
     /// 全模式英雄名 → 头像 URL 缓存
     private var allHeroPictures: [String: String] = [:]
@@ -35,7 +31,7 @@ final class GameDataService: ObservableObject {
 
     private init() {
         // 预加载所有模式的头像缓存
-        for modeId in ["17", "16", "4"] {
+        for modeId in ModeProfile.supported.map(\.id) {
             let dir = ProjectPaths.gameDataDirectory(mode: modeId).path
             let h: [HeroModel] = loadArray("\(dir)/chess.json", key: "data")
             var heroMap: [String: HeroModel] = [:]

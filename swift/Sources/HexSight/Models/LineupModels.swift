@@ -21,51 +21,35 @@ struct LineupCard: Identifiable {
     var heroPreview: [LineupPiece] { Array(detail.finalHeroes.prefix(8)) }
     var augmentIDs: [String] { Array(detail.recommendedHexIDs.prefix(3)) }
 
-    init?(dict: [String: Any], rawData: [String: Any]? = nil) {
-        let rid = lineupString(dict["id"])
-        let qid = lineupString(dict["queue_id"])
-        let detailRaw = dict["detail"] as? String ?? "{}"
-        let detailPayload = (try? JSONSerialization.jsonObject(with: Data(detailRaw.utf8))) as? [String: Any] ?? [:]
-        let parsedDetail = LineupDetailData(payload: detailPayload)
-        let resolvedName = nonEmptyString(detailPayload["line_name"])
-            ?? nonEmptyString(dict["name"])
-            ?? "未知阵容"
-
-        self.name = resolvedName
-        self.id = [rid, qid, resolvedName].first(where: { !$0.isEmpty }) ?? UUID().uuidString
+    init(
+        id: String,
+        name: String,
+        author: String,
+        authorAvatar: String,
+        quality: String,
+        traits: [String],
+        category: String?,
+        tags: [String],
+        top4Rate: Double,
+        rawData: [String: Any]?,
+        detail: LineupDetailData
+    ) {
+        self.id = id
+        self.name = name
+        self.author = author
+        self.authorAvatar = authorAvatar
+        self.quality = quality
+        self.traits = traits
+        self.category = category
+        self.tags = tags
+        self.top4Rate = top4Rate
         self.rawData = rawData
-        self.detail = parsedDetail
+        self.detail = detail
+    }
 
-        let authorData = dict["lineupauthor_data"] as? [String: Any]
-        let littleLegend = detailPayload["author_littlelegend"] as? [String: Any]
-        self.author = nonEmptyString(authorData?["name"])
-            ?? nonEmptyString(littleLegend?["desc"])
-            ?? nonEmptyString(littleLegend?["item_name"])
-            ?? nonEmptyString(dict["author"])
-            ?? "未知作者"
-        self.authorAvatar = nonEmptyString(authorData?["imgUrl"])
-            ?? nonEmptyString(littleLegend?["imagePath"])
-            ?? nonEmptyString(littleLegend?["icon"])
-            ?? ""
-
-        self.quality = nonEmptyString(dict["quality"]) ?? "A"
-
-        let contacts = detailPayload["contact"] as? [[String: Any]] ?? []
-        let contactTraits = contacts.compactMap { nonEmptyString($0["name"]) }
-        self.traits = contactTraits.isEmpty ? LineupCard.extractBracketTraits(from: resolvedName) : contactTraits
-
-        let lineTag = nonEmptyString(detailPayload["line_tag"]) ?? lineupString(detailPayload["line_tag"])
-        self.category = LineupCatalog.categoryName(for: lineTag)
-
-        let smarTag = detailPayload["smar_lineup_tag"] as? [String: Any]
-        let allTag = smarTag?["all"] as? [String: Any]
-        if let t = allTag?["tag"] as? [String] { self.tags = t }
-        else if let t = nonEmptyString(allTag?["tag"]) { self.tags = [t] }
-        else if let category { self.tags = [category] }
-        else { self.tags = [] }
-
-        let rate = allTag?["rate"] as? [String: Any]
-        self.top4Rate = (rate?["top4_rate"] as? Double ?? 0) * 100
+    init?(dict: [String: Any], rawData: [String: Any]? = nil) {
+        guard let card = LineupSourceAdapter.card(from: rawData ?? dict) else { return nil }
+        self = card
     }
 
     static func extractBracketTraits(from name: String) -> [String] {
@@ -116,56 +100,80 @@ struct LineupDetailData {
     let traitPartyInfo: String
     let legendGalaxyInfo: String
 
+    init(
+        raw: [String: Any],
+        finalHeroes: [LineupPiece],
+        earlyHeroes: [LineupPiece],
+        midHeroes: [LineupPiece],
+        recommendedHexIDs: [String],
+        replacementHexIDs: [String],
+        equipmentOrderIDs: [String],
+        level3HeroIDs: [String],
+        heroReplacements: [LineupHeroReplacement],
+        unlockTasks: [LineupUnlockTask],
+        godRewards: [LineupGodReward],
+        officialTraits: [LineupTraitContact],
+        earlyTraits: [LineupTraitContact],
+        midTraits: [LineupTraitContact],
+        chosenContact: LineupTraitContact?,
+        messengerContact: LineupTraitContact?,
+        chosenBackups: [LineupChosenBackup],
+        lineFeature: String,
+        earlyInfo: String,
+        dTime: String,
+        locationInfo: String,
+        enemyInfo: String,
+        hexInfo: String,
+        equipmentInfo: String,
+        godRewardInfo: String,
+        taskInfo: String,
+        chosenInfo: String,
+        locationInfo2: String,
+        earlyRound: String,
+        midRound: String,
+        staffInfo: String,
+        goopInfo: String,
+        traitPartyInfo: String,
+        legendGalaxyInfo: String
+    ) {
+        self.raw = raw
+        self.finalHeroes = finalHeroes
+        self.earlyHeroes = earlyHeroes
+        self.midHeroes = midHeroes
+        self.recommendedHexIDs = recommendedHexIDs
+        self.replacementHexIDs = replacementHexIDs
+        self.equipmentOrderIDs = equipmentOrderIDs
+        self.level3HeroIDs = level3HeroIDs
+        self.heroReplacements = heroReplacements
+        self.unlockTasks = unlockTasks
+        self.godRewards = godRewards
+        self.officialTraits = officialTraits
+        self.earlyTraits = earlyTraits
+        self.midTraits = midTraits
+        self.chosenContact = chosenContact
+        self.messengerContact = messengerContact
+        self.chosenBackups = chosenBackups
+        self.lineFeature = lineFeature
+        self.earlyInfo = earlyInfo
+        self.dTime = dTime
+        self.locationInfo = locationInfo
+        self.enemyInfo = enemyInfo
+        self.hexInfo = hexInfo
+        self.equipmentInfo = equipmentInfo
+        self.godRewardInfo = godRewardInfo
+        self.taskInfo = taskInfo
+        self.chosenInfo = chosenInfo
+        self.locationInfo2 = locationInfo2
+        self.earlyRound = earlyRound
+        self.midRound = midRound
+        self.staffInfo = staffInfo
+        self.goopInfo = goopInfo
+        self.traitPartyInfo = traitPartyInfo
+        self.legendGalaxyInfo = legendGalaxyInfo
+    }
+
     init(payload: [String: Any]) {
-        self.raw = payload
-        self.finalHeroes = LineupDetailData.parsePieces(payload["hero_location"])
-        self.earlyHeroes = LineupDetailData.parsePieces(payload["y21_early_heros"])
-        self.midHeroes = LineupDetailData.parsePieces(payload["y21_metaphase_heros"])
-        let hexBuff = payload["hexbuff"] as? [String: Any] ?? [:]
-        self.recommendedHexIDs = splitIDs(hexBuff["recomm"])
-        self.replacementHexIDs = splitIDs(hexBuff["replace"])
-        self.equipmentOrderIDs = splitIDs(payload["equipment_order"])
-        self.level3HeroIDs = splitIDs(payload["level_3_heros"])
-        let replacements = payload["hero_replace"] as? [[String: Any]] ?? []
-        self.heroReplacements = replacements.compactMap(LineupHeroReplacement.init(dict:))
-        let tasks = payload["task_list"] as? [[String: Any]] ?? []
-        self.unlockTasks = tasks.compactMap(LineupUnlockTask.init(dict:))
-        let gods = payload["god_list"] as? [[String: Any]] ?? []
-        self.godRewards = gods.compactMap(LineupGodReward.init(dict:))
-        self.officialTraits = LineupDetailData.parseTraitContacts(payload["contact"])
-        self.earlyTraits = LineupDetailData.parseTraitContacts(payload["y21_early_heros_contact"])
-        self.midTraits = LineupDetailData.parseTraitContacts(payload["y21_metaphase_heros_contact"])
-        self.chosenContact = LineupTraitContact(dict: payload["chosen_contact"] as? [String: Any] ?? [:])
-        self.messengerContact = LineupTraitContact(dict: payload["messengerContact"] as? [String: Any] ?? [:])
-        let chosenBackups = payload["chosen_backup"] as? [[String: Any]] ?? []
-        self.chosenBackups = chosenBackups.compactMap(LineupChosenBackup.init(dict:))
-        self.lineFeature = nonEmptyString(payload["line_feature"]) ?? ""
-        self.earlyInfo = nonEmptyString(payload["early_info"]) ?? ""
-        self.dTime = nonEmptyString(payload["d_time"]) ?? ""
-        self.locationInfo = nonEmptyString(payload["location_info"]) ?? ""
-        self.enemyInfo = nonEmptyString(payload["enemy_info"]) ?? ""
-        self.hexInfo = nonEmptyString(payload["hex_info"]) ?? ""
-        self.equipmentInfo = nonEmptyString(payload["equipment_info"]) ?? ""
-        self.godRewardInfo = nonEmptyString(payload["godreward_info"]) ?? ""
-        self.taskInfo = nonEmptyString(payload["task_info"]) ?? ""
-        self.chosenInfo = nonEmptyString(payload["chosen_info"]) ?? ""
-        self.locationInfo2 = nonEmptyString(payload["location_info_2"]) ?? ""
-        self.earlyRound = nonEmptyString(payload["early_round"]) ?? ""
-        self.midRound = nonEmptyString(payload["metaphase_round"]) ?? ""
-        self.staffInfo = nonEmptyString(payload["staff_info"]) ?? ""
-        self.goopInfo = nonEmptyString(payload["goop_info"]) ?? ""
-        self.traitPartyInfo = nonEmptyString(payload["traitparty_info"]) ?? ""
-        self.legendGalaxyInfo = nonEmptyString(payload["legendgalaxyinfo"]) ?? ""
-    }
-
-    private static func parsePieces(_ value: Any?) -> [LineupPiece] {
-        let list = value as? [[String: Any]] ?? []
-        return list.compactMap(LineupPiece.init(dict:))
-    }
-
-    private static func parseTraitContacts(_ value: Any?) -> [LineupTraitContact] {
-        let list = value as? [[String: Any]] ?? []
-        return list.compactMap(LineupTraitContact.init(dict:))
+        self = LineupSourceAdapter.detail(from: payload)
     }
 }
 

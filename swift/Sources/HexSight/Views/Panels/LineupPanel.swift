@@ -308,26 +308,18 @@ struct LineupPanel: View {
     private func loadLocalCache(mode: String) -> [LineupCard]? {
         guard let fileName = LineupCatalog.cacheFileName(for: mode) else { return nil }
         let path = ProjectPaths.lineupDirectory().appendingPathComponent(fileName).path
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let json = payload["lineup_list"] as? [[String: Any]]
-        else { return nil }
-        return json.compactMap { LineupCard(dict: $0, rawData: $0) }
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return nil }
+        return LineupSourceAdapter.cards(fromTopLevelData: data, mode: mode)
     }
 
     private func fetchFromAPI(mode: String) async -> [LineupCard] {
         guard let url = LineupCatalog.remoteURL(for: mode),
-              let (data, _) = try? await URLSession.shared.data(from: url),
-              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let details = payload["lineup_list"] as? [[String: Any]]
+              let (data, _) = try? await URLSession.shared.data(from: url)
         else { return [] }
 
-        let fetched = details.compactMap { LineupCard(dict: $0, rawData: $0) }
+        let fetched = LineupSourceAdapter.cards(fromTopLevelData: data, mode: mode)
         persistRemoteCache(data: data, mode: mode)
-        return fetched.sorted { lhs, rhs in
-            if lhs.category == rhs.category { return lhs.name < rhs.name }
-            return (lhs.category ?? "") < (rhs.category ?? "")
-        }
+        return fetched
     }
 
     private func shouldApply(mode: String, token: Int) -> Bool {

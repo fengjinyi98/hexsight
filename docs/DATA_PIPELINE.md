@@ -296,6 +296,64 @@ https://game.gtimg.cn/images/lol/act/jkzlk/js//{mode}/{version}-{season}/{type}.
 
 ## 四、API 接口（阵容数据）
 
+### 4.0 当前项目阵容真实源
+
+当前应用优先使用官方 CDN 的聚合阵容快照 `lineup_detail_total.json`，本地缓存放在 `config/lineups/`。该文件已经包含列表字段和 `detail` 字符串，适合做离线快照、回归测试和规则上下文生成。
+
+| 模式 | 玩法 | CDN 路径 | 本地缓存 |
+| ---- | ---- | ---- | ---- |
+| mode17 | 星神 | `lineupJson/m18/11/17/lineup_detail_total.json` | `config/lineups/mode17_S18.json` |
+| mode16 | 英雄联盟传奇 | `lineupJson/m17/11/16/lineup_detail_total.json` | `config/lineups/mode16_S18.json` |
+| mode4 | 天选福星 | `lineupJson/m17/11/4/lineup_detail_total.json` | `config/lineups/mode4_S18.json` |
+
+工程上由 `ModeProfile` 统一声明模式、赛季、CDN 路径和玩法能力；由 `LineupSourceAdapter` 统一把官方 JSON 转成 `LineupCard` / `LineupDetailData`；由 `LineupRulesContext` 输出规则引擎和 LLM 需要的结构化字段。
+
+```mermaid
+flowchart LR
+  A["lineup_detail_total.json"] --> B["LineupSourceAdapter"]
+  B --> C["LineupCard / LineupDetailData"]
+  C --> D["LineupPanel UI"]
+  C --> E["LineupRulesContext"]
+  F["ModeProfile"] --> B
+  F --> E
+```
+
+### 4.0.1 阵容 detail 字段矩阵
+
+| 字段 | mode17 星神 | mode16 英雄联盟传奇 | mode4 天选福星 | 规则用途 |
+| ---- | ---- | ---- | ---- | ---- |
+| `hero_location` | ✅ | ✅ | ✅ | 最终阵容、装备归属、站位规则 |
+| `contact` | ✅ | ✅ | ✅ | 羁绊总览与阵容目标 |
+| `y21_early_heros` / `y21_metaphase_heros` | ✅ | ✅ | ✅ | 过渡阵容和阶段运营 |
+| `hexbuff.recomm` / `hexbuff.replace` | ✅ | ✅ | ✅ | 强化符文优先级 |
+| `equipment_order` | ✅ | ✅ | ✅ | 装备合成顺序 |
+| `god_list` / `godreward_info` | ✅ |  |  | 星神奖励选择 |
+| `task_list` / `task_info` |  | ✅ |  | 英雄解锁任务 |
+| `chosen_contact` / `messengerContact` / `chosen_backup` |  |  | ✅ | 天选、使者和备选羁绊 |
+| `staff_info` / `goop_info` / `traitparty_info` / `legendgalaxyinfo` |  |  | ✅ | 天选福星特殊机制说明 |
+
+### 4.0.2 追版本校验命令
+
+每次刷新 `config/game_data/` 或 `config/lineups/` 后，先跑规则上下文测试，再跑全量 Swift 验证。
+
+```bash
+cd swift
+swift test --filter LineupAdapterSnapshotTests
+swift test --filter LineupRulesContextTests
+swift test
+swift build
+```
+
+`LineupRulesContextTests` 会使用真实本地缓存验证以下核心数据：
+
+| 校验项 | 数据源 | 失败含义 |
+| ---- | ---- | ---- |
+| 可读英雄 | `hero_location` + `chess.json` | 阵容棋子 ID 与静态数据版本错位 |
+| 可读装备顺序 | `equipment_order` + `equip.json` | 装备 ID 或装备表变更未适配 |
+| 可读强化符文 | `hexbuff` + `hex.json` | 强化符文 ID 或字段变更未适配 |
+| 可读羁绊 | `contact` 或英雄羁绊反推 + `trait.json` | 羁绊 ID、类型或阈值规则变更 |
+| 模式专属字段 | `god_list` / `task_list` / `chosen_*` | 玩法字段变更未进入适配层 |
+
 ### 4.1 阵容推荐列表
 
 ```
