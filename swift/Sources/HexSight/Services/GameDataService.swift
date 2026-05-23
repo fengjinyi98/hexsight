@@ -78,10 +78,9 @@ final class GameDataService: ObservableObject {
     /// 获取某羁绊包含的英雄
     func heroesForTrait(traitId: String, isRace: Bool) -> [HeroModel] {
         let displayable = HeroCatalog.displayHeroes(from: heroes)
-        if isRace {
-            return displayable.filter { $0.species == traitId }
-        } else {
-            return displayable.filter { $0.heroClass == traitId }
+        return displayable.filter { h in
+            let ids = (isRace ? h.species : h.heroClass).split(separator: "|").map(String.init)
+            return ids.contains(traitId)
         }
     }
 

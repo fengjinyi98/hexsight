@@ -119,12 +119,15 @@ struct TraitModel: Identifiable {
     let id: String
     let name: String
     let level: Int
+    let num: String
     let numList: String
     let desc: String
+    let realDesc: String
     let picture: String
     let color: String
     let traitType: Int
     let checkId: String
+    let values: String
 
     var thresholds: [Int] {
         numList.split(separator: "|").compactMap { Int($0) }
@@ -136,12 +139,15 @@ struct TraitModel: Identifiable {
         self.id = id
         self.name = name
         self.level = dict["level"] as? Int ?? 1
+        self.num = stringValue(dict["num"])
         self.numList = dict["numList"] as? String ?? ""
         self.desc = (dict["desc"] as? String) ?? (dict["prefix"] as? String) ?? ""
+        self.realDesc = dict["realDesc"] as? String ?? ""
         self.picture = dict["picture"] as? String ?? ""
         self.color = stringValue(dict["color"])
         self.traitType = dict["type"] as? Int ?? 0
         self.checkId = stringValue(dict["checkId"])
+        self.values = dict["values"] as? String ?? ""
     }
 }
 
