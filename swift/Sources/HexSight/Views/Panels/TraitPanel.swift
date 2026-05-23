@@ -86,7 +86,9 @@ struct TraitPanel: View {
                     .onTapGesture { selected = trait }
                 }
             }
-            .padding(8)
+            .padding(.horizontal, 8)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
         }
     }
 
@@ -173,7 +175,9 @@ struct TraitPanel: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 32)
         }
     }
 

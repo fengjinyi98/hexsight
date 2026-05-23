@@ -44,7 +44,7 @@ struct HeroPanel: View {
                     }
                 }
             }
-            .padding(.bottom, 12)
+            .padding(.bottom, 32)
         }
     }
 
@@ -93,7 +93,9 @@ struct HeroPanel: View {
                     synergySection(relatedHeroes)
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 32)
         }
     }
 

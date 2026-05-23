@@ -28,8 +28,9 @@ struct MainView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let currentW = geometry.size.width
-            let scale = currentW / 1250.0
+            let scaleW = geometry.size.width / 1250.0
+            let scaleH = geometry.size.height / 798.0
+            let scale = min(scaleW, scaleH)
 
             HStack(spacing: 0) {
                 navSidebar
@@ -37,11 +38,12 @@ struct MainView: View {
                 contentArea
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 1250, height: 820)
-            .glassEffect(in: .rect(cornerRadius: 14))
+            .frame(width: 1250, height: 798)
+            .glassEffect(in: .rect(cornerRadius: Theme.CornerRadius.panel))
             .scaleEffect(scale, anchor: .topLeading)
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
-        .frame(minWidth: 1000, idealWidth: 1250, minHeight: 656, idealHeight: 820)
+        .frame(minWidth: 1000, idealWidth: 1250, minHeight: 638, idealHeight: 798)
     }
 
     // MARK: - 导航侧栏
@@ -52,7 +54,7 @@ struct MainView: View {
                 ForEach(dataService.availableModes, id: \.id) { mode in
                     Button(mode.name) { dataService.switchMode(mode.id) }
                         .buttonStyle(.glass)
-                        .font(.system(size: 10, weight: dataService.selectedMode == mode.id ? .bold : .regular))
+                        .font(Theme.Font.caption.weight(dataService.selectedMode == mode.id ? .bold : .regular))
                         .opacity(dataService.selectedMode == mode.id ? 1.0 : 0.5)
                         .frame(width: 103, height: 22)
                 }
@@ -68,20 +70,23 @@ struct MainView: View {
                             .font(.system(size: 13))
                             .frame(width: 18, alignment: .center)
                         Text(item.rawValue)
-                            .font(.system(size: 11, weight: selectedNav == item ? .semibold : .regular))
+                            .font(Theme.Font.caption.weight(selectedNav == item ? .semibold : .regular))
                         Spacer(minLength: 0)
                     }
                     .padding(.horizontal, 10)
                     .frame(width: 103, height: 34)
-                    .foregroundStyle(selectedNav == item ? .primary : .secondary)
-                    .background(selectedNav == item ? Color.white.opacity(0.12) : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .foregroundStyle(selectedNav == item ? Theme.Color.textPrimary : Theme.Color.textSecondary)
+                    .background(selectedNav == item ? Theme.Color.cardHover : Color.clear)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.chip))
                 }
                 .buttonStyle(.plain)
             }
 
             Spacer()
-            Text("HexSight V1.0").font(.system(size: 8)).foregroundStyle(.tertiary).padding(.bottom, 8)
+            Text("HexSight V1.0")
+                .font(Theme.Font.micro)
+                .foregroundStyle(Theme.Color.textTertiary)
+                .padding(.bottom, 8)
         }
         .frame(width: 115).padding(.top, 8)
     }

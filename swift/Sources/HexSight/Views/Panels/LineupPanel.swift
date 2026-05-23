@@ -47,7 +47,9 @@ struct LineupPanel: View {
                     LazyVStack(spacing: 8) {
                         ForEach(filteredLineups) { card in lineupRow(card) }
                     }
-                    .padding(10)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 10)
+                    .padding(.bottom, 32)
                 }
             }
         }
@@ -89,56 +91,56 @@ struct LineupPanel: View {
 
     private func lineupRow(_ card: LineupCard) -> some View {
         Button { detailLineup = card } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: Theme.Spacing.medium) {
                 lineupIdentity(card)
                     .frame(width: 210, alignment: .leading)
 
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     QualityBadge(quality: card.quality)
                     augmentPreview(ids: card.augmentIDs)
                 }
-                .frame(width: 150, alignment: .leading)
+                .frame(width: 190, alignment: .leading)
 
                 heroPreview(card)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(Theme.Font.caption.weight(.semibold))
+                    .foregroundStyle(Theme.Color.textSecondary)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, Theme.Spacing.medium)
+            .padding(.vertical, 12)
             .background(LineupRowBackground())
             .overlay(
-                RoundedRectangle(cornerRadius: 4)
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.card)
                     .stroke(Color.white.opacity(0.06), lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
         }
         .buttonStyle(.plain)
     }
 
     private func lineupIdentity(_ card: LineupCard) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(card.name)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.primary)
+                .font(Theme.Font.title3)
+                .foregroundStyle(Theme.Color.textPrimary)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
 
             HStack(spacing: 6) {
-                RemoteIcon(url: card.authorAvatar, size: 20, cornerRadius: 10)
+                RemoteIcon(url: card.authorAvatar, size: 26, cornerRadius: 13)
                 Text(card.author)
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
+                    .font(Theme.Font.caption)
+                    .foregroundStyle(Theme.Color.textSecondary)
                     .lineLimit(1)
                 Spacer(minLength: 0)
             }
 
             if let tag = card.tags.first {
                 Text(tag)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.white.opacity(0.86))
+                    .font(Theme.Font.micro)
+                    .foregroundStyle(Theme.Color.textPrimary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
                     .background(Color.white.opacity(0.06))
@@ -151,8 +153,8 @@ struct LineupPanel: View {
         HStack(spacing: 8) {
             ForEach(ids, id: \.self) { id in
                 if let hex = data.hexes.first(where: { $0.id == id }) {
-                    RemoteIcon(url: hex.icon, size: 34, cornerRadius: 17)
-                        .overlay(Circle().stroke(Color.yellow.opacity(0.75), lineWidth: 1.4))
+                    RemoteIcon(url: hex.icon, size: 40, cornerRadius: 20)
+                        .overlay(Circle().stroke(Theme.Color.gold.opacity(0.75), lineWidth: 1.4))
                         .help(hex.name)
                 }
             }
@@ -287,7 +289,7 @@ private struct LineupDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
                 header
                 Divider().background(Color.white.opacity(0.1))
 
@@ -324,7 +326,8 @@ private struct LineupDetailView: View {
                 textSection("搜牌节奏", card.detail.dTime)
                 textSection("克制与变阵", card.detail.enemyInfo)
             }
-            .padding(16)
+            .padding(Theme.Spacing.medium)
+            .padding(.bottom, 40)
         }
         .background(.ultraThinMaterial)
     }
@@ -336,7 +339,7 @@ private struct LineupDetailView: View {
                     HStack(spacing: 4) { Image(systemName: "chevron.left"); Text("返回") }
                 }
                 .buttonStyle(.glass)
-                .font(.system(size: 11))
+                .font(Theme.Font.caption)
                 Spacer()
                 QualityBadge(quality: card.quality)
             }
@@ -345,12 +348,14 @@ private struct LineupDetailView: View {
                 RemoteIcon(url: card.authorAvatar, size: 34, cornerRadius: 17)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(card.name)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.primary)
+                        .font(Theme.Font.title1)
+                        .foregroundStyle(Theme.Color.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 8) {
                         if let tag = card.tags.first { Text(tag).badgeStyle() }
-                        Text(card.author).font(.system(size: 11)).foregroundStyle(.secondary)
+                        Text(card.author)
+                            .font(Theme.Font.caption)
+                            .foregroundStyle(Theme.Color.textSecondary)
                     }
                 }
                 Spacer()
@@ -378,18 +383,18 @@ private struct LineupDetailView: View {
     }
 
     private var traitSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
             sectionTitle("羁绊组成")
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 6)], spacing: 6) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 6)], spacing: 6) {
                 ForEach(card.traits, id: \.self) { trait in
                     Text(trait)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .font(Theme.Font.caption)
+                        .foregroundStyle(Theme.Color.textSecondary)
                         .lineLimit(1)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .frame(maxWidth: .infinity)
-                        .background(Color.white.opacity(0.05))
+                        .background(Theme.Color.cardBackground)
                         .clipShape(Capsule())
                 }
             }
@@ -397,14 +402,16 @@ private struct LineupDetailView: View {
     }
 
     private var transitionSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
             sectionTitle("早期过渡")
             
             HStack(alignment: .top, spacing: 16) {
                 // 前期过渡
                 if !card.detail.earlyHeroes.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("前期").font(.system(size: 12, weight: .bold)).foregroundStyle(.yellow)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                        Text("前期")
+                            .font(Theme.Font.title3)
+                            .foregroundStyle(Theme.Color.gold)
                         
                         // 圆形打工英雄一览
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -424,16 +431,18 @@ private struct LineupDetailView: View {
                         
                         ChessboardView(pieces: card.detail.earlyHeroes, mode: data.selectedMode, compact: true)
                     }
-                    .padding(10)
-                    .background(Color.white.opacity(0.02))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
+                    .padding(12)
+                    .background(Theme.Color.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+                    .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
                 }
 
                 // 中期过渡
                 if !card.detail.midHeroes.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("中期").font(.system(size: 12, weight: .bold)).foregroundStyle(.purple)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                        Text("中期")
+                            .font(Theme.Font.title3)
+                            .foregroundStyle(Theme.Color.accent)
                         
                         // 圆形打工英雄一览
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -453,33 +462,37 @@ private struct LineupDetailView: View {
                         
                         ChessboardView(pieces: card.detail.midHeroes, mode: data.selectedMode, compact: true)
                     }
-                    .padding(10)
-                    .background(Color.white.opacity(0.02))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
+                    .padding(12)
+                    .background(Theme.Color.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+                    .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
                 }
             }
         }
     }
 
     private var equipmentAnalysisSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
             sectionTitle("装备分析")
             
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
                 // 1. 抢装顺序
                 if !card.detail.equipmentOrderIDs.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("抢装顺序").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
-                        HStack(spacing: 6) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("抢装顺序")
+                            .font(Theme.Font.caption.weight(.semibold))
+                            .foregroundStyle(Theme.Color.textTertiary)
+                        HStack(spacing: 8) {
                             ForEach(0..<card.detail.equipmentOrderIDs.count, id: \.self) { idx in
                                 let eqId = card.detail.equipmentOrderIDs[idx]
                                 if let eq = data.getEquip(eqId) {
-                                    HStack(spacing: 4) {
-                                        RemoteIcon(url: eq.picture, size: 24, cornerRadius: 4)
+                                    HStack(spacing: 6) {
+                                        RemoteIcon(url: eq.picture, size: 32, cornerRadius: 4)
                                             .help(eq.name)
                                         if idx < card.detail.equipmentOrderIDs.count - 1 {
-                                            Image(systemName: "chevron.right").font(.system(size: 8)).foregroundStyle(.secondary)
+                                            Image(systemName: "chevron.right")
+                                                .font(.system(size: 11, weight: .bold))
+                                                .foregroundStyle(Theme.Color.textTertiary)
                                         }
                                     }
                                 }
@@ -492,8 +505,10 @@ private struct LineupDetailView: View {
                 let carries = card.detail.finalHeroes.filter { $0.isCarryHero }
                 if !carries.isEmpty {
                     Divider().background(Color.white.opacity(0.05))
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("主C装备").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("主C装备")
+                            .font(Theme.Font.caption.weight(.semibold))
+                            .foregroundStyle(Theme.Color.textTertiary)
                         ForEach(carries) { piece in
                             let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
                             HStack(spacing: 12) {
@@ -505,11 +520,13 @@ private struct LineupDetailView: View {
                                     is3Star: is3Star
                                 )
                                 
-                                Text("推荐神装:").font(.system(size: 10)).foregroundStyle(.secondary)
+                                Text("推荐神装:")
+                                    .font(Theme.Font.caption)
+                                    .foregroundStyle(Theme.Color.textSecondary)
                                 HStack(spacing: 4) {
                                     ForEach(piece.equipmentIDs, id: \.self) { eqId in
                                         if let eq = data.getEquip(eqId) {
-                                            RemoteIcon(url: eq.picture, size: 22, cornerRadius: 3)
+                                            RemoteIcon(url: eq.picture, size: 28, cornerRadius: 3)
                                                 .help(eq.name)
                                         }
                                     }
@@ -523,24 +540,26 @@ private struct LineupDetailView: View {
                 let others = card.detail.finalHeroes.filter { !$0.isCarryHero && !$0.equipmentIDs.isEmpty }
                 if !others.isEmpty {
                     Divider().background(Color.white.opacity(0.05))
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("其他英雄装备").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("其他英雄装备")
+                            .font(Theme.Font.caption.weight(.semibold))
+                            .foregroundStyle(Theme.Color.textTertiary)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 8)], spacing: 8) {
                             ForEach(others) { piece in
                                 let hero = data.hero(for: piece.heroID, mode: data.selectedMode)
-                                HStack(spacing: 8) {
-                                    SafeAsyncImage(urlString: hero?.picture ?? "", size: 20, cornerRadius: 10)
-                                    HStack(spacing: 2) {
+                                HStack(spacing: 10) {
+                                    SafeAsyncImage(urlString: hero?.picture ?? "", size: 26, cornerRadius: 13)
+                                    HStack(spacing: 3) {
                                         ForEach(piece.equipmentIDs, id: \.self) { eqId in
                                             if let eq = data.getEquip(eqId) {
-                                                RemoteIcon(url: eq.picture, size: 14, cornerRadius: 2)
+                                                RemoteIcon(url: eq.picture, size: 18, cornerRadius: 2)
                                             }
                                         }
                                     }
                                 }
-                                .padding(4)
-                                .background(Color.white.opacity(0.03))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .padding(6)
+                                .background(Theme.Color.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.chip))
                             }
                         }
                     }
@@ -550,19 +569,19 @@ private struct LineupDetailView: View {
                 if !card.detail.equipmentInfo.isEmpty {
                     Divider().background(Color.white.opacity(0.05))
                     Text(card.detail.equipmentInfo)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                        .font(Theme.Font.body)
+                        .foregroundStyle(Theme.Color.textSecondary)
                         .lineSpacing(4)
-                        .padding(8)
+                        .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white.opacity(0.025))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .background(Theme.Color.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.chip))
                 }
             }
-            .padding(10)
-            .background(Color.white.opacity(0.02))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
+            .padding(12)
+            .background(Theme.Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
         }
     }
 
@@ -588,17 +607,17 @@ private struct LineupDetailView: View {
     private func textSection(_ title: String, _ text: String) -> some View {
         Group {
             if !text.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.small) {
                     sectionTitle(title)
                     Text(text)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .lineSpacing(4)
+                        .font(Theme.Font.body)
+                        .foregroundStyle(Theme.Color.textSecondary)
+                        .lineSpacing(5)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(10)
+                        .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white.opacity(0.035))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .background(Theme.Color.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
                 }
             }
         }
@@ -606,8 +625,8 @@ private struct LineupDetailView: View {
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .bold))
-            .foregroundStyle(.primary)
+            .font(Theme.Font.title3)
+            .foregroundStyle(Theme.Color.textPrimary)
     }
 }
 
@@ -732,63 +751,63 @@ private struct LineupHeroChip: View {
         if let w = customWidth {
             return w
         }
-        return style == .circle ? 40 : (compact ? 40 : 50)
+        return style == .circle ? 50 : (compact ? 40 : 50)
     }
 
     private var chipHeight: CGFloat {
         if let h = customHeight {
             return h
         }
-        return style == .circle ? 40 : (compact ? 46 : 58)
+        return style == .circle ? 50 : (compact ? 46 : 58)
     }
 
     private var avatarWidth: CGFloat {
-        style == .circle ? 40 : chipWidth
+        style == .circle ? 50 : chipWidth
     }
 
     private var avatarHeight: CGFloat {
-        style == .circle ? 40 : chipHeight
+        style == .circle ? 50 : chipHeight
     }
 
     private var equipSize: CGFloat {
         if style == .circle {
-            return 10
+            return 14
         } else {
             return chipWidth * 0.24
         }
     }
 
     var body: some View {
-        VStack(spacing: style == .circle ? 2 : 0) {
+        VStack(spacing: style == .circle ? 4 : 0) {
             ZStack(alignment: style == .circle ? .topLeading : .bottom) {
                 // Circular Avatar or Hexagon Avatar
                 if style == .circle {
                     if let urlString = hero?.picture, !urlString.isEmpty {
                         RemoteIcon(url: urlString, size: avatarWidth, cornerRadius: avatarWidth / 2)
-                            .overlay(Circle().stroke(piece.isCarryHero ? Color.yellow : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
+                            .overlay(Circle().stroke(piece.isCarryHero ? Theme.Color.gold : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
                     } else {
                         Circle()
                             .fill(Color.white.opacity(0.05))
                             .frame(width: avatarWidth, height: avatarWidth)
-                            .overlay(Circle().stroke(piece.isCarryHero ? Color.yellow : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
+                            .overlay(Circle().stroke(piece.isCarryHero ? Theme.Color.gold : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
                     }
 
                     // Stars above Circle Avatar
                     HStack(spacing: 1) {
                         ForEach(0..<(is3Star ? 3 : 2), id: \.self) { _ in
                             Image(systemName: "star.fill")
-                                .font(.system(size: 6))
-                                .foregroundStyle(.yellow)
+                                .font(.system(size: 6.5))
+                                .foregroundStyle(Theme.Color.gold)
                         }
                     }
-                    .offset(x: 10, y: -6)
+                    .offset(x: 14, y: -6)
 
                     // C Badge for carry
                     if piece.isCarryHero {
                         Text("C")
-                            .font(.system(size: 7, weight: .bold))
+                            .font(.system(size: 8.5, weight: .bold))
                             .foregroundStyle(.white)
-                            .frame(width: 12, height: 12)
+                            .frame(width: 15, height: 15)
                             .background(Color.orange)
                             .clipShape(Circle())
                             .overlay(Circle().stroke(Color.white, lineWidth: 1))
@@ -807,7 +826,7 @@ private struct LineupHeroChip: View {
 
                     // Hexagon Border
                     HexagonShape()
-                        .stroke(piece.isCarryHero ? Color.yellow.opacity(0.95) : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.6 : 1)
+                        .stroke(piece.isCarryHero ? Theme.Color.gold.opacity(0.95) : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.6 : 1)
                         .frame(width: avatarWidth, height: avatarHeight)
 
                     if piece.chessType == "pet" {
@@ -836,12 +855,15 @@ private struct LineupHeroChip: View {
             .padding(.top, style == .circle ? 6 : 0)
 
             // Equipment row below Circle Avatar
-            if style == .circle && !piece.equipmentIDs.isEmpty {
+            if style == .circle {
                 HStack(spacing: 1) {
-                    ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
-                        if let equip = data.getEquip(id) {
+                    let equips = piece.equipmentIDs.compactMap { data.getEquip($0) }
+                    if !equips.isEmpty {
+                        ForEach(Array(equips.prefix(3))) { equip in
                             RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
                         }
+                    } else {
+                        Color.clear.frame(height: equipSize)
                     }
                 }
                 .frame(height: equipSize)
@@ -850,8 +872,8 @@ private struct LineupHeroChip: View {
             // Name text for Circle
             if style == .circle && showName {
                 Text(hero?.name ?? "?")
-                    .font(.system(size: 8))
-                    .foregroundStyle(.secondary)
+                    .font(Theme.Font.caption)
+                    .foregroundStyle(Theme.Color.textSecondary)
                     .lineLimit(1)
             }
         }
