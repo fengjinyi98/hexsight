@@ -162,7 +162,14 @@ struct LineupPanel: View {
     private func heroPreview(_ card: LineupCard) -> some View {
         HStack(spacing: 8) {
             ForEach(card.heroPreview) { piece in
-                LineupHeroChip(piece: piece, mode: data.selectedMode, compact: true)
+                let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
+                LineupHeroChip(
+                    piece: piece,
+                    mode: data.selectedMode,
+                    style: .circle,
+                    showName: false,
+                    is3Star: is3Star
+                )
             }
         }
     }
@@ -284,7 +291,9 @@ private struct LineupDetailView: View {
                 header
                 Divider().background(Color.white.opacity(0.1))
 
-                sectionTitle("最终阵容")
+                sectionTitle("阵容站位")
+                finalHeroesRow(card)
+                    .padding(.bottom, 4)
                 ChessboardView(pieces: card.detail.finalHeroes, mode: data.selectedMode)
 
                 if !card.traits.isEmpty {
@@ -303,18 +312,13 @@ private struct LineupDetailView: View {
                     }
                 }
 
-                detailIconSection(title: "装备优先级", ids: card.detail.equipmentOrderIDs) { id in
-                    if let equip = data.getEquip(id) {
-                        IconTextItem(icon: equip.picture, title: equip.name, subtitle: equip.type)
-                    }
-                }
+                equipmentAnalysisSection
 
                 if !card.detail.earlyHeroes.isEmpty || !card.detail.midHeroes.isEmpty {
                     transitionSection
                 }
 
                 textSection("站位说明", card.detail.locationInfo)
-                textSection("装备分析", card.detail.equipmentInfo)
                 textSection("强化思路", card.detail.hexInfo)
                 textSection("前期过渡", card.detail.earlyInfo)
                 textSection("搜牌节奏", card.detail.dTime)
@@ -354,6 +358,25 @@ private struct LineupDetailView: View {
         }
     }
 
+    private func finalHeroesRow(_ card: LineupCard) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(card.detail.finalHeroes) { piece in
+                    let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
+                    LineupHeroChip(
+                        piece: piece,
+                        mode: data.selectedMode,
+                        style: .circle,
+                        showName: true,
+                        is3Star: is3Star
+                    )
+                }
+            }
+            .padding(.horizontal, 4)
+            .padding(.top, 4)
+        }
+    }
+
     private var traitSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("羁绊组成")
@@ -375,19 +398,171 @@ private struct LineupDetailView: View {
 
     private var transitionSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("过渡阵容")
-            if !card.detail.earlyHeroes.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("前期").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
-                    ChessboardView(pieces: card.detail.earlyHeroes, mode: data.selectedMode, compact: true)
+            sectionTitle("早期过渡")
+            
+            HStack(alignment: .top, spacing: 16) {
+                // 前期过渡
+                if !card.detail.earlyHeroes.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("前期").font(.system(size: 12, weight: .bold)).foregroundStyle(.yellow)
+                        
+                        // 圆形打工英雄一览
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(card.detail.earlyHeroes) { piece in
+                                    let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
+                                    LineupHeroChip(
+                                        piece: piece,
+                                        mode: data.selectedMode,
+                                        style: .circle,
+                                        showName: true,
+                                        is3Star: is3Star
+                                    )
+                                }
+                            }
+                        }
+                        
+                        ChessboardView(pieces: card.detail.earlyHeroes, mode: data.selectedMode, compact: true)
+                    }
+                    .padding(10)
+                    .background(Color.white.opacity(0.02))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
+                }
+
+                // 中期过渡
+                if !card.detail.midHeroes.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("中期").font(.system(size: 12, weight: .bold)).foregroundStyle(.purple)
+                        
+                        // 圆形打工英雄一览
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(card.detail.midHeroes) { piece in
+                                    let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
+                                    LineupHeroChip(
+                                        piece: piece,
+                                        mode: data.selectedMode,
+                                        style: .circle,
+                                        showName: true,
+                                        is3Star: is3Star
+                                    )
+                                }
+                            }
+                        }
+                        
+                        ChessboardView(pieces: card.detail.midHeroes, mode: data.selectedMode, compact: true)
+                    }
+                    .padding(10)
+                    .background(Color.white.opacity(0.02))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
                 }
             }
-            if !card.detail.midHeroes.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("中期").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
-                    ChessboardView(pieces: card.detail.midHeroes, mode: data.selectedMode, compact: true)
+        }
+    }
+
+    private var equipmentAnalysisSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("装备分析")
+            
+            VStack(alignment: .leading, spacing: 12) {
+                // 1. 抢装顺序
+                if !card.detail.equipmentOrderIDs.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("抢装顺序").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
+                        HStack(spacing: 6) {
+                            ForEach(0..<card.detail.equipmentOrderIDs.count, id: \.self) { idx in
+                                let eqId = card.detail.equipmentOrderIDs[idx]
+                                if let eq = data.getEquip(eqId) {
+                                    HStack(spacing: 4) {
+                                        RemoteIcon(url: eq.picture, size: 24, cornerRadius: 4)
+                                            .help(eq.name)
+                                        if idx < card.detail.equipmentOrderIDs.count - 1 {
+                                            Image(systemName: "chevron.right").font(.system(size: 8)).foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 2. 主C装备
+                let carries = card.detail.finalHeroes.filter { $0.isCarryHero }
+                if !carries.isEmpty {
+                    Divider().background(Color.white.opacity(0.05))
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("主C装备").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
+                        ForEach(carries) { piece in
+                            let is3Star = card.detail.level3HeroIDs.contains(piece.heroID)
+                            HStack(spacing: 12) {
+                                LineupHeroChip(
+                                    piece: piece,
+                                    mode: data.selectedMode,
+                                    style: .circle,
+                                    showName: true,
+                                    is3Star: is3Star
+                                )
+                                
+                                Text("推荐神装:").font(.system(size: 10)).foregroundStyle(.secondary)
+                                HStack(spacing: 4) {
+                                    ForEach(piece.equipmentIDs, id: \.self) { eqId in
+                                        if let eq = data.getEquip(eqId) {
+                                            RemoteIcon(url: eq.picture, size: 22, cornerRadius: 3)
+                                                .help(eq.name)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 3. 其他英雄装备
+                let others = card.detail.finalHeroes.filter { !$0.isCarryHero && !$0.equipmentIDs.isEmpty }
+                if !others.isEmpty {
+                    Divider().background(Color.white.opacity(0.05))
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("其他英雄装备").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
+                            ForEach(others) { piece in
+                                let hero = data.hero(for: piece.heroID, mode: data.selectedMode)
+                                HStack(spacing: 8) {
+                                    SafeAsyncImage(urlString: hero?.picture ?? "", size: 20, cornerRadius: 10)
+                                    HStack(spacing: 2) {
+                                        ForEach(piece.equipmentIDs, id: \.self) { eqId in
+                                            if let eq = data.getEquip(eqId) {
+                                                RemoteIcon(url: eq.picture, size: 14, cornerRadius: 2)
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(4)
+                                .background(Color.white.opacity(0.03))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                        }
+                    }
+                }
+                
+                // 4. 文字装备分析说明
+                if !card.detail.equipmentInfo.isEmpty {
+                    Divider().background(Color.white.opacity(0.05))
+                    Text(card.detail.equipmentInfo)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(4)
+                        .padding(8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.white.opacity(0.025))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
             }
+            .padding(10)
+            .background(Color.white.opacity(0.02))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.05), lineWidth: 1))
         }
     }
 
@@ -443,45 +618,83 @@ private struct LineupDetailView: View {
 /// - 按金铲铲 4×7 错列棋盘展示站位
 /// - 按 hero_id 回查棋子头像与名称
 /// - 在棋子下方展示携带装备图标
+enum LineupChipStyle {
+    case circle
+    case hexagon
+}
+
 private struct ChessboardView: View {
     let pieces: [LineupPiece]
     let mode: String
     var compact = false
 
+    @State private var containerWidth: CGFloat = 0
+
     private let rows = [4, 3, 2, 1]
     private let cols = Array(1...7)
 
-    private var cellWidth: CGFloat { compact ? 40 : 50 }
-    private var cellHeight: CGFloat { compact ? 46 : 58 }
-    private var avatarSize: CGFloat { compact ? 26 : 34 }
+    private var activeWidth: CGFloat {
+        if containerWidth > 0 {
+            return containerWidth
+        }
+        return compact ? 320.0 : 500.0
+    }
+
+    private var cellWidth: CGFloat {
+        let maxW = compact ? 360.0 : 550.0
+        let effectiveW = min(activeWidth, maxW)
+        return effectiveW / (compact ? 8.2 : 7.6)
+    }
+
+    private var cellHeight: CGFloat {
+        cellWidth * 1.1547
+    }
+
+    private var rowSpacing: CGFloat {
+        -cellHeight * 0.25
+    }
+
+    private var colSpacing: CGFloat { 0 }
 
     private var board: [String: LineupPiece] {
         Dictionary(uniqueKeysWithValues: pieces.map { ($0.locationKey, $0) })
     }
 
     var body: some View {
-        VStack(spacing: compact ? -2 : -1) {
+        VStack(spacing: rowSpacing) {
             ForEach(rows, id: \.self) { row in
-                HStack(spacing: compact ? 1 : 2) {
+                let pads = rowPadding(for: row)
+                HStack(spacing: colSpacing) {
                     ForEach(cols, id: \.self) { col in
                         let key = "\(row),\(col)"
                         if let piece = board[key] {
-                            LineupHeroChip(piece: piece, mode: mode, compact: compact)
+                            LineupHeroChip(piece: piece, mode: mode, style: .hexagon, compact: compact, customWidth: cellWidth, customHeight: cellHeight)
                                 .frame(width: cellWidth, height: cellHeight)
-                                .background(HexTile(fill: piece.isCarryHero ? Color.yellow.opacity(0.14) : Color.white.opacity(0.035)))
-                                .overlay(HexTile(stroke: piece.isCarryHero ? Color.yellow.opacity(0.9) : Color.white.opacity(0.08), lineWidth: piece.isCarryHero ? 1.5 : 1))
                         } else {
-                            HexTile(fill: Color.white.opacity(0.014))
+                            HexTile(fill: Color.white.opacity(0.015))
                                 .frame(width: cellWidth, height: cellHeight)
-                                .overlay(HexTile(stroke: Color.white.opacity(0.04), lineWidth: 1))
+                                .overlay(HexTile(stroke: Color.white.opacity(0.05), lineWidth: 1))
                         }
                     }
                 }
-                .padding(.leading, rowOffset(for: row))
+                .padding(.leading, pads.leading)
+                .padding(.trailing, pads.trailing)
             }
         }
         .padding(compact ? 8 : 12)
         .frame(maxWidth: .infinity, alignment: .center)
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear {
+                        let w = geo.size.width
+                        if w > 0 { containerWidth = w }
+                    }
+                    .onChange(of: geo.size.width) { _, newWidth in
+                        if newWidth > 0 { containerWidth = newWidth }
+                    }
+            }
+        )
         .background(
             LinearGradient(
                 colors: [Color.black.opacity(0.18), Color.purple.opacity(0.12)],
@@ -493,60 +706,154 @@ private struct ChessboardView: View {
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.06), lineWidth: 1))
     }
 
-    private func rowOffset(for row: Int) -> CGFloat {
-        row.isMultiple(of: 2) ? cellWidth * 0.5 : 0
+    private func rowPadding(for row: Int) -> (leading: CGFloat, trailing: CGFloat) {
+        if row.isMultiple(of: 2) {
+            return (cellWidth * 0.5, 0)
+        } else {
+            return (0, cellWidth * 0.5)
+        }
     }
 }
 
-/// LineupHeroChip 阵容棋子头像组件
-/// 核心职责：
-/// - 展示棋子头像、名称与装备
-/// - 标记主 C 与召唤物
-/// - 复用在列表预览和详情棋盘
 private struct LineupHeroChip: View {
     let piece: LineupPiece
     let mode: String
+    var style: LineupChipStyle = .circle
+    var showName = false
+    var is3Star = false
     var compact = false
+    var customWidth: CGFloat? = nil
+    var customHeight: CGFloat? = nil
     @StateObject private var data = GameDataService.shared
 
     private var hero: HeroModel? { data.hero(for: piece.heroID, mode: mode) }
-    private var avatarSize: CGFloat { compact ? 30 : 34 }
-    private var equipSize: CGFloat { compact ? 10 : 12 }
+
+    private var chipWidth: CGFloat {
+        if let w = customWidth {
+            return w
+        }
+        return style == .circle ? 40 : (compact ? 40 : 50)
+    }
+
+    private var chipHeight: CGFloat {
+        if let h = customHeight {
+            return h
+        }
+        return style == .circle ? 40 : (compact ? 46 : 58)
+    }
+
+    private var avatarWidth: CGFloat {
+        style == .circle ? 40 : chipWidth
+    }
+
+    private var avatarHeight: CGFloat {
+        style == .circle ? 40 : chipHeight
+    }
+
+    private var equipSize: CGFloat {
+        if style == .circle {
+            return 10
+        } else {
+            return chipWidth * 0.24
+        }
+    }
 
     var body: some View {
-        VStack(spacing: compact ? 1 : 2) {
-            ZStack(alignment: .topTrailing) {
-                RemoteIcon(url: hero?.picture ?? "", size: avatarSize, cornerRadius: compact ? 15 : 5)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: compact ? 15 : 5)
-                            .stroke(piece.isCarryHero ? Color.yellow.opacity(0.95) : Color.white.opacity(0.14), lineWidth: piece.isCarryHero ? 1.6 : 1)
-                    )
-                if piece.chessType == "pet" {
-                    Image(systemName: "pawprint.fill")
-                        .font(.system(size: 7))
-                        .foregroundStyle(.white)
-                        .padding(2)
-                        .background(Color.black.opacity(0.55))
-                        .clipShape(Circle())
-                        .offset(x: 3, y: -3)
+        VStack(spacing: style == .circle ? 2 : 0) {
+            ZStack(alignment: style == .circle ? .topLeading : .bottom) {
+                // Circular Avatar or Hexagon Avatar
+                if style == .circle {
+                    if let urlString = hero?.picture, !urlString.isEmpty {
+                        RemoteIcon(url: urlString, size: avatarWidth, cornerRadius: avatarWidth / 2)
+                            .overlay(Circle().stroke(piece.isCarryHero ? Color.yellow : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
+                    } else {
+                        Circle()
+                            .fill(Color.white.opacity(0.05))
+                            .frame(width: avatarWidth, height: avatarWidth)
+                            .overlay(Circle().stroke(piece.isCarryHero ? Color.yellow : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.8 : 1))
+                    }
+
+                    // Stars above Circle Avatar
+                    HStack(spacing: 1) {
+                        ForEach(0..<(is3Star ? 3 : 2), id: \.self) { _ in
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.yellow)
+                        }
+                    }
+                    .offset(x: 10, y: -6)
+
+                    // C Badge for carry
+                    if piece.isCarryHero {
+                        Text("C")
+                            .font(.system(size: 7, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 12, height: 12)
+                            .background(Color.orange)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                            .offset(x: -2, y: -2)
+                    }
+                } else {
+                    // Hexagon Avatar
+                    if let urlString = hero?.picture, !urlString.isEmpty {
+                        RemoteIcon(url: urlString, width: avatarWidth, height: avatarHeight, cornerRadius: 0)
+                            .clipShape(HexagonShape())
+                    } else {
+                        HexagonShape()
+                            .fill(Color.white.opacity(0.05))
+                            .frame(width: avatarWidth, height: avatarHeight)
+                    }
+
+                    // Hexagon Border
+                    HexagonShape()
+                        .stroke(piece.isCarryHero ? Color.yellow.opacity(0.95) : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.6 : 1)
+                        .frame(width: avatarWidth, height: avatarHeight)
+
+                    if piece.chessType == "pet" {
+                        Image(systemName: "pawprint.fill")
+                            .font(.system(size: 6))
+                            .foregroundStyle(.white)
+                            .padding(2)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Circle())
+                            .offset(x: avatarWidth * 0.35, y: -avatarHeight * 0.35)
+                    }
+
+                    // Equipment row overlapping the bottom edge
+                    HStack(spacing: 1) {
+                        ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
+                            if let equip = data.getEquip(id) {
+                                RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
+                                    .overlay(RoundedRectangle(cornerRadius: 1).stroke(Color.black.opacity(0.8), lineWidth: 0.5))
+                            }
+                        }
+                    }
+                    .offset(y: equipSize * 0.3)
                 }
             }
+            .frame(width: avatarWidth, height: avatarHeight)
+            .padding(.top, style == .circle ? 6 : 0)
 
-            if !compact {
+            // Equipment row below Circle Avatar
+            if style == .circle && !piece.equipmentIDs.isEmpty {
+                HStack(spacing: 1) {
+                    ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
+                        if let equip = data.getEquip(id) {
+                            RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
+                        }
+                    }
+                }
+                .frame(height: equipSize)
+            }
+
+            // Name text for Circle
+            if style == .circle && showName {
                 Text(hero?.name ?? "?")
-                    .font(.system(size: 7))
+                    .font(.system(size: 8))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-
-            HStack(spacing: 1) {
-                ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
-                    if let equip = data.getEquip(id) {
-                        RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 2)
-                    }
-                }
-            }
-            .frame(height: equipSize)
         }
         .help(hero?.name ?? piece.heroID)
     }
@@ -569,15 +876,15 @@ private struct HexTile: View {
 
 private struct HexagonShape: Shape {
     func path(in rect: CGRect) -> Path {
-        let insetX = rect.width * 0.18
-        let midY = rect.midY
+        let insetY = rect.height * 0.25
+        let midX = rect.midX
         var path = Path()
-        path.move(to: CGPoint(x: insetX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX - insetX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: midY))
-        path.addLine(to: CGPoint(x: rect.maxX - insetX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: insetX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: midY))
+        path.move(to: CGPoint(x: midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + insetY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - insetY))
+        path.addLine(to: CGPoint(x: midX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - insetY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + insetY))
         path.closeSubpath()
         return path
     }
@@ -625,8 +932,23 @@ private struct QualityBadge: View {
 
 private struct RemoteIcon: View {
     let url: String
-    let size: CGFloat
+    let width: CGFloat
+    let height: CGFloat
     let cornerRadius: CGFloat
+
+    init(url: String, size: CGFloat, cornerRadius: CGFloat) {
+        self.url = url
+        self.width = size
+        self.height = size
+        self.cornerRadius = cornerRadius
+    }
+
+    init(url: String, width: CGFloat, height: CGFloat, cornerRadius: CGFloat) {
+        self.url = url
+        self.width = width
+        self.height = height
+        self.cornerRadius = cornerRadius
+    }
 
     var body: some View {
         AsyncImage(url: URL(string: url)) { phase in
@@ -635,9 +957,9 @@ private struct RemoteIcon: View {
                 image.resizable().aspectRatio(contentMode: .fill)
             case .failure:
                 Image(systemName: "photo")
-                    .font(.system(size: size * 0.38))
+                    .font(.system(size: min(width, height) * 0.38))
                     .foregroundStyle(.secondary)
-                    .frame(width: size, height: size)
+                    .frame(width: width, height: height)
                     .background(Color.white.opacity(0.05))
             case .empty:
                 Color.white.opacity(0.05)
@@ -645,7 +967,7 @@ private struct RemoteIcon: View {
                 Color.white.opacity(0.05)
             }
         }
-        .frame(width: size, height: size)
+        .frame(width: width, height: height)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }

@@ -68,28 +68,73 @@ struct EquipPanel: View {
                 if !equip.synthesis1.isEmpty, equip.synthesis1 != "0" {
                     Divider().background(Color.white.opacity(0.1))
                     Text("合成配方").font(.headline).foregroundStyle(.primary)
-                    HStack(spacing: 14) {
+                    HStack(spacing: 12) {
                         synthIcon(equip.synthesis1)
-                        Image(systemName: "plus").font(.system(size: 12)).foregroundStyle(.tertiary)
+                        Image(systemName: "plus")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.secondary)
                         synthIcon(equip.synthesis2)
-                        Image(systemName: "arrow.right").font(.system(size: 12)).foregroundStyle(.tertiary)
+                        Image(systemName: "equal")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.secondary)
                         synthIcon(equip.id, isResult: true)
-                    }.padding(.top, 4)
+                    }
+                    .padding(12)
+                    .background(Color.white.opacity(0.025))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.06), lineWidth: 1))
+                    .padding(.top, 4)
                 }
                 if equip.isComponent {
                     let buildFrom = data.equipment.filter { $0.synthesis1 == equip.id || $0.synthesis2 == equip.id }
                     if !buildFrom.isEmpty {
                         Divider().background(Color.white.opacity(0.1))
-                        Text("可合成 (\(buildFrom.count))").font(.headline).foregroundStyle(.primary)
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 4) {
-                            ForEach(buildFrom) { eq in
-                                VStack(spacing: 2) {
+                        Text("可合成的装备 (\(buildFrom.count))").font(.headline).foregroundStyle(.primary)
+                        VStack(spacing: 8) {
+                            ForEach(buildFrom.sorted(by: { $0.name < $1.name })) { eq in
+                                let otherId = eq.synthesis1 == equip.id ? eq.synthesis2 : eq.synthesis1
+                                HStack(spacing: 12) {
                                     AsyncImage(url: URL(string: eq.picture)) { img in
                                         img.resizable().aspectRatio(contentMode: .fit)
                                     } placeholder: { Color.gray.opacity(0.2) }
-                                    .frame(width: 28, height: 28).clipShape(RoundedRectangle(cornerRadius: 3))
-                                    Text(eq.name).font(.system(size: 8)).foregroundStyle(.secondary).lineLimit(1)
-                                }.frame(width: 60)
+                                    .frame(width: 32, height: 32)
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(eq.name).font(.system(size: 11, weight: .bold)).foregroundStyle(.primary)
+                                        Text(eq.basicDesc).font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(1)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    HStack(spacing: 6) {
+                                        Text("配方:").font(.system(size: 9)).foregroundStyle(.tertiary)
+                                        AsyncImage(url: URL(string: equip.picture)) { img in
+                                            img.resizable().aspectRatio(contentMode: .fit)
+                                        } placeholder: { Color.clear }
+                                        .frame(width: 18, height: 18)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        
+                                        Image(systemName: "plus").font(.system(size: 8)).foregroundStyle(.secondary)
+                                        
+                                        if let otherEq = data.getEquip(otherId) {
+                                            AsyncImage(url: URL(string: otherEq.picture)) { img in
+                                                img.resizable().aspectRatio(contentMode: .fit)
+                                            } placeholder: { Color.clear }
+                                            .frame(width: 18, height: 18)
+                                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                                            .help(otherEq.name)
+                                        }
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.white.opacity(0.02))
+                                    .clipShape(RoundedRectangle(cornerRadius: 5))
+                                }
+                                .padding(8)
+                                .background(Color.white.opacity(0.02))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.04), lineWidth: 1))
                             }
                         }
                     }

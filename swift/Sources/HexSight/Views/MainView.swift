@@ -27,13 +27,21 @@ struct MainView: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            navSidebar
-            Divider().background(Color.white.opacity(0.15))
-            contentArea
+        GeometryReader { geometry in
+            let currentW = geometry.size.width
+            let scale = currentW / 1250.0
+
+            HStack(spacing: 0) {
+                navSidebar
+                Divider().background(Color.white.opacity(0.15))
+                contentArea
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .frame(width: 1250, height: 820)
+            .glassEffect(in: .rect(cornerRadius: 14))
+            .scaleEffect(scale, anchor: .topLeading)
         }
-        .frame(width: 700, height: 580)
-        .glassEffect(in: .rect(cornerRadius: 14))
+        .frame(minWidth: 1000, idealWidth: 1250, minHeight: 656, idealHeight: 820)
     }
 
     // MARK: - 导航侧栏
@@ -46,6 +54,7 @@ struct MainView: View {
                         .buttonStyle(.glass)
                         .font(.system(size: 10, weight: dataService.selectedMode == mode.id ? .bold : .regular))
                         .opacity(dataService.selectedMode == mode.id ? 1.0 : 0.5)
+                        .frame(width: 103, height: 22)
                 }
             }
             .padding(.horizontal, 6).padding(.vertical, 8)
@@ -54,14 +63,19 @@ struct MainView: View {
 
             ForEach(NavItem.allCases, id: \.self) { item in
                 Button { selectedNav = item } label: {
-                    VStack(spacing: 3) {
-                        Image(systemName: item.icon).font(.system(size: 16))
-                        Text(item.rawValue).font(.system(size: 9))
+                    HStack(spacing: 8) {
+                        Image(systemName: item.icon)
+                            .font(.system(size: 13))
+                            .frame(width: 18, alignment: .center)
+                        Text(item.rawValue)
+                            .font(.system(size: 11, weight: selectedNav == item ? .semibold : .regular))
+                        Spacer(minLength: 0)
                     }
-                    .frame(width: 60, height: 48)
+                    .padding(.horizontal, 10)
+                    .frame(width: 103, height: 34)
                     .foregroundStyle(selectedNav == item ? .primary : .secondary)
                     .background(selectedNav == item ? Color.white.opacity(0.12) : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }
@@ -69,7 +83,7 @@ struct MainView: View {
             Spacer()
             Text("HexSight V1.0").font(.system(size: 8)).foregroundStyle(.tertiary).padding(.bottom, 8)
         }
-        .frame(width: 72).padding(.top, 8)
+        .frame(width: 115).padding(.top, 8)
     }
 
     // MARK: - 内容区

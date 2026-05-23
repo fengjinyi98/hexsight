@@ -9,7 +9,7 @@ import SwiftUI
 final class MainWindow: NSPanel {
     init() {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 640, height: 540),
+            contentRect: NSRect(x: 0, y: 0, width: 1250, height: 820),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -20,7 +20,8 @@ final class MainWindow: NSPanel {
         self.isFloatingPanel = false
         self.isMovableByWindowBackground = false
         self.collectionBehavior = [.canJoinAllSpaces, .stationary]
-        self.minSize = NSSize(width: 500, height: 360)
+        self.minSize = NSSize(width: 1000, height: 656)
+        self.aspectRatio = NSSize(width: 1250, height: 820)
 
         self.isOpaque = false
         self.backgroundColor = .clear
