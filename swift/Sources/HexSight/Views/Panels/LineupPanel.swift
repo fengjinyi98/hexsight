@@ -380,11 +380,13 @@ private struct LineupDetailView: View {
                 sectionTitle("阵容站位")
                 finalHeroesRow(card)
                     .padding(.bottom, 4)
-                ChessboardView(pieces: card.detail.finalHeroes, mode: data.selectedMode)
-
+                
                 if !card.traits.isEmpty {
-                    traitSection
+                    traitOverviewRow
+                        .padding(.bottom, 8)
                 }
+                
+                ChessboardView(pieces: card.detail.finalHeroes, mode: data.selectedMode)
 
                 detailIconSection(title: "推荐强化", ids: card.detail.recommendedHexIDs) { id in
                     if let hex = data.hexes.first(where: { $0.id == id }) {
@@ -466,22 +468,14 @@ private struct LineupDetailView: View {
         }
     }
 
-    private var traitSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-            sectionTitle("羁绊组成")
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 6)], spacing: 6) {
+    private var traitOverviewRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
                 ForEach(card.traits, id: \.self) { trait in
-                    Text(trait)
-                        .font(Theme.Font.caption)
-                        .foregroundStyle(Theme.Color.textSecondary)
-                        .lineLimit(1)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
-                        .background(Theme.Color.cardBackground)
-                        .clipShape(Capsule())
+                    LineupTraitBadge(traitStr: trait)
                 }
             }
+            .padding(.horizontal, 2)
         }
     }
 
@@ -898,41 +892,44 @@ private struct LineupHeroChip: View {
                             .offset(x: -2, y: -2)
                     }
                 } else {
-                    // Hexagon Avatar
-                    if let urlString = hero?.picture, !urlString.isEmpty {
-                        RemoteIcon(url: urlString, width: avatarWidth, height: avatarHeight, cornerRadius: 0)
-                            .clipShape(HexagonShape())
-                    } else {
+                    // Hexagon Avatar Group
+                    ZStack(alignment: .bottom) {
+                        if let urlString = hero?.picture, !urlString.isEmpty {
+                            RemoteIcon(url: urlString, width: avatarWidth, height: avatarHeight, cornerRadius: 0)
+                                .clipShape(HexagonShape())
+                        } else {
+                            HexagonShape()
+                                .fill(Color.white.opacity(0.05))
+                                .frame(width: avatarWidth, height: avatarHeight)
+                        }
+
+                        // Hexagon Border
                         HexagonShape()
-                            .fill(Color.white.opacity(0.05))
+                            .stroke(piece.isCarryHero ? Theme.Color.gold.opacity(0.95) : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.6 : 1)
                             .frame(width: avatarWidth, height: avatarHeight)
-                    }
 
-                    // Hexagon Border
-                    HexagonShape()
-                        .stroke(piece.isCarryHero ? Theme.Color.gold.opacity(0.95) : Color.white.opacity(0.15), lineWidth: piece.isCarryHero ? 1.6 : 1)
-                        .frame(width: avatarWidth, height: avatarHeight)
+                        if piece.chessType == "pet" {
+                            Image(systemName: "pawprint.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.white)
+                                .padding(2)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Circle())
+                                .offset(x: avatarWidth * 0.35, y: -avatarHeight * 0.35)
+                        }
 
-                    if piece.chessType == "pet" {
-                        Image(systemName: "pawprint.fill")
-                            .font(.system(size: 6))
-                            .foregroundStyle(.white)
-                            .padding(2)
-                            .background(Color.black.opacity(0.6))
-                            .clipShape(Circle())
-                            .offset(x: avatarWidth * 0.35, y: -avatarHeight * 0.35)
-                    }
-
-                    // Equipment row overlapping the bottom edge
-                    HStack(spacing: 1) {
-                        ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
-                            if let equip = data.getEquip(id) {
-                                RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
-                                    .overlay(RoundedRectangle(cornerRadius: 1).stroke(Color.black.opacity(0.8), lineWidth: 0.5))
+                        // Equipment row overlapping the bottom edge
+                        HStack(spacing: 1) {
+                            ForEach(Array(piece.equipmentIDs.prefix(3)), id: \.self) { id in
+                                if let equip = data.getEquip(id) {
+                                    RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
+                                        .overlay(RoundedRectangle(cornerRadius: 1).stroke(Color.black.opacity(0.8), lineWidth: 0.5))
+                                }
                             }
                         }
+                        .offset(y: equipSize * 0.3)
                     }
-                    .offset(y: equipSize * 0.3)
+                    .scaleEffect(0.90)
                 }
             }
             .frame(width: avatarWidth, height: avatarHeight)
@@ -947,7 +944,7 @@ private struct LineupHeroChip: View {
                             RemoteIcon(url: equip.picture, size: equipSize, cornerRadius: 1)
                         }
                     } else {
-                        Color.clear.frame(height: equipSize)
+                        Color.clear.frame(width: avatarWidth, height: equipSize)
                     }
                 }
                 .frame(height: equipSize)
@@ -961,6 +958,7 @@ private struct LineupHeroChip: View {
                     .lineLimit(1)
             }
         }
+        .frame(width: style == .circle ? avatarWidth : nil)
         .help(hero?.name ?? piece.heroID)
     }
 }
@@ -977,6 +975,7 @@ private struct HexTile: View {
                 HexagonShape()
                     .stroke(stroke ?? .clear, lineWidth: lineWidth)
             )
+            .scaleEffect(0.90)
     }
 }
 
@@ -1268,5 +1267,124 @@ private struct SeasonTabCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 6))
         .shadow(color: glowColor, radius: 8, x: 0, y: 0)
+    }
+}
+
+// MARK: - 阵容推荐详情页 羁绊徽章 LineupTraitBadge
+private struct LineupTraitBadge: View {
+    let traitStr: String
+    @StateObject private var data = GameDataService.shared
+    
+    var body: some View {
+        let parsed = parseTrait(traitStr)
+        let traitModel = data.traits.first(where: { $0.name == parsed.name })
+        let tier = traitTier(name: parsed.name, countStr: parsed.count)
+        
+        HStack(spacing: 0) {
+            // Left part: Hexagon emblem with icon
+            ZStack {
+                HexagonShape()
+                    .fill(tier.color)
+                    .frame(width: 20, height: 23)
+                
+                if let trait = traitModel, !trait.picture.isEmpty {
+                    RemoteIcon(url: trait.picture, size: 13, cornerRadius: 0)
+                        .colorMultiply(.black.opacity(0.85)) // Matches dark emblem icons
+                } else {
+                    Image(systemName: "shield.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.black.opacity(0.85))
+                }
+            }
+            .padding(.leading, 1)
+            
+            // Right part: Text "Count Name"
+            HStack(spacing: 4) {
+                if !parsed.count.isEmpty {
+                    Text(parsed.count)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(tier == .gold ? Color(red: 0.95, green: 0.77, blue: 0.35) : .white)
+                }
+                
+                Text(parsed.name)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.Color.textPrimary)
+            }
+            .padding(.horizontal, 8)
+        }
+        .frame(height: 24)
+        .background(Color.white.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 3))
+        .overlay(
+            RoundedRectangle(cornerRadius: 3)
+                .stroke(tier.color.opacity(0.4), lineWidth: 1)
+        )
+    }
+    
+    private func parseTrait(_ traitStr: String) -> (count: String, name: String) {
+        let trimmed = traitStr.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let firstChar = trimmed.first, firstChar.isNumber {
+            var numberStr = String(firstChar)
+            var remaining = trimmed.dropFirst()
+            while let nextChar = remaining.first, nextChar.isNumber {
+                numberStr.append(nextChar)
+                remaining = remaining.dropFirst()
+            }
+            let name = remaining.trimmingCharacters(in: .whitespacesAndNewlines)
+            return (numberStr, name)
+        }
+        return ("", trimmed)
+    }
+    
+    private func traitTier(name: String, countStr: String) -> TFTTraitTier {
+        guard let count = Int(countStr) else { return .grey }
+        let matches = data.traits.filter { $0.name == name }
+        guard let trait = matches.first else {
+            if count >= 6 { return .gold }
+            if count >= 4 { return .silver }
+            if count >= 3 { return .bronze }
+            return .grey
+        }
+        
+        let thresholds = trait.thresholds.sorted()
+        if thresholds.isEmpty {
+            return .grey
+        }
+        
+        var activeIndex = -1
+        for (idx, thresh) in thresholds.enumerated() {
+            if count >= thresh {
+                activeIndex = idx
+            }
+        }
+        
+        if activeIndex == -1 {
+            return .grey
+        }
+        
+        let totalLevels = thresholds.count
+        if activeIndex == totalLevels - 1 {
+            return .gold
+        } else if activeIndex >= totalLevels / 2 {
+            return .silver
+        } else {
+            return .bronze
+        }
+    }
+    
+    private enum TFTTraitTier {
+        case gold
+        case silver
+        case bronze
+        case grey
+        
+        var color: Color {
+            switch self {
+            case .gold: return Color(red: 0.95, green: 0.77, blue: 0.35)
+            case .silver: return Color(red: 0.75, green: 0.75, blue: 0.8)
+            case .bronze: return Color(red: 0.7, green: 0.45, blue: 0.25)
+            case .grey: return Color(red: 0.4, green: 0.4, blue: 0.45)
+            }
+        }
     }
 }
