@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 // MARK: - 阵容列表
@@ -1255,11 +1256,21 @@ private struct QualityBadge: View {
     }
 }
 
+/// RemoteIcon 远程图片组件
+/// 核心职责：
+/// - 使用内存缓存复用英雄、装备、强化符文图标
+/// - 对列表页高并发图片加载做重试
+/// - 避免 AsyncImage 失败态永久停留在占位图
 private struct RemoteIcon: View {
     let url: String
     let width: CGFloat
     let height: CGFloat
     let cornerRadius: CGFloat
+
+    @State private var image: NSImage?
+    @State private var didFail = false
+
+    private static let cache = NSCache<NSURL, NSImage>()
 
     init(url: String, size: CGFloat, cornerRadius: CGFloat) {
         self.url = url
@@ -1276,24 +1287,70 @@ private struct RemoteIcon: View {
     }
 
     var body: some View {
-        AsyncImage(url: URL(string: url)) { phase in
-            switch phase {
-            case .success(let image):
-                image.resizable().aspectRatio(contentMode: .fill)
-            case .failure:
-                Image(systemName: "photo")
-                    .font(.system(size: min(width, height) * 0.38))
-                    .foregroundStyle(.secondary)
-                    .frame(width: width, height: height)
-                    .background(Color.white.opacity(0.05))
-            case .empty:
-                Color.white.opacity(0.05)
-            @unknown default:
-                Color.white.opacity(0.05)
+        content
+            .frame(width: width, height: height)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .task(id: url) {
+                await loadImage()
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let image {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } else if didFail {
+            Image(systemName: "photo")
+                .font(.system(size: min(width, height) * 0.38))
+                .foregroundStyle(.secondary)
+                .frame(width: width, height: height)
+                .background(Color.white.opacity(0.05))
+        } else {
+            Color.white.opacity(0.05)
+        }
+    }
+
+    @MainActor
+    private func loadImage() async {
+        guard let remoteURL = URL(string: url), !url.isEmpty else {
+            didFail = true
+            return
+        }
+
+        let cacheKey = remoteURL as NSURL
+        if let cached = Self.cache.object(forKey: cacheKey) {
+            image = cached
+            didFail = false
+            return
+        }
+
+        image = nil
+        didFail = false
+
+        for attempt in 0..<3 {
+            do {
+                let request = URLRequest(url: remoteURL, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 12)
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                    throw URLError(.badServerResponse)
+                }
+                guard let loadedImage = NSImage(data: data) else {
+                    throw URLError(.cannotDecodeContentData)
+                }
+                Self.cache.setObject(loadedImage, forKey: cacheKey)
+                image = loadedImage
+                didFail = false
+                return
+            } catch {
+                if attempt < 2 {
+                    try? await Task.sleep(for: .milliseconds(250 * (attempt + 1)))
+                }
             }
         }
-        .frame(width: width, height: height)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+
+        didFail = true
     }
 }
 
