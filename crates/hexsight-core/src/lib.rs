@@ -6,8 +6,10 @@
 
 pub mod data_types;
 pub mod error;
+pub mod rule_types;
 pub mod types;
 
 pub use data_types::*;
 pub use error::{HexError, HexResult};
+pub use rule_types::*;
 pub use types::*;

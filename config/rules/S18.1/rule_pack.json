@@ -1,0 +1,39 @@
+{
+  "version": "S18.1",
+  "modes": ["17", "16", "4"],
+  "damageProfile": {
+    "2": 0,
+    "3": 2,
+    "4": 4,
+    "5": 6,
+    "6": 8,
+    "7": 12
+  },
+  "weights": {
+    "lineupFit": {
+      "itemFit": 0.22,
+      "championHit": 0.18,
+      "augmentFit": 0.12,
+      "economyFit": 0.05,
+      "healthSafety": 0.05,
+      "traitFit": 0.08,
+      "stageFit": 0.05,
+      "playstyleSwitch": 0.05,
+      "baseScore": 0.20
+    },
+    "transition": {
+      "twoStar": 0.30,
+      "frontline": 0.25,
+      "backline": 0.20,
+      "trait": 0.10,
+      "item": 0.10,
+      "augment": 0.05
+    }
+  },
+  "thresholds": {
+    "lockLineupScore": 75,
+    "pivotRiskScore": 70,
+    "mustStabilizeHealth": 35,
+    "largeDamageWarning": 8
+  }
+}
