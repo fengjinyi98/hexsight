@@ -2,10 +2,14 @@
 // 核心职责：
 // - 数据加载、索引与规则上下文生成
 // - 阵容规则档案构建（LineupProfileBuilder）
-// - 装备/阵容/过渡/赌狗评分器
-// - 开局路线分类、决策规划
+// - 装备/阵容/过渡/赌狗/海克斯/经济/风险评分器
+// - 开局路线分类、决策规划、过渡匹配、伤害预测
+// - 规则包加载、版本覆写、Schema校验
 // - 规则引擎输出结构化 RuleOutput JSON
 
+pub mod augment_economy_planner;
+pub mod augment_effect_interpreter;
+pub mod damage_patch_loader;
 pub mod decision;
 pub mod decision_planner;
 pub mod game_data_index;
@@ -23,8 +27,12 @@ pub mod reroll_eligibility_scorer;
 pub mod rule_pack_loader;
 pub mod rules;
 pub mod rules_context;
+pub mod transition_risk_scorer;
 pub mod version_validator;
 
+pub use augment_economy_planner::{AugmentFitScorer, EconomyPlanner};
+pub use augment_effect_interpreter::AugmentEffectInterpreter;
+pub use damage_patch_loader::{DamageProfile, PatchOverrideLoader};
 pub use decision::DecisionEngine;
 pub use decision_planner::DecisionPlanner;
 pub use game_data_index::GameDataIndex;

@@ -1,0 +1,9 @@
+{
+  "version": "S18.1",
+  "description": "S18.1 版本公告修正与热修覆写（初始为空模板，版本更新时按需填入）",
+  "lineup_tier_overrides": {},
+  "item_synergy_overrides": {},
+  "damage_overrides": {},
+  "threshold_overrides": {},
+  "weight_overrides": {}
+}

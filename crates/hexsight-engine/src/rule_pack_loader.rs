@@ -8,24 +8,41 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use hexsight_core::{HexError, HexResult, RulePack};
+use crate::PatchOverrideLoader;
 
 /// 规则包加载器
 pub struct RulePackLoader;
 
 impl RulePackLoader {
-    /// 加载指定版本的规则包，失败回退 Default
-    pub fn load(config_root: &Path, version: &str) -> (RulePack, Option<String>) {
+    /// 加载指定版本的规则包，自动尝试应用 patch_overrides.json
+    /// 失败回退 Default 规则包并返回警告信息
+    pub fn load(config_root: &Path, version: &str) -> (RulePack, Vec<String>) {
         let path = Self::rule_pack_path(config_root, version);
-        match Self::load_from_path(&path) {
-            Ok(pack) => (pack, None),
+        let mut warnings = Vec::new();
+
+        let mut pack = match Self::load_from_path(&path) {
+            Ok(p) => p,
             Err(e) => {
-                let warning = format!(
+                warnings.push(format!(
                     "规则包加载失败 {}: {}，回退到默认规则包",
                     path.display(), e
-                );
-                (RulePack::default(), Some(warning))
+                ));
+                RulePack::default()
+            }
+        };
+
+        // 自动尝试加载并应用版本覆写
+        match PatchOverrideLoader::load(config_root, version) {
+            Ok(Some(ov)) => {
+                PatchOverrideLoader::apply(&mut pack, &ov);
+            }
+            Ok(None) => {} // 无覆写文件，正常
+            Err(e) => {
+                warnings.push(format!("版本覆写加载失败: {}", e));
             }
         }
+
+        (pack, warnings)
     }
 
     /// 从指定路径加载规则包
@@ -77,8 +94,8 @@ mod tests {
 
     #[test]
     fn load_s18_1_rule_pack() {
-        let (pack, warning) = RulePackLoader::load(&test_config_root(), "S18.1");
-        assert!(warning.is_none(), "加载失败: {:?}", warning);
+        let (pack, warnings) = RulePackLoader::load(&test_config_root(), "S18.1");
+        assert!(warnings.is_empty(), "加载失败: {:?}", warnings);
         assert_eq!(pack.version, "S18.1");
         assert!(!pack.modes.is_empty());
         assert!(pack.weights.lineup_fit.item_fit > 0.0);
@@ -87,8 +104,8 @@ mod tests {
 
     #[test]
     fn load_nonexistent_version_falls_back() {
-        let (pack, warning) = RulePackLoader::load(&test_config_root(), "S99");
-        assert!(warning.is_some());
+        let (pack, warnings) = RulePackLoader::load(&test_config_root(), "S99");
+        assert!(!warnings.is_empty());
         // 回退到默认
         assert_eq!(pack.version, "S18.1");
     }
@@ -145,8 +162,8 @@ mod regression_tests {
     fn full_pipeline_rule_pack_to_scores() {
         let root = config_root();
         // 1. 加载规则包
-        let (pack, warning) = RulePackLoader::load(&root, "S18.1");
-        assert!(warning.is_none());
+        let (pack, warnings) = RulePackLoader::load(&root, "S18.1");
+        assert!(warnings.is_empty());
 
         // 2. 加载游戏数据 + 阵容
         let index = GameDataIndex::load(&root, "17").unwrap();
