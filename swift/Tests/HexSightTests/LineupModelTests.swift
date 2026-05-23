@@ -49,3 +49,84 @@ final class LineupModelTests: XCTestCase {
         XCTAssertEqual(card.detail.locationInfo, "超级机甲单顶")
     }
 }
+
+extension LineupModelTests {
+    func testMode16DetailParsesUnlockTasks() throws {
+        let payload: [String: Any] = [
+            "id": "3941",
+            "quality": "S",
+            "detail": """
+            {
+              "line_name":"【约德尔人吉格斯】8约德尔人2护卫2主宰2法师",
+              "task_list":[
+                {"task_id":1242001,"chess_id":"2420"},
+                {"task_id":1527101,"chess_id":"5271"}
+              ]
+            }
+            """,
+        ]
+
+        let card = try XCTUnwrap(LineupCard(dict: payload, rawData: payload))
+
+        XCTAssertEqual(card.detail.unlockTasks.count, 2)
+        XCTAssertEqual(card.detail.unlockTasks.first?.taskID, "1242001")
+        XCTAssertEqual(card.detail.unlockTasks.first?.heroID, "12420")
+        XCTAssertEqual(card.detail.unlockTasks.last?.heroID, "15271")
+    }
+
+    func testMode17DetailParsesGodRewards() throws {
+        let payload: [String: Any] = [
+            "id": "4514",
+            "quality": "S",
+            "detail": """
+            {
+              "line_name":"【神谕龙王】3牧羊人3霸天机甲3神谕",
+              "god_list":[
+                {"stage_num":2,"god_id":4,"wishes":[1704022,1704020]},
+                {"stage_num":3,"god_id":5,"wishes":[1705031,1705041]}
+              ],
+              "godreward_info":"优先凯尔补装备"
+            }
+            """,
+        ]
+
+        let card = try XCTUnwrap(LineupCard(dict: payload, rawData: payload))
+
+        XCTAssertEqual(card.detail.godRewards.count, 2)
+        XCTAssertEqual(card.detail.godRewards.first?.stage, 2)
+        XCTAssertEqual(card.detail.godRewards.first?.godID, "4")
+        XCTAssertEqual(card.detail.godRewards.first?.wishIDs, ["1704022", "1704020"])
+        XCTAssertEqual(card.detail.godRewardInfo, "优先凯尔补装备")
+    }
+
+    func testMode4DetailParsesChosenAndOfficialContacts() throws {
+        let payload: [String: Any] = [
+            "id": "4242",
+            "quality": "S",
+            "detail": """
+            {
+              "line_name":"【新年第一把-武财神德莱文】3战神3三国猛将",
+              "chosen_contact":{"id":"91","type":"job"},
+              "messengerContact":{"id":"102","type":"race"},
+              "chosen_backup":[{"hero_$key_id":"15091","id":"90","type":"race"}],
+              "contact":[
+                {"color":2,"id":"94","level":1,"type":"job","num":3},
+                {"color":1,"id":"90","level":1,"type":"race","num":3}
+              ],
+              "early_round":"2-3",
+              "metaphase_round":"4-3"
+            }
+            """,
+        ]
+
+        let card = try XCTUnwrap(LineupCard(dict: payload, rawData: payload))
+
+        XCTAssertEqual(card.detail.officialTraits.count, 2)
+        XCTAssertEqual(card.detail.officialTraits.first?.id, "94")
+        XCTAssertEqual(card.detail.chosenContact?.id, "91")
+        XCTAssertEqual(card.detail.messengerContact?.id, "102")
+        XCTAssertEqual(card.detail.chosenBackups.first?.heroID, "15091")
+        XCTAssertEqual(card.detail.earlyRound, "2-3")
+        XCTAssertEqual(card.detail.midRound, "4-3")
+    }
+}

@@ -90,6 +90,14 @@ struct LineupDetailData {
     let equipmentOrderIDs: [String]
     let level3HeroIDs: [String]
     let heroReplacements: [LineupHeroReplacement]
+    let unlockTasks: [LineupUnlockTask]
+    let godRewards: [LineupGodReward]
+    let officialTraits: [LineupTraitContact]
+    let earlyTraits: [LineupTraitContact]
+    let midTraits: [LineupTraitContact]
+    let chosenContact: LineupTraitContact?
+    let messengerContact: LineupTraitContact?
+    let chosenBackups: [LineupChosenBackup]
     let lineFeature: String
     let earlyInfo: String
     let dTime: String
@@ -97,6 +105,16 @@ struct LineupDetailData {
     let enemyInfo: String
     let hexInfo: String
     let equipmentInfo: String
+    let godRewardInfo: String
+    let taskInfo: String
+    let chosenInfo: String
+    let locationInfo2: String
+    let earlyRound: String
+    let midRound: String
+    let staffInfo: String
+    let goopInfo: String
+    let traitPartyInfo: String
+    let legendGalaxyInfo: String
 
     init(payload: [String: Any]) {
         self.raw = payload
@@ -110,6 +128,17 @@ struct LineupDetailData {
         self.level3HeroIDs = splitIDs(payload["level_3_heros"])
         let replacements = payload["hero_replace"] as? [[String: Any]] ?? []
         self.heroReplacements = replacements.compactMap(LineupHeroReplacement.init(dict:))
+        let tasks = payload["task_list"] as? [[String: Any]] ?? []
+        self.unlockTasks = tasks.compactMap(LineupUnlockTask.init(dict:))
+        let gods = payload["god_list"] as? [[String: Any]] ?? []
+        self.godRewards = gods.compactMap(LineupGodReward.init(dict:))
+        self.officialTraits = LineupDetailData.parseTraitContacts(payload["contact"])
+        self.earlyTraits = LineupDetailData.parseTraitContacts(payload["y21_early_heros_contact"])
+        self.midTraits = LineupDetailData.parseTraitContacts(payload["y21_metaphase_heros_contact"])
+        self.chosenContact = LineupTraitContact(dict: payload["chosen_contact"] as? [String: Any] ?? [:])
+        self.messengerContact = LineupTraitContact(dict: payload["messengerContact"] as? [String: Any] ?? [:])
+        let chosenBackups = payload["chosen_backup"] as? [[String: Any]] ?? []
+        self.chosenBackups = chosenBackups.compactMap(LineupChosenBackup.init(dict:))
         self.lineFeature = nonEmptyString(payload["line_feature"]) ?? ""
         self.earlyInfo = nonEmptyString(payload["early_info"]) ?? ""
         self.dTime = nonEmptyString(payload["d_time"]) ?? ""
@@ -117,11 +146,128 @@ struct LineupDetailData {
         self.enemyInfo = nonEmptyString(payload["enemy_info"]) ?? ""
         self.hexInfo = nonEmptyString(payload["hex_info"]) ?? ""
         self.equipmentInfo = nonEmptyString(payload["equipment_info"]) ?? ""
+        self.godRewardInfo = nonEmptyString(payload["godreward_info"]) ?? ""
+        self.taskInfo = nonEmptyString(payload["task_info"]) ?? ""
+        self.chosenInfo = nonEmptyString(payload["chosen_info"]) ?? ""
+        self.locationInfo2 = nonEmptyString(payload["location_info_2"]) ?? ""
+        self.earlyRound = nonEmptyString(payload["early_round"]) ?? ""
+        self.midRound = nonEmptyString(payload["metaphase_round"]) ?? ""
+        self.staffInfo = nonEmptyString(payload["staff_info"]) ?? ""
+        self.goopInfo = nonEmptyString(payload["goop_info"]) ?? ""
+        self.traitPartyInfo = nonEmptyString(payload["traitparty_info"]) ?? ""
+        self.legendGalaxyInfo = nonEmptyString(payload["legendgalaxyinfo"]) ?? ""
     }
 
     private static func parsePieces(_ value: Any?) -> [LineupPiece] {
         let list = value as? [[String: Any]] ?? []
         return list.compactMap(LineupPiece.init(dict:))
+    }
+
+    private static func parseTraitContacts(_ value: Any?) -> [LineupTraitContact] {
+        let list = value as? [[String: Any]] ?? []
+        return list.compactMap(LineupTraitContact.init(dict:))
+    }
+}
+
+
+/// LineupUnlockTask 英雄解锁任务模型
+/// 核心职责：
+/// - 表示官方 task_list 中的任务 ID
+/// - 从 task_id 推导任务关联英雄 ID
+/// - 为详情页和规则引擎保留解锁条件入口
+struct LineupUnlockTask: Identifiable, Equatable {
+    var id: String { taskID }
+    let taskID: String
+    let chessID: String
+    let heroID: String
+
+    init?(dict: [String: Any]) {
+        let taskID = lineupString(dict["task_id"])
+        guard !taskID.isEmpty else { return nil }
+        self.taskID = taskID
+        self.chessID = lineupString(dict["chess_id"])
+        self.heroID = String(taskID.dropLast(2))
+    }
+}
+
+/// LineupGodReward 星神奖励模型
+/// 核心职责：
+/// - 表示 mode17 的阶段神明奖励选择
+/// - 保留 god_id、stage 与 wish_id 列表
+/// - 支撑星神模式规则提取
+struct LineupGodReward: Identifiable, Equatable {
+    var id: String { "\(stage)-\(godID)-\(wishIDs.joined(separator: "-"))" }
+    let stage: Int
+    let godID: String
+    let wishIDs: [String]
+
+    init?(dict: [String: Any]) {
+        let godID = lineupString(dict["god_id"])
+        guard !godID.isEmpty else { return nil }
+        self.stage = Int(lineupString(dict["stage_num"])) ?? 0
+        self.godID = godID
+        if let wishes = dict["wishes"] as? [Any] {
+            self.wishIDs = wishes.map(lineupString).filter { !$0.isEmpty }
+        } else {
+            self.wishIDs = splitIDs(dict["wishes"])
+        }
+    }
+}
+
+/// LineupTraitContact 官方羁绊计数模型
+/// 核心职责：
+/// - 表示官方 contact 字段中的羁绊 ID 与数量
+/// - 区分种族、职业和特殊羁绊类型
+/// - 保留颜色等级用于还原官网徽章样式
+struct LineupTraitContact: Identifiable, Equatable, Hashable {
+    let id: String
+    let type: String
+    let count: Int
+    let color: Int
+    let level: Int
+
+    init?(dict: [String: Any]) {
+        let id = lineupString(dict["id"])
+        let type = nonEmptyString(dict["type"]) ?? ""
+        guard !id.isEmpty || !type.isEmpty else { return nil }
+        self.id = id
+        self.type = type
+        self.count = Int(lineupString(dict["num"])) ?? 0
+        self.color = Int(lineupString(dict["color"])) ?? 0
+        self.level = Int(lineupString(dict["level"])) ?? 0
+    }
+
+    static func synthetic(id: String, type: String) -> LineupTraitContact {
+        LineupTraitContact(id: id, type: type, count: 0, color: 1, level: 1)
+    }
+
+    private init(id: String, type: String, count: Int, color: Int, level: Int) {
+        self.id = id
+        self.type = type
+        self.count = count
+        self.color = color
+        self.level = level
+    }
+}
+
+/// LineupChosenBackup 天选备选模型
+/// 核心职责：
+/// - 表示 mode4 天选备选英雄与对应羁绊
+/// - 保留官方英雄 key 与羁绊类型
+/// - 支撑天选福星模式规则提取
+struct LineupChosenBackup: Identifiable, Equatable, Hashable {
+    var id: String { "\(heroID)-\(traitID)-\(type)" }
+    let heroID: String
+    let traitID: String
+    let type: String
+
+    init?(dict: [String: Any]) {
+        let heroID = nonEmptyString(dict["hero_$key_id"]) ?? ""
+        let traitID = nonEmptyString(dict["id"]) ?? ""
+        guard !heroID.isEmpty || !traitID.isEmpty else { return nil }
+        self.heroID = heroID
+        self.traitID = traitID
+        self.type = nonEmptyString(dict["type"]) ?? ""
     }
 }
 

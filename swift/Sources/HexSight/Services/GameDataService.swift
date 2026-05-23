@@ -26,6 +26,12 @@ final class GameDataService: ObservableObject {
     private var allHeroPictures: [String: String] = [:]
     /// 全模式 hero_id → 英雄数据缓存
     private var allHeroesByMode: [String: [String: HeroModel]] = [:]
+    /// 全模式羁绊缓存
+    private var allTraitsByMode: [String: [TraitModel]] = [:]
+    /// 全模式任务缓存
+    private var allMissionsByMode: [String: [String: MissionModel]] = [:]
+    /// 全模式星神奖励缓存
+    private var allGodWishesByMode: [String: [String: GodWishModel]] = [:]
 
     private init() {
         // 预加载所有模式的头像缓存
@@ -38,6 +44,9 @@ final class GameDataService: ObservableObject {
                 heroMap[hero.id] = hero
             }
             allHeroesByMode[modeId] = heroMap
+            allTraitsByMode[modeId] = loadArray("\(dir)/trait.json", key: "data")
+            allMissionsByMode[modeId] = loadMissions("\(dir)/mission.json")
+            allGodWishesByMode[modeId] = loadGodWishes("\(dir)/god.json")
         }
         loadMode("17")
     }
@@ -103,6 +112,80 @@ final class GameDataService: ObservableObject {
         equipment.first { $0.id == id }
     }
 
+    /// 解锁任务详情
+    func mission(for id: String, mode: String) -> MissionModel? {
+        allMissionsByMode[mode]?[id]
+    }
+
+    /// 星神奖励详情
+    func godWish(for id: String, mode: String) -> GodWishModel? {
+        allGodWishesByMode[mode]?[id]
+    }
+
+    /// 阵容羁绊总览
+    func traitSummaries(
+        for pieces: [LineupPiece],
+        mode: String,
+        officialContacts: [LineupTraitContact] = []
+    ) -> [LineupTraitSummary] {
+        let traits = allTraitsByMode[mode] ?? []
+        if !officialContacts.isEmpty {
+            return officialContacts.compactMap { contact in
+                guard contact.color > 0 || contact.count > 0 else { return nil }
+                guard let trait = traits.first(where: { trait in
+                    trait.checkId == contact.id && traitMatches(contact.type, trait: trait)
+                }) ?? traits.first(where: { $0.checkId == contact.id }) else { return nil }
+                return LineupTraitSummary(
+                    id: "\(contact.type)-\(contact.id)",
+                    traitID: contact.id,
+                    type: contact.type,
+                    name: trait.name,
+                    count: contact.count,
+                    color: contact.color,
+                    level: contact.level,
+                    picture: trait.picture
+                )
+            }
+        }
+
+        var counts: [String: Int] = [:]
+        for piece in pieces where piece.chessType == "hero" {
+            guard let hero = hero(for: piece.heroID, mode: mode) else { continue }
+            for id in splitTraitIDs(hero.species) { counts["race:\(id)", default: 0] += 1 }
+            for id in splitTraitIDs(hero.heroClass) { counts["job:\(id)", default: 0] += 1 }
+        }
+
+        let summaries = counts.compactMap { key, count -> LineupTraitSummary? in
+            let parts = key.split(separator: ":").map(String.init)
+            guard parts.count == 2 else { return nil }
+            let type = parts[0]
+            let checkId = parts[1]
+            let candidates = traits.filter { $0.checkId == checkId && traitMatches(type, trait: $0) }
+            guard let active = candidates
+                .filter({ count >= (Int($0.num) ?? Int.max) })
+                .max(by: { $0.level < $1.level })
+            else { return nil }
+            return LineupTraitSummary(
+                id: key,
+                traitID: checkId,
+                type: type,
+                name: active.name,
+                count: count,
+                color: Int(active.color) ?? 0,
+                level: active.level,
+                picture: active.picture
+            )
+        }
+
+        return summaries.sorted { lhs, rhs in
+            if lhs.color == rhs.color {
+                if lhs.count == rhs.count { return lhs.name < rhs.name }
+                return lhs.count > rhs.count
+            }
+            return lhs.color > rhs.color
+        }
+    }
+
     /// 获取羁绊的所有等级
     func traitLevels(for checkId: String) -> [TraitModel] {
         traits.filter { $0.checkId == checkId }
@@ -136,6 +219,53 @@ final class GameDataService: ObservableObject {
         return map
     }
 
+    private func loadMissions(_ path: String) -> [String: MissionModel] {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let container = json["data"] as? [String: Any]
+        else { return [:] }
+
+        var map: [String: MissionModel] = [:]
+        for (_, value) in container {
+            guard let group = value as? [String: Any] else { continue }
+            let heroID = stringValue(group["heroid"])
+            let missions = group["mission"] as? [[String: Any]] ?? []
+            for missionDict in missions {
+                guard let mission = MissionModel(dict: missionDict, heroID: heroID) else { continue }
+                map[mission.id] = mission
+            }
+        }
+        return map
+    }
+
+    private func loadGodWishes(_ path: String) -> [String: GodWishModel] {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let container = json["data"] as? [[String: Any]]
+        else { return [:] }
+
+        var map: [String: GodWishModel] = [:]
+        for god in container {
+            let godID = stringValue(god["godId"])
+            let godName = stringValue(god["godName"])
+            let stages = god["stages"] as? [[String: Any]] ?? []
+            for stage in stages {
+                let stageNumber = Int(stringValue(stage["num"])) ?? 0
+                let wishes = stage["wishes"] as? [[String: Any]] ?? []
+                for wishDict in wishes {
+                    guard let wish = GodWishModel(
+                        dict: wishDict,
+                        godID: godID,
+                        godName: godName,
+                        stage: stageNumber
+                    ) else { continue }
+                    map[wish.id] = wish
+                }
+            }
+        }
+        return map
+    }
+
     private func loadArray<T>(_ path: String, key: String) -> [T] {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -158,8 +288,21 @@ final class GameDataService: ObservableObject {
     }
 }
 
+private func splitTraitIDs(_ raw: String) -> [String] {
+    raw.split(separator: "|")
+        .map(String.init)
+        .filter { !$0.isEmpty && $0 != "0" && $0 != "-1" }
+}
+
+private func traitMatches(_ type: String, trait: TraitModel) -> Bool {
+    if type == "race" { return trait.traitType == 0 }
+    if type == "job" { return trait.traitType == 1 }
+    return true
+}
+
 private func stringValue(_ val: Any?) -> String {
     if let s = val as? String { return s }
     if let i = val as? Int { return String(i) }
+    if let d = val as? Double { return d.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(d)) : String(d) }
     return ""
 }

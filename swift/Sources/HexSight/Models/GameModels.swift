@@ -176,6 +176,71 @@ struct HexModel: Identifiable {
     }
 }
 
+
+/// MissionModel 英雄解锁任务数据模型
+/// 核心职责：
+/// - 表示玩法任务 ID、关联英雄与任务描述
+/// - 支撑阵容详情页解锁任务展示
+/// - 为后续规则引擎提供结构化条件文本
+struct MissionModel: Identifiable {
+    let id: String
+    let heroID: String
+    let taskTips: String
+    let desc: String
+
+    init?(dict: [String: Any], heroID: String) {
+        let id = stringValue(dict["id"])
+        guard !id.isEmpty else { return nil }
+        self.id = id
+        self.heroID = heroID
+        self.taskTips = stringValue(dict["tasktips"])
+        self.desc = stringValue(dict["desc"])
+    }
+}
+
+/// GodWishModel 星神奖励选项模型
+/// 核心职责：
+/// - 表示 mode17 神明奖励中的 wish 选项
+/// - 保留名称、描述、图标与所属神明
+/// - 支撑星神模式规则展示和 LLM 理解
+struct GodWishModel: Identifiable {
+    let id: String
+    let godID: String
+    let godName: String
+    let stage: Int
+    let name: String
+    let desc: String
+    let icon: String
+
+    init?(dict: [String: Any], godID: String, godName: String, stage: Int) {
+        let id = stringValue(dict["id"])
+        guard !id.isEmpty else { return nil }
+        self.id = id
+        self.godID = godID
+        self.godName = godName
+        self.stage = stage
+        self.name = stringValue(dict["name"])
+        self.desc = stringValue(dict["desc"])
+        self.icon = stringValue(dict["icon"])
+    }
+}
+
+/// LineupTraitSummary 阵容羁绊汇总模型
+/// 核心职责：
+/// - 表示阵容激活羁绊的名称、数量和图标
+/// - 兼容官方 contact 和本地棋子反推两种来源
+/// - 支撑详情页羁绊总览与规则化理解
+struct LineupTraitSummary: Identifiable, Equatable {
+    let id: String
+    let traitID: String
+    let type: String
+    let name: String
+    let count: Int
+    let color: Int
+    let level: Int
+    let picture: String
+}
+
 /// 类型转换辅助
 private func stringValue(_ val: Any?) -> String {
     if let s = val as? String { return s }

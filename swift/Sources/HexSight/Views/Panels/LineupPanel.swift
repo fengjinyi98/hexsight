@@ -377,40 +377,26 @@ private struct LineupDetailView: View {
                 header
                 Divider().background(Color.white.opacity(0.1))
 
+                lineupOverviewSection
+
                 sectionTitle("阵容站位")
                 finalHeroesRow(card)
                     .padding(.bottom, 4)
-                
-                if !card.traits.isEmpty {
-                    traitOverviewRow
-                        .padding(.bottom, 8)
-                }
-                
                 ChessboardView(pieces: card.detail.finalHeroes, mode: data.selectedMode)
+                textSection("站位说明", combinedLocationInfo)
 
-                detailIconSection(title: "推荐强化", ids: card.detail.recommendedHexIDs) { id in
-                    if let hex = data.hexes.first(where: { $0.id == id }) {
-                        IconTextItem(icon: hex.icon, title: hex.name, subtitle: "\(hex.level)级")
-                    }
-                }
-
-                detailIconSection(title: "可替换强化", ids: card.detail.replacementHexIDs) { id in
-                    if let hex = data.hexes.first(where: { $0.id == id }) {
-                        IconTextItem(icon: hex.icon, title: hex.name, subtitle: "\(hex.level)级")
-                    }
-                }
-
+                unlockTaskSection
+                modeSpecificMechanicSection
+                hexAnalysisSection
                 equipmentAnalysisSection
 
                 if !card.detail.earlyHeroes.isEmpty || !card.detail.midHeroes.isEmpty {
                     transitionSection
                 }
 
-                textSection("站位说明", card.detail.locationInfo)
-                textSection("强化思路", card.detail.hexInfo)
                 textSection("前期过渡", card.detail.earlyInfo)
                 textSection("搜牌节奏", card.detail.dTime)
-                textSection("克制与变阵", card.detail.enemyInfo)
+                textSection("克制分析", card.detail.enemyInfo)
             }
             .padding(Theme.Spacing.medium)
             .padding(.bottom, 40)
@@ -468,15 +454,48 @@ private struct LineupDetailView: View {
         }
     }
 
-    private var traitOverviewRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(card.traits, id: \.self) { trait in
-                    LineupTraitBadge(traitStr: trait)
+    private var lineupOverviewSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+            sectionTitle("羁绊总览")
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(finalTraitSummaries) { trait in
+                        LineupTraitSummaryBadge(summary: trait)
+                    }
                 }
+                .padding(.horizontal, 2)
             }
-            .padding(.horizontal, 2)
         }
+    }
+
+    private var finalTraitSummaries: [LineupTraitSummary] {
+        data.traitSummaries(
+            for: card.detail.finalHeroes,
+            mode: data.selectedMode,
+            officialContacts: card.detail.officialTraits
+        )
+    }
+
+    private var earlyTraitSummaries: [LineupTraitSummary] {
+        data.traitSummaries(
+            for: card.detail.earlyHeroes,
+            mode: data.selectedMode,
+            officialContacts: card.detail.earlyTraits
+        )
+    }
+
+    private var midTraitSummaries: [LineupTraitSummary] {
+        data.traitSummaries(
+            for: card.detail.midHeroes,
+            mode: data.selectedMode,
+            officialContacts: card.detail.midTraits
+        )
+    }
+
+    private var combinedLocationInfo: String {
+        [card.detail.locationInfo, card.detail.locationInfo2]
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
     }
 
     private var transitionSection: some View {
@@ -547,6 +566,207 @@ private struct LineupDetailView: View {
                 }
             }
         }
+    }
+
+    private var unlockTaskSection: some View {
+        Group {
+            if !card.detail.unlockTasks.isEmpty {
+                VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                    sectionTitle("解锁任务")
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(card.detail.unlockTasks) { task in
+                            let mission = data.mission(for: task.taskID, mode: data.selectedMode)
+                            let hero = data.hero(for: task.heroID, mode: data.selectedMode)
+                            HStack(alignment: .top, spacing: 12) {
+                                RemoteIcon(url: hero?.picture ?? "", size: 42, cornerRadius: 21)
+                                    .overlay(Circle().stroke(Theme.Color.gold.opacity(0.8), lineWidth: 1.2))
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(hero?.name ?? "任务英雄")
+                                        .font(Theme.Font.caption.weight(.semibold))
+                                        .foregroundStyle(Theme.Color.textPrimary)
+                                    Text(mission?.desc ?? "任务 ID：\(task.taskID)")
+                                        .font(Theme.Font.body)
+                                        .foregroundStyle(Theme.Color.textSecondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer(minLength: 0)
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .background(Theme.Color.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+                    .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
+                }
+            }
+        }
+    }
+
+    private var modeSpecificMechanicSection: some View {
+        Group {
+            if !card.detail.godRewards.isEmpty {
+                godRewardSection
+            }
+            if card.detail.chosenContact != nil
+                || card.detail.messengerContact != nil
+                || !card.detail.chosenBackups.isEmpty
+                || !card.detail.chosenInfo.isEmpty
+                || !card.detail.staffInfo.isEmpty
+                || !card.detail.goopInfo.isEmpty
+                || !card.detail.traitPartyInfo.isEmpty
+                || !card.detail.legendGalaxyInfo.isEmpty {
+                mode4MechanicSection
+            }
+        }
+    }
+
+    private var godRewardSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+            sectionTitle("星神奖励")
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(card.detail.godRewards) { reward in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("阶段 \(reward.stage) · 神明 \(reward.godID)")
+                            .font(Theme.Font.caption.weight(.semibold))
+                            .foregroundStyle(Theme.Color.gold)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
+                            ForEach(reward.wishIDs, id: \.self) { wishID in
+                                if let wish = data.godWish(for: wishID, mode: data.selectedMode) {
+                                    IconTextItem(icon: wish.icon, title: wish.name, subtitle: wish.desc)
+                                }
+                            }
+                        }
+                    }
+                    if reward != card.detail.godRewards.last {
+                        Divider().background(Color.white.opacity(0.05))
+                    }
+                }
+                if !card.detail.godRewardInfo.isEmpty {
+                    Text(card.detail.godRewardInfo)
+                        .font(Theme.Font.body)
+                        .foregroundStyle(Theme.Color.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(12)
+            .background(Theme.Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
+        }
+    }
+
+    private var mode4MechanicSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+            sectionTitle("模式机制")
+            VStack(alignment: .leading, spacing: 8) {
+                if let chosen = card.detail.chosenContact {
+                    mechanicLine(title: "天选羁绊", value: traitName(for: chosen))
+                }
+                if let messenger = card.detail.messengerContact {
+                    mechanicLine(title: "使者羁绊", value: traitName(for: messenger))
+                }
+                if !card.detail.chosenBackups.isEmpty {
+                    ForEach(card.detail.chosenBackups, id: \.self) { backup in
+                        let hero = data.hero(for: backup.heroID, mode: data.selectedMode)
+                        mechanicLine(title: "备选天选", value: [hero?.name, traitName(id: backup.traitID, type: backup.type)].compactMap { $0 }.joined(separator: " · "))
+                    }
+                }
+                textValueLine("天选说明", card.detail.chosenInfo)
+                textValueLine("奇遇/银河", card.detail.legendGalaxyInfo)
+                textValueLine("锻造器", card.detail.staffInfo)
+                textValueLine("果实", card.detail.goopInfo)
+                textValueLine("羁绊派对", card.detail.traitPartyInfo)
+            }
+            .padding(12)
+            .background(Theme.Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
+        }
+    }
+
+    private var hexAnalysisSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+            sectionTitle("强化符文")
+            VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+                if !card.detail.recommendedHexIDs.isEmpty {
+                    hexIconRow(title: "优先", ids: card.detail.recommendedHexIDs)
+                }
+                if !card.detail.replacementHexIDs.isEmpty {
+                    hexIconRow(title: "次选", ids: card.detail.replacementHexIDs)
+                }
+                if !card.detail.hexInfo.isEmpty {
+                    Text(card.detail.hexInfo)
+                        .font(Theme.Font.body)
+                        .foregroundStyle(Theme.Color.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(12)
+            .background(Theme.Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .overlay(RoundedRectangle(cornerRadius: Theme.CornerRadius.card).stroke(Color.white.opacity(0.05), lineWidth: 1))
+        }
+    }
+
+    private func hexIconRow(title: String, ids: [String]) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(title)
+                .font(Theme.Font.caption.weight(.semibold))
+                .foregroundStyle(Theme.Color.gold)
+                .frame(width: 34, alignment: .leading)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(ids, id: \.self) { id in
+                        if let hex = data.hexes.first(where: { $0.id == id }) {
+                            VStack(spacing: 5) {
+                                RemoteIcon(url: hex.icon, size: 38, cornerRadius: 19)
+                                    .overlay(Circle().stroke(Theme.Color.gold.opacity(0.8), lineWidth: 1.2))
+                                Text(hex.name)
+                                    .font(Theme.Font.micro)
+                                    .foregroundStyle(Theme.Color.textSecondary)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.center)
+                                    .frame(width: 58)
+                            }
+                            .help(hex.desc)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func mechanicLine(title: String, value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(title)
+                .font(Theme.Font.caption.weight(.semibold))
+                .foregroundStyle(Theme.Color.gold)
+                .frame(width: 70, alignment: .leading)
+            Text(value)
+                .font(Theme.Font.body)
+                .foregroundStyle(Theme.Color.textSecondary)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func textValueLine(_ title: String, _ value: String) -> some View {
+        Group {
+            if !value.isEmpty {
+                mechanicLine(title: title, value: value)
+            }
+        }
+    }
+
+    private func traitName(for contact: LineupTraitContact) -> String {
+        traitName(id: contact.id, type: contact.type) ?? "\(contact.type) \(contact.id)"
+    }
+
+    private func traitName(id: String, type: String) -> String? {
+        data.traitSummaries(
+            for: [],
+            mode: data.selectedMode,
+            officialContacts: [LineupTraitContact.synthetic(id: id, type: type)]
+        ).first?.name
     }
 
     private var equipmentAnalysisSection: some View {
@@ -1267,6 +1487,53 @@ private struct SeasonTabCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 6))
         .shadow(color: glowColor, radius: 8, x: 0, y: 0)
+    }
+}
+
+// MARK: - 阵容推荐详情页 羁绊汇总徽章 LineupTraitSummaryBadge
+private struct LineupTraitSummaryBadge: View {
+    let summary: LineupTraitSummary
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ZStack {
+                HexagonShape()
+                    .fill(tierColor)
+                    .frame(width: 22, height: 25)
+                if !summary.picture.isEmpty {
+                    RemoteIcon(url: summary.picture, size: 14, cornerRadius: 0)
+                        .colorMultiply(.black.opacity(0.85))
+                } else {
+                    Image(systemName: "shield.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.black.opacity(0.85))
+                }
+            }
+            HStack(spacing: 4) {
+                Text("\(summary.count)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(summary.color >= 3 ? Color(red: 0.95, green: 0.77, blue: 0.35) : .white)
+                Text(summary.name)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.Color.textPrimary)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 8)
+        }
+        .frame(height: 26)
+        .background(Color.white.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 3))
+        .overlay(RoundedRectangle(cornerRadius: 3).stroke(tierColor.opacity(0.45), lineWidth: 1))
+        .help("\(summary.count) \(summary.name)")
+    }
+
+    private var tierColor: Color {
+        switch summary.color {
+        case 5, 4, 3: return Color(red: 0.95, green: 0.77, blue: 0.35)
+        case 2: return Color(red: 0.75, green: 0.75, blue: 0.8)
+        case 1: return Color(red: 0.7, green: 0.45, blue: 0.25)
+        default: return Color(red: 0.4, green: 0.4, blue: 0.45)
+        }
     }
 }
 
