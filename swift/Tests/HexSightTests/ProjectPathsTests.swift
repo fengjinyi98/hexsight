@@ -35,4 +35,11 @@ final class ProjectPathsTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: regionsURL.path), regionsURL.path)
         XCTAssertTrue(regionsURL.path.hasSuffix("/Desktop/hexsight/config/regions.json"), regionsURL.path)
     }
+
+    func testLineupDirectoryPointsToExistingFolderUsingDefaultAnchor() {
+        let lineupDir = ProjectPaths.lineupDirectory()
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: lineupDir.path), lineupDir.path)
+        XCTAssertTrue(lineupDir.path.hasSuffix("/Desktop/hexsight/config/lineups"), lineupDir.path)
+    }
 }

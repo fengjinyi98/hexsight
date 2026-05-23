@@ -7,6 +7,7 @@ struct MainView: View {
     @State private var selectedNav: NavItem = .decision
 
     enum NavItem: String, CaseIterable {
+        case lineup = "阵容"
         case decision = "决策"
         case hero = "英雄"
         case equip = "装备"
@@ -15,6 +16,7 @@ struct MainView: View {
 
         var icon: String {
             switch self {
+            case .lineup: "square.grid.2x2.fill"
             case .decision: "bolt.fill"
             case .hero: "person.2.fill"
             case .equip: "shield.fill"
@@ -85,6 +87,8 @@ struct MainView: View {
             TraitPanel()
         case .hex:
             HexPanel()
+        case .lineup:
+            LineupPanel()
         }
     }
 }

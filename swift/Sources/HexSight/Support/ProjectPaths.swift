@@ -6,7 +6,13 @@ import Foundation
 /// - 提供配置、阵容与游戏数据目录路径
 /// - 避免各模块重复拼接路径
 enum ProjectPaths {
-    static func repoRoot(sourceFilePath: String = #filePath) -> URL {
+    private static let anchorFilePath = #filePath
+
+    static func repoRoot() -> URL {
+        repoRoot(sourceFilePath: anchorFilePath)
+    }
+
+    static func repoRoot(sourceFilePath: String) -> URL {
         URL(fileURLWithPath: sourceFilePath)
             .deletingLastPathComponent()  // Support/
             .deletingLastPathComponent()  // HexSight/
@@ -15,22 +21,38 @@ enum ProjectPaths {
             .deletingLastPathComponent()  // hexsight/
     }
 
-    static func configFile(named name: String, sourceFilePath: String = #filePath) -> URL {
+    static func configFile(named name: String) -> URL {
+        configFile(named: name, sourceFilePath: anchorFilePath)
+    }
+
+    static func configFile(named name: String, sourceFilePath: String) -> URL {
         repoRoot(sourceFilePath: sourceFilePath)
             .appendingPathComponent("config/\(name)")
     }
 
-    static func configDirectory(sourceFilePath: String = #filePath) -> URL {
+    static func configDirectory() -> URL {
+        configDirectory(sourceFilePath: anchorFilePath)
+    }
+
+    static func configDirectory(sourceFilePath: String) -> URL {
         repoRoot(sourceFilePath: sourceFilePath)
             .appendingPathComponent("config", isDirectory: true)
     }
 
-    static func lineupDirectory(sourceFilePath: String = #filePath) -> URL {
+    static func lineupDirectory() -> URL {
+        lineupDirectory(sourceFilePath: anchorFilePath)
+    }
+
+    static func lineupDirectory(sourceFilePath: String) -> URL {
         configDirectory(sourceFilePath: sourceFilePath)
             .appendingPathComponent("lineups", isDirectory: true)
     }
 
-    static func gameDataDirectory(mode: String, sourceFilePath: String = #filePath) -> URL {
+    static func gameDataDirectory(mode: String) -> URL {
+        gameDataDirectory(mode: mode, sourceFilePath: anchorFilePath)
+    }
+
+    static func gameDataDirectory(mode: String, sourceFilePath: String) -> URL {
         configDirectory(sourceFilePath: sourceFilePath)
             .appendingPathComponent("game_data", isDirectory: true)
             .appendingPathComponent("mode\(mode)", isDirectory: true)
