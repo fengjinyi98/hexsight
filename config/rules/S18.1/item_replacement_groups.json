@@ -1,0 +1,33 @@
+{
+  "version": "S18.1",
+  "groups": {
+    "ap_mana": {
+      "label": "AP回蓝装",
+      "itemNames": ["青龙刀", "蓝霸符", "大天使"],
+      "items": ["青龙刀", "蓝霸符", "大天使"],
+      "replaces_for": ["ap_carry_mana"],
+      "notes": "适合高蓝条AP主C的启动/回蓝装备"
+    },
+    "ap_burst": {
+      "label": "AP爆发装",
+      "itemNames": ["法爆", "帽子", "巨杀"],
+      "items": ["法爆", "帽子", "巨杀"],
+      "replaces_for": ["ap_carry_burst"],
+      "notes": "适合AP爆发型主C的输出装备"
+    },
+    "ad_attack": {
+      "label": "AD攻速装",
+      "itemNames": ["羊刀", "火炮", "分裂弓"],
+      "items": ["羊刀", "火炮", "分裂弓"],
+      "replaces_for": ["ad_carry_attack_speed"],
+      "notes": "适合AD普攻型主C的攻速装备"
+    },
+    "tank_core": {
+      "label": "主坦核心装",
+      "itemNames": ["狂徒", "反甲", "龙牙", "石像鬼"],
+      "items": ["狂徒", "反甲", "龙牙", "石像鬼"],
+      "replaces_for": ["main_tank"],
+      "notes": "主坦通用抗性/血量装备"
+    }
+  }
+}

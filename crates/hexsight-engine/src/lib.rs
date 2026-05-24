@@ -11,6 +11,7 @@ pub mod augment_economy_planner;
 pub mod augment_effect_interpreter;
 pub mod board_power_fight;
 pub mod champion_combat_profile_builder;
+pub mod champion_item_fit;
 pub mod damage_patch_loader;
 pub mod decision;
 pub mod decision_planner;
@@ -38,6 +39,10 @@ pub use augment_economy_planner::{AugmentFitScorer, EconomyPlanner};
 pub use augment_effect_interpreter::AugmentEffectInterpreter;
 pub use board_power_fight::{BoardPower, BoardPowerScorer, FightOutcomeEstimator};
 pub use champion_combat_profile_builder::ChampionCombatProfileBuilder;
+pub use champion_item_fit::{
+    ChampionItemFitScorer, ChampionItemOverrideLoader, ItemReplacementGroupLoader,
+    ItemSynthesisIndex,
+};
 pub use damage_patch_loader::{DamageProfile, PatchOverrideLoader};
 pub use decision::DecisionEngine;
 pub use decision_planner::DecisionPlanner;
@@ -52,7 +57,7 @@ pub use knowledge_builders::{
 };
 pub use lineup::LineupDB;
 pub use lineup_adapter::LineupAdapter;
-pub use lineup_fit_scorer::{LineupFitScorer, TransitionStrengthScorer};
+pub use lineup_fit_scorer::{LineupFitScorer, LineupItemFitContext, TransitionStrengthScorer};
 pub use lineup_loader::LineupLoader;
 pub use lineup_profile_builder::LineupProfileBuilder;
 pub use llm_context::LlmContextBuilder;

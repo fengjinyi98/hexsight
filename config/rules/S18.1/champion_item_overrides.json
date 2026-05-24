@@ -1,0 +1,9 @@
+{
+  "version": "S18.1",
+  "overrides": {
+    "14382": {
+      "itemStrictness": "high",
+      "notes": "示例：AP主C，缺启动装明显降强度"
+    }
+  }
+}

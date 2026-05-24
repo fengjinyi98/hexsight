@@ -4,11 +4,15 @@
 // - ItemValueBuilder：从 EquipmentData + KnowledgeKeywords 生成 ItemValueProfile
 // - 输出解析覆盖率报告（未知标签/低置信度条目/需覆写项）
 
+use std::path::Path;
+
 use hexsight_core::{
     AugmentEffectProfile, ChampionCapability, ChampionRole, EquipmentData, HeroData,
     HexData, ItemPreferences, ItemStat, ItemValueProfile, KnowledgeKeywords, PowerSpike,
     TraitData, TraitEffectProfile,
 };
+
+use crate::champion_item_fit::{ChampionItemOverrideLoader, ChampionItemOverrides};
 
 /// 棋子能力构建器
 pub struct ChampionCapabilityBuilder {
@@ -566,11 +570,28 @@ impl KnowledgeBaseBuilder {
         hexes: &[HexData],
         traits: &[TraitData],
     ) -> KnowledgeBase {
+        self.build_all_with_item_overrides(heroes, equips, hexes, traits, None)
+    }
+
+    /// 使用 P1 装备覆写配置生成全量知识库
+    pub fn build_all_with_item_overrides(
+        &self,
+        heroes: &[HeroData],
+        equips: &[EquipmentData],
+        hexes: &[HexData],
+        traits: &[TraitData],
+        item_overrides: Option<&ChampionItemOverrides>,
+    ) -> KnowledgeBase {
         // 棋子（只处理 cost > 0 且非假人）
         let hero_refs: Vec<&HeroData> = heroes.iter()
             .filter(|h| h.cost > 0 && !h.name.contains("假人"))
             .collect();
-        let (champions, champ_report) = self.champ_builder.build_all(&hero_refs);
+        let (mut champions, champ_report) = self.champ_builder.build_all(&hero_refs);
+        if let Some(overrides) = item_overrides {
+            for champion in &mut champions {
+                ChampionItemOverrideLoader::apply(champion, overrides);
+            }
+        }
 
         let equip_refs: Vec<&EquipmentData> = equips.iter().collect();
         let items = self.item_builder.build_all(&equip_refs);
@@ -619,6 +640,24 @@ impl KnowledgeBaseBuilder {
             traits,
             coverage,
         }
+    }
+
+    /// 从规则配置目录加载 P1 覆写并生成全量知识库
+    pub fn build_all_with_rule_config(
+        &self,
+        heroes: &[HeroData],
+        equips: &[EquipmentData],
+        hexes: &[HexData],
+        traits: &[TraitData],
+        config_root: &Path,
+        version: &str,
+    ) -> hexsight_core::HexResult<KnowledgeBase> {
+        let override_path = config_root
+            .join("rules")
+            .join(version)
+            .join("champion_item_overrides.json");
+        let overrides = ChampionItemOverrideLoader::load(&override_path)?;
+        Ok(self.build_all_with_item_overrides(heroes, equips, hexes, traits, Some(&overrides)))
     }
 }
 
@@ -740,6 +779,25 @@ mod tests {
         assert!(!profile.conflict_group.is_empty());
     }
 
+    #[test]
+    fn item_overrides_apply_to_knowledge_base() {
+        let builder = KnowledgeBaseBuilder::with_defaults();
+        let hero = make_hero("覆写主C", 4, 600, 85, "造成魔法伤害");
+        let overrides = crate::champion_item_fit::ChampionItemOverrides {
+            version: "test".into(),
+            overrides: std::collections::HashMap::from([(
+                hero.id.clone(),
+                crate::champion_item_fit::ChampionItemOverrideEntry {
+                    item_strictness: Some("high".into()),
+                    notes: String::new(),
+                },
+            )]),
+        };
+        let kb = builder.build_all_with_item_overrides(&[hero.clone()], &[], &[], &[], Some(&overrides));
+        let champion = kb.champions.iter().find(|champion| champion.hero_id == hero.id).unwrap();
+        assert_eq!(champion.item_strictness, "high");
+    }
+
     // ---- 全模式真实数据测试 ----
 
     fn config_root() -> std::path::PathBuf {
@@ -775,6 +833,28 @@ mod tests {
             assert!(cov.augments.total > 0);
             assert!(cov.traits.total > 0);
         }
+    }
+
+    #[test]
+    fn real_rule_config_item_overrides_enter_knowledge_base() {
+        use crate::{ChampionItemOverrideLoader, GameDataLoader};
+
+        let root = config_root();
+        let mut heroes_map = GameDataLoader::load_heroes(&root, "17").unwrap();
+        GameDataLoader::enrich_heroes(&mut heroes_map);
+        let heroes: Vec<HeroData> = heroes_map.into_values().collect();
+        let equips: Vec<EquipmentData> = GameDataLoader::load_equipment(&root, "17").unwrap().into_values().collect();
+        let hexes: Vec<HexData> = GameDataLoader::load_hexes(&root, "17").unwrap().into_values().collect();
+        let traits = GameDataLoader::load_traits(&root, "17").unwrap();
+        let override_path = root.join("rules").join("S18.1").join("champion_item_overrides.json");
+        let overrides = ChampionItemOverrideLoader::load(&override_path).unwrap();
+        let overridden_id = overrides.overrides.keys().next().unwrap().clone();
+
+        let kb = KnowledgeBaseBuilder::with_defaults()
+            .build_all_with_rule_config(&heroes, &equips, &hexes, &traits, &root, "S18.1")
+            .unwrap();
+        let champion = kb.champions.iter().find(|champion| champion.hero_id == overridden_id).unwrap();
+        assert_eq!(champion.item_strictness, "high");
     }
 
     #[test]
