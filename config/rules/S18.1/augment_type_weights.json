@@ -1,0 +1,15 @@
+{
+  "version": "S18.1",
+  "weights": {
+    "generic_combat": 8,
+    "generic_econ": 5,
+    "generic_item": 10,
+    "trait_commit": -6,
+    "hero_commit": -18,
+    "reroll_enable": 6,
+    "tempo": 7,
+    "late_cap": 2,
+    "mode_special": -4,
+    "high_risk": -10
+  }
+}

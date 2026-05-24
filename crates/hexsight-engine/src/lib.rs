@@ -10,6 +10,8 @@
 
 pub mod augment_economy_planner;
 pub mod augment_effect_interpreter;
+pub mod augment_option_ranker;
+pub mod augment_reroll_scorer;
 pub mod bench_transition_scorer;
 pub mod board_power_fight;
 pub mod champion_combat_profile_builder;
@@ -42,6 +44,12 @@ pub mod version_validator;
 
 pub use augment_economy_planner::{AugmentFitScorer, EconomyPlanner};
 pub use augment_effect_interpreter::AugmentEffectInterpreter;
+pub use augment_option_ranker::AugmentOptionRanker;
+pub use augment_reroll_scorer::{
+    AugmentDecisionAction, AugmentRerollConfigLoader, AugmentRerollContext, AugmentRerollDecision,
+    AugmentRerollScorer, AugmentSituationContext, AugmentStage, AugmentThresholds,
+    AugmentTypeWeights, RankedAugmentOption,
+};
 pub use bench_transition_scorer::{BenchTransitionDecision, BenchTransitionScorer};
 pub use board_power_fight::{BoardPower, BoardPowerScorer, FightOutcomeEstimator};
 pub use champion_combat_profile_builder::ChampionCombatProfileBuilder;

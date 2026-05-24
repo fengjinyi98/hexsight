@@ -218,6 +218,7 @@ impl AugmentFitScorer {
     ) -> AugmentDecision {
         if scores.is_empty() {
             return AugmentDecision {
+                action: "take_fallback".into(),
                 recommended: "无候选海克斯".into(),
                 lock_lineup: false,
                 follow_up: "等待后续海克斯选择".into(),
@@ -248,6 +249,7 @@ impl AugmentFitScorer {
         };
 
         AugmentDecision {
+            action: "take".into(),
             recommended,
             lock_lineup,
             follow_up,

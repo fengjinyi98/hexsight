@@ -10,6 +10,7 @@ use hexsight_core::{
 };
 use crate::augment_economy_planner::AugmentScore;
 use crate::augment_economy_planner::EconomyDecisionResult;
+use crate::augment_reroll_scorer::{AugmentDecisionAction, AugmentRerollDecision};
 use crate::transition_risk_scorer::{RiskReport, TransitionMatch};
 
 /// 规则决策规划器
@@ -85,6 +86,7 @@ impl DecisionPlanner {
         };
 
         let augment_action = AugmentDecision {
+            action: "take".into(),
             recommended: augment_action,
             lock_lineup,
             follow_up,
@@ -220,6 +222,7 @@ impl DecisionPlanner {
         };
 
         let augment_action = AugmentDecision {
+            action: "take".into(),
             recommended: augment_action,
             lock_lineup,
             follow_up,
@@ -272,6 +275,74 @@ impl DecisionPlanner {
             fight_outcome,
             generated_at: chrono_now(),
             engine_version: "0.3.0".into(),
+        }
+    }
+
+    /// 完整规则输出（集成 P4 海克斯刷新决策）—— P4 主入口
+    pub fn plan_with_augment_reroll(
+        opening: &OpeningRouteResult,
+        lineup_scores: &[LineupScore],
+        item_fit_direction: &str,
+        economy_result: &EconomyDecisionResult,
+        augment_scores: &[AugmentScore],
+        is_first_augment: bool,
+        augment_reroll: Option<&AugmentRerollDecision>,
+        risk_report: &RiskReport,
+        reroll_candidates: &[RerollEligibility],
+        transition_matches: &[TransitionMatch],
+        fight_outcome: Option<FightOutcome>,
+        current_hp: i32,
+    ) -> RuleOutput {
+        let mut output = Self::plan(
+            opening,
+            lineup_scores,
+            item_fit_direction,
+            economy_result,
+            augment_scores,
+            is_first_augment,
+            risk_report,
+            reroll_candidates,
+            transition_matches,
+            fight_outcome,
+            current_hp,
+        );
+
+        if let Some(decision) = augment_reroll {
+            output.augment_action = Self::augment_decision_from_reroll(decision);
+            output.engine_version = "0.4.0".into();
+        }
+
+        output
+    }
+
+    fn augment_decision_from_reroll(decision: &AugmentRerollDecision) -> AugmentDecision {
+        let action = match decision.action {
+            AugmentDecisionAction::Take => "take",
+            AugmentDecisionAction::Reroll => "reroll",
+            AugmentDecisionAction::TakeFallback => "take_fallback",
+        }.to_string();
+
+        let recommended = match decision.action {
+            AugmentDecisionAction::Take => decision.recommended_augment_name.as_ref()
+                .map(|name| format!("拿 {}", name))
+                .unwrap_or_else(|| "拿当前最高分海克斯".into()),
+            AugmentDecisionAction::Reroll => "刷新当前三个海克斯".into(),
+            AugmentDecisionAction::TakeFallback => decision.recommended_augment_name.as_ref()
+                .map(|name| format!("兜底拿 {}", name))
+                .unwrap_or_else(|| "兜底拿锁方向风险最低的海克斯".into()),
+        };
+
+        let lock_lineup = decision.action == AugmentDecisionAction::Take
+            && decision.lock_risk <= 35
+            && decision.ranked_options.first()
+                .map(|option| option.supported_lineup_ids.len() <= 2)
+                .unwrap_or(false);
+
+        AugmentDecision {
+            action,
+            recommended,
+            lock_lineup,
+            follow_up: decision.reason.join("; "),
         }
     }
 }

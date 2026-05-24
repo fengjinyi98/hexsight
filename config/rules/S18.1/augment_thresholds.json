@@ -1,0 +1,9 @@
+{
+  "version": "S18.1",
+  "first_min_take_score": 65,
+  "later_min_take_score": 58,
+  "fallback_min_score": 35,
+  "reroll_expected_gain": 12,
+  "low_hp_take_bonus": 8,
+  "low_hp_threshold": 45
+}

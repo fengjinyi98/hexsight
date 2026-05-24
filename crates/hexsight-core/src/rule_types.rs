@@ -347,9 +347,15 @@ pub struct ItemDecision {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AugmentDecision {
+    #[serde(default = "default_augment_action")]
+    pub action: String,
     pub recommended: String,
     pub lock_lineup: bool,
     pub follow_up: String,
+}
+
+fn default_augment_action() -> String {
+    "take".into()
 }
 
 /// 过渡决策
