@@ -310,6 +310,9 @@ pub struct RuleOutput {
     pub pivot_conditions: Vec<String>,
     /// 战斗预测（可选）
     pub fight_outcome: Option<FightOutcome>,
+    /// P7 知识动作汇总（可选）
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub knowledge_actions: Option<KnowledgeActions>,
     /// 生成时间
     pub generated_at: String,
     /// 规则引擎版本
@@ -325,6 +328,36 @@ pub struct LineupRecommendation {
     pub score: i32,
     pub reason: Vec<String>,
     pub risk: Vec<String>,
+}
+
+/// P7 知识动作汇总
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct KnowledgeActions {
+    pub holder: Option<HolderActionSummary>,
+    pub combat: Option<CombatActionSummary>,
+    pub patch: Vec<String>,
+    pub short_explanations: Vec<String>,
+}
+
+/// 承载者动作摘要
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HolderActionSummary {
+    pub item: String,
+    pub temporary_holder: String,
+    pub final_holder: Option<String>,
+    pub action: String,
+    pub reason: String,
+}
+
+/// 简化收益动作摘要
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CombatActionSummary {
+    pub winner: String,
+    pub score_diff: i32,
+    pub reason: String,
 }
 
 /// 经济决策

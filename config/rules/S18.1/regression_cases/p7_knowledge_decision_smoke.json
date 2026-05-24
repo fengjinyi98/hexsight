@@ -1,0 +1,16 @@
+{
+  "version": "S18.1",
+  "cases": [
+    {
+      "id": "p7_knowledge_decision_smoke",
+      "title": "P7 知识动作集成烟测",
+      "fixture": "p7_smoke",
+      "expectedActions": ["reroll", "equip_now", "pivot_condition", "combat_diff"],
+      "expectedExplanations": [
+        "当前三个海克斯低于阈值，建议刷新",
+        "替代装备收益更高",
+        "装备适配偏低，考虑转向更吃当前装备的阵容"
+      ]
+    }
+  ]
+}

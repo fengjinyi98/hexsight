@@ -4,14 +4,14 @@
 // - 输出结构化 RuleOutput JSON（对齐文档第十五章）
 // - 为每个推荐生成理由、风险和转向条件
 
-use hexsight_core::{
-    AugmentDecision, EconomyDecision, FightOutcome, ItemDecision, LineupRecommendation,
-    LineupScore, OpeningRouteResult, RerollEligibility, RuleOutput, TransitionDecision,
-};
 use crate::augment_economy_planner::AugmentScore;
 use crate::augment_economy_planner::EconomyDecisionResult;
 use crate::augment_reroll_scorer::{AugmentDecisionAction, AugmentRerollDecision};
 use crate::transition_risk_scorer::{RiskReport, TransitionMatch};
+use hexsight_core::{
+    AugmentDecision, EconomyDecision, FightOutcome, ItemDecision, LineupRecommendation,
+    LineupScore, OpeningRouteResult, RerollEligibility, RuleOutput, TransitionDecision,
+};
 
 /// 规则决策规划器
 pub struct DecisionPlanner;
@@ -32,15 +32,16 @@ impl DecisionPlanner {
         sorted.sort_by(|a, b| b.total_score.cmp(&a.total_score));
         let top3: Vec<&LineupScore> = sorted.into_iter().take(3).collect();
 
-        let lineup_recommendations: Vec<LineupRecommendation> = top3.iter().map(|s| {
-            LineupRecommendation {
+        let lineup_recommendations: Vec<LineupRecommendation> = top3
+            .iter()
+            .map(|s| LineupRecommendation {
                 lineup_id: s.lineup_id.clone(),
                 name: s.name.clone(),
                 score: s.total_score,
                 reason: s.reasons.clone(),
                 risk: s.risks.clone(),
-            }
-        }).collect();
+            })
+            .collect();
 
         // 策略描述
         let strategy = match opening.route {
@@ -142,6 +143,7 @@ impl DecisionPlanner {
             transition_action,
             pivot_conditions,
             fight_outcome: None,
+            knowledge_actions: None,
             generated_at: chrono_now(),
             engine_version: "0.2.0".into(),
         }
@@ -166,8 +168,9 @@ impl DecisionPlanner {
         sorted.sort_by(|a, b| b.total_score.cmp(&a.total_score));
         let top3: Vec<&LineupScore> = sorted.into_iter().take(3).collect();
 
-        let lineup_recommendations: Vec<LineupRecommendation> = top3.iter().map(|s| {
-            LineupRecommendation {
+        let lineup_recommendations: Vec<LineupRecommendation> = top3
+            .iter()
+            .map(|s| LineupRecommendation {
                 lineup_id: s.lineup_id.clone(),
                 name: s.name.clone(),
                 score: s.total_score,
@@ -177,8 +180,8 @@ impl DecisionPlanner {
                     r.extend(risk_report.details.iter().cloned());
                     r
                 },
-            }
-        }).collect();
+            })
+            .collect();
 
         let strategy = match opening.route {
             hexsight_core::OpeningRoute::WinStreak => "连胜".to_string(),
@@ -204,7 +207,8 @@ impl DecisionPlanner {
         };
 
         // 海克斯决策（来自 AugmentFitScorer）
-        let (augment_action, lock_lineup, follow_up) = if let Some(best) = augment_scores.iter()
+        let (augment_action, lock_lineup, follow_up) = if let Some(best) = augment_scores
+            .iter()
             .filter(|s| s.is_recommended)
             .max_by_key(|s| s.total_score)
         {
@@ -214,11 +218,23 @@ impl DecisionPlanner {
                 "继续观察".to_string()
             };
             let lock = best.supported_lineup_ids.len() <= 2 && best.total_score >= 70;
-            (format!("{} ({}分)", best.augment_name, best.total_score), lock, lf)
+            (
+                format!("{} ({}分)", best.augment_name, best.total_score),
+                lock,
+                lf,
+            )
         } else if is_first_augment {
-            ("通用经济/装备海克斯".into(), false, "3-2 前根据来牌确认方向".into())
+            (
+                "通用经济/装备海克斯".into(),
+                false,
+                "3-2 前根据来牌确认方向".into(),
+            )
         } else {
-            ("优先补阵容匹配海克斯".into(), false, "根据当前阵容补强".into())
+            (
+                "优先补阵容匹配海克斯".into(),
+                false,
+                "根据当前阵容补强".into(),
+            )
         };
 
         let augment_action = AugmentDecision {
@@ -229,8 +245,7 @@ impl DecisionPlanner {
         };
 
         // 过渡决策
-        let best_transition = transition_matches.iter()
-            .max_by_key(|m| m.transition_score);
+        let best_transition = transition_matches.iter().max_by_key(|m| m.transition_score);
         let transition_action = if let Some(tm) = best_transition {
             TransitionDecision {
                 route: format!("匹配 {}", tm.lineup_name),
@@ -260,7 +275,9 @@ impl DecisionPlanner {
                 pivot_conditions.extend(reroll.abandon_conditions.clone());
             }
         }
-        if pivot_conditions.is_empty() && lineup_recommendations.first().map(|r| r.score).unwrap_or(0) < 50 {
+        if pivot_conditions.is_empty()
+            && lineup_recommendations.first().map(|r| r.score).unwrap_or(0) < 50
+        {
             pivot_conditions.push("当前最佳阵容评分偏低，继续观察".to_string());
         }
 
@@ -273,6 +290,7 @@ impl DecisionPlanner {
             transition_action,
             pivot_conditions,
             fight_outcome,
+            knowledge_actions: None,
             generated_at: chrono_now(),
             engine_version: "0.3.0".into(),
         }
@@ -320,21 +338,28 @@ impl DecisionPlanner {
             AugmentDecisionAction::Take => "take",
             AugmentDecisionAction::Reroll => "reroll",
             AugmentDecisionAction::TakeFallback => "take_fallback",
-        }.to_string();
+        }
+        .to_string();
 
         let recommended = match decision.action {
-            AugmentDecisionAction::Take => decision.recommended_augment_name.as_ref()
+            AugmentDecisionAction::Take => decision
+                .recommended_augment_name
+                .as_ref()
                 .map(|name| format!("拿 {}", name))
                 .unwrap_or_else(|| "拿当前最高分海克斯".into()),
             AugmentDecisionAction::Reroll => "刷新当前三个海克斯".into(),
-            AugmentDecisionAction::TakeFallback => decision.recommended_augment_name.as_ref()
+            AugmentDecisionAction::TakeFallback => decision
+                .recommended_augment_name
+                .as_ref()
                 .map(|name| format!("兜底拿 {}", name))
                 .unwrap_or_else(|| "兜底拿锁方向风险最低的海克斯".into()),
         };
 
         let lock_lineup = decision.action == AugmentDecisionAction::Take
             && decision.lock_risk <= 35
-            && decision.ranked_options.first()
+            && decision
+                .ranked_options
+                .first()
                 .map(|option| option.supported_lineup_ids.len() <= 2)
                 .unwrap_or(false);
 
@@ -376,53 +401,82 @@ mod tests {
         };
 
         let scores = vec![LineupScore {
-            lineup_id: "4514".into(), name: "神谕龙王".into(),
-            total_score: 82, base_score: 80,
-            item_fit_score: 70, champion_hit_score: 60,
-            augment_fit_score: 50, trait_fit_score: 60,
-            stage_fit_score: 70, economy_fit_score: 75,
-            health_safety_score: 90, playstyle_switch_score: 50,
-            rival_penalty: 0, difficulty_penalty: 0,
-            reasons: vec!["装备匹配".into()], risks: vec![],
+            lineup_id: "4514".into(),
+            name: "神谕龙王".into(),
+            total_score: 82,
+            base_score: 80,
+            item_fit_score: 70,
+            champion_hit_score: 60,
+            augment_fit_score: 50,
+            trait_fit_score: 60,
+            stage_fit_score: 70,
+            economy_fit_score: 75,
+            health_safety_score: 90,
+            playstyle_switch_score: 50,
+            rival_penalty: 0,
+            difficulty_penalty: 0,
+            reasons: vec!["装备匹配".into()],
+            risks: vec![],
             requires_augment: false,
         }];
 
         let economy = EconomyDecisionResult {
-            action: "save_interest".into(), label: "保利息".into(),
+            action: "save_interest".into(),
+            label: "保利息".into(),
             target_gold: 30,
             reasons: vec!["经济中等".into()],
         };
 
         let augment_scores = vec![AugmentScore {
-            augment_id: "hex_a".into(), augment_name: "通用战力".into(),
-            total_score: 65, combat_power: 70, lineup_coverage: 60,
-            lock_risk: 20, playstyle_enable_value: 50,
-            is_recommended: true, tags: vec!["generic_combat".into()],
+            augment_id: "hex_a".into(),
+            augment_name: "通用战力".into(),
+            total_score: 65,
+            combat_power: 70,
+            lineup_coverage: 60,
+            lock_risk: 20,
+            playstyle_enable_value: 50,
+            is_recommended: true,
+            tags: vec!["generic_combat".into()],
             reasons: vec!["提供即时战力".into()],
             supported_lineup_ids: vec!["4514".into(), "other".into()],
         }];
 
         let risk = RiskReport {
             overall: RiskLevel::Low,
-            hp_risk: RiskLevel::Low, rival_risk: RiskLevel::Low,
-            item_risk: RiskLevel::Low, completion_risk: RiskLevel::Low,
-            economy_risk: RiskLevel::Low, lock_risk: RiskLevel::Low,
+            hp_risk: RiskLevel::Low,
+            rival_risk: RiskLevel::Low,
+            item_risk: RiskLevel::Low,
+            completion_risk: RiskLevel::Low,
+            economy_risk: RiskLevel::Low,
+            lock_risk: RiskLevel::Low,
             details: vec!["当前局势稳定".into()],
             priorities: vec!["保经济".into()],
-            should_pivot: false, pivot_reasons: vec![],
+            should_pivot: false,
+            pivot_reasons: vec![],
         };
 
         let transitions = vec![TransitionMatch {
-            lineup_id: "4514".into(), lineup_name: "神谕龙王".into(),
-            early_hits: 2, mid_hits: 1, transition_score: 65,
+            lineup_id: "4514".into(),
+            lineup_name: "神谕龙王".into(),
+            early_hits: 2,
+            mid_hits: 1,
+            transition_score: 65,
             keep_hero_ids: vec!["h1".into()],
             transition_traits: vec!["牧羊人 x3".into()],
         }];
 
         let output = DecisionPlanner::plan(
-            &opening, &scores, "AD",
-            &economy, &augment_scores, true,
-            &risk, &[], &transitions, None, 100,
+            &opening,
+            &scores,
+            "AD",
+            &economy,
+            &augment_scores,
+            true,
+            &risk,
+            &[],
+            &transitions,
+            None,
+            100,
         );
 
         assert_eq!(output.strategy, "混合过渡");
@@ -443,73 +497,137 @@ mod tests {
 
     #[test]
     fn p2_fight_outcome_in_rule_output() {
-        use crate::board_power_fight::{BoardPowerScorer, FightOutcomeEstimator};
-        use crate::DamageProfile;
         use crate::augment_economy_planner::{AugmentScore, EconomyDecisionResult};
+        use crate::board_power_fight::{BoardPowerScorer, FightOutcomeEstimator};
         use crate::transition_risk_scorer::{RiskLevel, RiskReport, TransitionMatch};
+        use crate::DamageProfile;
         use hexsight_core::ChampionCombatProfile;
         use hexsight_core::RulePack;
 
         let pack = RulePack::default();
         let make = |hp, ad, armor, tank| -> ChampionCombatProfile {
             let mut roles = vec!["副C".to_string()];
-            if tank { roles.push("主坦".to_string()); }
+            if tank {
+                roles.push("主坦".to_string());
+            }
             ChampionCombatProfile {
-                hero_id: "t".into(), name: "t".into(), cost: 3, role_tags: roles,
-                damage_type: "物理".into(), attack_pattern: vec!["单体".into()],
-                targeting: "当前目标".into(), cast_tempo: "中启动".into(),
-                special_tags: vec![], base_hp: hp, base_armor: armor,
-                base_mr: 30, base_ad: ad, base_as: 0.7,
+                hero_id: "t".into(),
+                name: "t".into(),
+                cost: 3,
+                role_tags: roles,
+                damage_type: "物理".into(),
+                attack_pattern: vec!["单体".into()],
+                targeting: "当前目标".into(),
+                cast_tempo: "中启动".into(),
+                special_tags: vec![],
+                base_hp: hp,
+                base_armor: armor,
+                base_mr: 30,
+                base_ad: ad,
+                base_as: 0.7,
                 effective_hp: (hp as f64 * (1.0 + armor as f64 / 100.0)) as i32,
             }
         };
 
         let our_power = BoardPowerScorer::compute(
             &[make(900, 50, 60, true), make(600, 85, 30, false)],
-            2, 1, false, &pack,
+            2,
+            1,
+            false,
+            &pack,
         );
         let enemy_power = BoardPowerScorer::compute(
             &[make(700, 80, 35, true), make(550, 90, 25, false)],
-            2, 2, true, &pack,
+            2,
+            2,
+            true,
+            &pack,
         );
         let dp = DamageProfile::from_rule_pack(&pack);
         let outcome = FightOutcomeEstimator::predict(&our_power, &enemy_power, 80, 4, &dp);
 
         let opening = OpeningRouteResult {
             route: hexsight_core::OpeningRoute::Mixed,
-            confidence: 0.65, reasons: vec![], two_star_count: 2, frontline_quality: 50,
-            can_build_combat_item: true, recommended_actions: vec![],
+            confidence: 0.65,
+            reasons: vec![],
+            two_star_count: 2,
+            frontline_quality: 50,
+            can_build_combat_item: true,
+            recommended_actions: vec![],
         };
         let scores = vec![LineupScore {
-            lineup_id: "x".into(), name: "x".into(), total_score: 80, base_score: 80,
-            item_fit_score: 70, champion_hit_score: 60, augment_fit_score: 50,
-            trait_fit_score: 60, stage_fit_score: 70, economy_fit_score: 75,
-            health_safety_score: 90, playstyle_switch_score: 50,
-            rival_penalty: 0, difficulty_penalty: 0,
-            reasons: vec![], risks: vec![], requires_augment: false,
+            lineup_id: "x".into(),
+            name: "x".into(),
+            total_score: 80,
+            base_score: 80,
+            item_fit_score: 70,
+            champion_hit_score: 60,
+            augment_fit_score: 50,
+            trait_fit_score: 60,
+            stage_fit_score: 70,
+            economy_fit_score: 75,
+            health_safety_score: 90,
+            playstyle_switch_score: 50,
+            rival_penalty: 0,
+            difficulty_penalty: 0,
+            reasons: vec![],
+            risks: vec![],
+            requires_augment: false,
         }];
-        let econ = EconomyDecisionResult { action: "s".into(), label: "s".into(), target_gold: 30, reasons: vec![] };
+        let econ = EconomyDecisionResult {
+            action: "s".into(),
+            label: "s".into(),
+            target_gold: 30,
+            reasons: vec![],
+        };
         let aug = vec![AugmentScore {
-            augment_id: "x".into(), augment_name: "x".into(), total_score: 60,
-            combat_power: 50, lineup_coverage: 50, lock_risk: 20,
-            playstyle_enable_value: 50, is_recommended: true,
-            tags: vec![], reasons: vec![], supported_lineup_ids: vec![],
+            augment_id: "x".into(),
+            augment_name: "x".into(),
+            total_score: 60,
+            combat_power: 50,
+            lineup_coverage: 50,
+            lock_risk: 20,
+            playstyle_enable_value: 50,
+            is_recommended: true,
+            tags: vec![],
+            reasons: vec![],
+            supported_lineup_ids: vec![],
         }];
         let risk = RiskReport {
-            overall: RiskLevel::Low, hp_risk: RiskLevel::Low, rival_risk: RiskLevel::Low,
-            item_risk: RiskLevel::Low, completion_risk: RiskLevel::Low,
-            economy_risk: RiskLevel::Low, lock_risk: RiskLevel::Low,
-            details: vec![], priorities: vec![], should_pivot: false, pivot_reasons: vec![],
+            overall: RiskLevel::Low,
+            hp_risk: RiskLevel::Low,
+            rival_risk: RiskLevel::Low,
+            item_risk: RiskLevel::Low,
+            completion_risk: RiskLevel::Low,
+            economy_risk: RiskLevel::Low,
+            lock_risk: RiskLevel::Low,
+            details: vec![],
+            priorities: vec![],
+            should_pivot: false,
+            pivot_reasons: vec![],
         };
         let tm = vec![TransitionMatch {
-            lineup_id: "x".into(), lineup_name: "x".into(),
-            early_hits: 1, mid_hits: 0, transition_score: 50,
-            keep_hero_ids: vec![], transition_traits: vec![],
+            lineup_id: "x".into(),
+            lineup_name: "x".into(),
+            early_hits: 1,
+            mid_hits: 0,
+            transition_score: 50,
+            keep_hero_ids: vec![],
+            transition_traits: vec![],
         }];
 
         let output = DecisionPlanner::plan(
-            &opening, &scores, "混合", &econ, &aug, false,
-            &risk, &[], &tm, Some(outcome), 100,
+            &opening,
+            &scores,
+            "混合",
+            &econ,
+            &aug,
+            false,
+            &risk,
+            &[],
+            &tm,
+            Some(outcome),
+            100,
         );
         assert!(output.fight_outcome.is_some());
         let json = serde_json::to_string_pretty(&output).unwrap();

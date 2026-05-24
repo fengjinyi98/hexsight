@@ -27,6 +27,8 @@ pub mod holder_scorer;
 pub mod item_conflict_scorer;
 pub mod item_fit_scorer;
 pub mod knowledge_builders;
+pub mod knowledge_decision_planner;
+pub mod knowledge_regression;
 pub mod lineup;
 pub mod lineup_adapter;
 pub mod lineup_fit_scorer;
@@ -46,7 +48,9 @@ pub mod team_effect_coverage;
 pub mod transition_risk_scorer;
 pub mod version_validator;
 
-pub use augment_economy_planner::{AugmentFitScorer, EconomyPlanner};
+pub use augment_economy_planner::{
+    AugmentFitScorer, AugmentScore, EconomyDecisionResult, EconomyPlanner,
+};
 pub use augment_effect_interpreter::AugmentEffectInterpreter;
 pub use augment_option_ranker::AugmentOptionRanker;
 pub use augment_reroll_scorer::{
@@ -84,6 +88,8 @@ pub use knowledge_builders::{
     KnowledgeBaseBuilder, KnowledgeCoverageReport, KnowledgeKeywordLoader, ManualOverrideLoader,
     TraitEffectProfileBuilder,
 };
+pub use knowledge_decision_planner::KnowledgeDecisionPlanner;
+pub use knowledge_regression::{KnowledgeRegression, KnowledgeRegressionCase};
 pub use lineup::LineupDB;
 pub use lineup_adapter::LineupAdapter;
 pub use lineup_fit_scorer::{LineupFitScorer, LineupItemFitContext, TransitionStrengthScorer};
