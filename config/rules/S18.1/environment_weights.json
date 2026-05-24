@@ -1,0 +1,8 @@
+{
+  "healHeavyAntiHeal": 18,
+  "frontlineThickArmorShred": 16,
+  "frontlineThickMrShred": 16,
+  "burstHeavySurvival": 12,
+  "ownAdArmorShred": 8,
+  "ownApMrShred": 8
+}

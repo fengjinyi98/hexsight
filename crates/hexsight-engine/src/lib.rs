@@ -16,9 +16,11 @@ pub mod bench_transition_scorer;
 pub mod board_power_fight;
 pub mod champion_combat_profile_builder;
 pub mod champion_item_fit;
+pub mod combat_value_estimator;
 pub mod damage_patch_loader;
 pub mod decision;
 pub mod decision_planner;
+pub mod environment_modifier;
 pub mod game_data_index;
 pub mod game_data_loader;
 pub mod holder_scorer;
@@ -59,9 +61,15 @@ pub use champion_item_fit::{
     ChampionItemFitScorer, ChampionItemOverrideLoader, ItemReplacementGroupLoader,
     ItemSynthesisIndex,
 };
+pub use combat_value_estimator::{
+    CombatValueDiff, CombatValueEstimate, CombatValueEstimator, CombatValueWeights,
+};
 pub use damage_patch_loader::{DamageProfile, PatchOverrideLoader};
 pub use decision::DecisionEngine;
 pub use decision_planner::DecisionPlanner;
+pub use environment_modifier::{
+    EnvironmentItemModifier, EnvironmentModifierScorer, EnvironmentWeights,
+};
 pub use game_data_index::GameDataIndex;
 pub use game_data_loader::GameDataLoader;
 pub use holder_scorer::{
