@@ -1,0 +1,20 @@
+{
+  "version": "S18.1",
+  "overrides": {
+    "13331": {
+      "bonus": 8,
+      "roles": ["carry"],
+      "notes": "三费过渡输出强度高"
+    },
+    "13338": {
+      "bonus": 8,
+      "roles": ["tank"],
+      "notes": "三费前排过渡强度高"
+    },
+    "12403": {
+      "bonus": 6,
+      "roles": ["tank", "utility"],
+      "notes": "低费前排适合临时承载功能装"
+    }
+  }
+}

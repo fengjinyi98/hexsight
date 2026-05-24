@@ -10,6 +10,7 @@
 
 pub mod augment_economy_planner;
 pub mod augment_effect_interpreter;
+pub mod bench_transition_scorer;
 pub mod board_power_fight;
 pub mod champion_combat_profile_builder;
 pub mod champion_item_fit;
@@ -18,6 +19,7 @@ pub mod decision;
 pub mod decision_planner;
 pub mod game_data_index;
 pub mod game_data_loader;
+pub mod holder_scorer;
 pub mod item_conflict_scorer;
 pub mod item_fit_scorer;
 pub mod knowledge_builders;
@@ -40,6 +42,7 @@ pub mod version_validator;
 
 pub use augment_economy_planner::{AugmentFitScorer, EconomyPlanner};
 pub use augment_effect_interpreter::AugmentEffectInterpreter;
+pub use bench_transition_scorer::{BenchTransitionDecision, BenchTransitionScorer};
 pub use board_power_fight::{BoardPower, BoardPowerScorer, FightOutcomeEstimator};
 pub use champion_combat_profile_builder::ChampionCombatProfileBuilder;
 pub use champion_item_fit::{
@@ -51,6 +54,11 @@ pub use decision::DecisionEngine;
 pub use decision_planner::DecisionPlanner;
 pub use game_data_index::GameDataIndex;
 pub use game_data_loader::GameDataLoader;
+pub use holder_scorer::{
+    HolderAction, HolderConfigLoader, HolderPlan, HolderRecommendation, HolderRole, HolderRules,
+    HolderScorer, HolderScoringContext, HolderUnit, HolderUnitSource, WorkhorseOverride,
+    WorkhorseOverrides,
+};
 pub use item_conflict_scorer::{ConflictGroupLoader, ItemConflictScorer, StackingPolicyLoader};
 pub use item_fit_scorer::ItemFitScorer;
 pub use knowledge_builders::{

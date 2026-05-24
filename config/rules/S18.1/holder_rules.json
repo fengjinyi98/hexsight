@@ -1,0 +1,9 @@
+{
+  "version": "S18.1",
+  "two_star_bonus": 18,
+  "board_bonus": 8,
+  "role_match_bonus": 16,
+  "trait_match_bonus": 4,
+  "wait_score_gap": 12,
+  "sell_cost_penalty_per_gold": 2
+}
