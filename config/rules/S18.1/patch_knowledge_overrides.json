@@ -1,0 +1,5 @@
+{
+  "version": "S18.1",
+  "description": "S18.1 版本公告知识人工覆写。用于补充热修、实战校准和特殊机制影响分；patch_overrides.json 保留给规则包、伤害、阈值与权重覆写。",
+  "entries": []
+}
