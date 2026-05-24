@@ -650,6 +650,19 @@ P6 不做完整战斗模拟，先做能服务决策的收益估算。
 
 P7 是阶段收口点。之后每次规则争议都必须沉淀为回归样例，版本更新后先跑回归。
 
+### P8：Swift 展示桥接
+
+| 项 | 内容 |
+|---|---|
+| 目标 | 把 Rust `RuleOutput` 知识决策结果通过 FFI 暴露给 Swift，Swift 只负责解析和展示 |
+| 核心模块 | `crates/hexsight-ffi/src/data_ffi.rs`、`swift/Sources/HexSight/Bridge/RustBridge.swift`、`swift/Sources/HexSight/Services/LineupRepository.swift` |
+| 配置产物 | 复用 `config/rules/<version>/*.json` 与本地阵容缓存 |
+| 输入 | `config_root`、`mode`、`lineup_id` |
+| 输出 | 包含 `knowledgeActions`、装备动作、海克斯动作、转向条件和短解释的 `RuleOutput` JSON |
+| 验收 | Swift 能通过 Rust FFI 获取并解析 `knowledgeActions`；Swift 不参与装备收益、版本修正和知识决策计算 |
+
+P8 负责完成“Rust 计算、Swift 展示”的边界收口。Swift 层只消费结构化 JSON，不重新实现 P0-P7 的规则逻辑。
+
 ### P 级依赖顺序
 
 ```text
@@ -661,6 +674,7 @@ P0 知识底座
  -> P5 版本修正
  -> P6 简化收益估算
  -> P7 RuleOutput 集成与回归
+ -> P8 Swift 展示桥接
 ```
 
 | P 级 | 可以并行的内容 | 依赖 |
@@ -673,6 +687,7 @@ P0 知识底座
 | P5 | 版本公告结构可提前建模 | P0 |
 | P6 | 收益估算依赖装备/棋子/冲突 | P1/P2/P3 |
 | P7 | 集成和回归 | P0-P6 |
+| P8 | Swift 展示桥接 | P7 |
 
 ---
 

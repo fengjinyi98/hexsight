@@ -80,4 +80,13 @@ final class LineupRepositoryTests: XCTestCase {
         XCTAssertNotNil(report?["total_lineups"])
         XCTAssertNotNil(report?["missing_hero_ids"])
     }
+
+    func testKnowledgeRuleOutputLoadsViaRustFFI() async {
+        let repo = LineupRepository.shared
+        let output = repo.loadKnowledgeRuleOutput(mode: "17", lineupId: "神谕龙王")
+
+        XCTAssertNotNil(output?["strategy"])
+        XCTAssertNotNil(output?["lineupRecommendations"])
+        XCTAssertNotNil((output?["knowledgeActions"] as? [String: Any])?["shortExplanations"])
+    }
 }

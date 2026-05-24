@@ -138,6 +138,20 @@ final class RustBridge: @unchecked Sendable {
         } ?? nil
     }
 
+    /// 获取 Rust 知识决策 RuleOutput
+    func getKnowledgeRuleOutput(mode: String, lineupId: String) -> [String: Any]? {
+        callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                lineupId.withCString { idPtr in
+                    guard let ptr = hexsight_get_knowledge_rule_output_json(root, modePtr, idPtr),
+                          let json = String(validatingCString: ptr) else { return nil }
+                    hexsight_free_string(ptr)
+                    return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+                }
+            }
+        } ?? nil
+    }
+
     /// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
     func refreshLineups(mode: String) -> Bool {
         callWithConfigRoot { root in
@@ -235,6 +249,14 @@ private func hexsight_get_lineup_detail_json(
 /// 获取阵容规则上下文（JSON）
 @_silgen_name("hexsight_get_lineup_rules_context_json")
 private func hexsight_get_lineup_rules_context_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>,
+    _ lineup_id: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 获取 Rust 知识决策 RuleOutput（JSON）
+@_silgen_name("hexsight_get_knowledge_rule_output_json")
+private func hexsight_get_knowledge_rule_output_json(
     _ config_root: UnsafePointer<CChar>,
     _ mode: UnsafePointer<CChar>,
     _ lineup_id: UnsafePointer<CChar>
