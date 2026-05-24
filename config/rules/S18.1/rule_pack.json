@@ -28,6 +28,14 @@
       "trait": 0.10,
       "item": 0.10,
       "augment": 0.05
+    },
+    "boardPower": {
+      "frontlineEHP": 0.30,
+      "backlineDPS": 0.30,
+      "burstPower": 0.15,
+      "traitPower": 0.10,
+      "itemPower": 0.10,
+      "controlPower": 0.05
     }
   },
   "thresholds": {

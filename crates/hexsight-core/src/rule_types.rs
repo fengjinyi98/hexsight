@@ -418,6 +418,8 @@ pub struct ScoreWeights {
     pub lineup_fit: LineupFitWeights,
     #[serde(rename = "transition")]
     pub transition: TransitionWeights,
+    #[serde(rename = "boardPower")]
+    pub board_power: BoardPowerWeights,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -458,6 +460,23 @@ pub struct TransitionWeights {
     pub transition_augment: f64,
 }
 
+/// 棋盘战力权重
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BoardPowerWeights {
+    #[serde(rename = "frontlineEHP")]
+    pub frontline_ehp: f64,
+    #[serde(rename = "backlineDPS")]
+    pub backline_dps: f64,
+    #[serde(rename = "burstPower")]
+    pub burst_power: f64,
+    #[serde(rename = "traitPower")]
+    pub trait_power: f64,
+    #[serde(rename = "itemPower")]
+    pub item_power: f64,
+    #[serde(rename = "controlPower")]
+    pub control_power: f64,
+}
+
 /// 规则阈值
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RuleThresholds {
@@ -473,6 +492,42 @@ pub struct RuleThresholds {
     /// 大入预警血量
     #[serde(rename = "largeDamageWarning")]
     pub large_damage_warning: i32,
+}
+
+// ============================================================
+// 棋子战斗画像（对齐文档 16.3）
+// ============================================================
+
+/// 棋子战斗画像
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ChampionCombatProfile {
+    pub hero_id: String,
+    pub name: String,
+    pub cost: i32,
+    /// 角色标签: 主C/副C/主坦/副坦/控制/功能/召唤
+    pub role_tags: Vec<String>,
+    /// 伤害类型: 物理/魔法/真实/混合
+    pub damage_type: String,
+    /// 攻击模式: 单体/范围/弹射/穿透/全屏/召唤物
+    pub attack_pattern: Vec<String>,
+    /// 索敌方式
+    pub targeting: String,
+    /// 施法节奏: 快启动/中启动/慢启动
+    pub cast_tempo: String,
+    /// 特殊标签: 处决/破甲/魔抗击碎/减疗/护盾/治疗/技能暴击
+    pub special_tags: Vec<String>,
+    /// 基础生命值
+    pub base_hp: i32,
+    /// 基础护甲
+    pub base_armor: i32,
+    /// 基础魔抗
+    pub base_mr: i32,
+    /// 基础攻击力
+    pub base_ad: i32,
+    /// 攻击速度
+    pub base_as: f64,
+    /// 有效生命值（简易估算）
+    pub effective_hp: i32,
 }
 
 impl Default for RulePack {
@@ -506,6 +561,14 @@ impl Default for RulePack {
                     transition_trait: 0.10,
                     transition_item: 0.10,
                     transition_augment: 0.05,
+                },
+                board_power: BoardPowerWeights {
+                    frontline_ehp: 0.30,
+                    backline_dps: 0.30,
+                    burst_power: 0.15,
+                    trait_power: 0.10,
+                    item_power: 0.10,
+                    control_power: 0.05,
                 },
             },
             thresholds: RuleThresholds {

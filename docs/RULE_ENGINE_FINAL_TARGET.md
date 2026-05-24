@@ -417,8 +417,8 @@ flowchart LR
 | P1 | `TransitionLineupMatcher` | 匹配官网过渡阵容 |
 | P1 | `RiskScorer` | 输出同行、血量、装备、成型风险 |
 | P1 | `DamageProfile` | 维护版本化阶段基础伤害表 |
-| P1 | `BoardPowerScorer` | 计算己方和敌方棋盘战力 |
-| P1 | `FightOutcomeEstimator` | 预测胜率、剩余棋子、掉血区间 |
+| P2 | `BoardPowerScorer` | 计算己方和敌方棋盘战力 |
+| P2 | `FightOutcomeEstimator` | 预测胜率、剩余棋子、掉血区间 |
 | P2 | `ModeSpecialPlanner` | 星神、任务、天选等模式玩法 |
 | P2 | `PositioningPlanner` | 后期站位与对位规则 |
 | P2 | `ChampionCombatProfileBuilder` | 从棋子技能和属性生成战斗画像 |
@@ -605,7 +605,7 @@ boardPower =
 
 ```json
 {
-  "fight": {
+  "fightOutcome": {
     "winProbability": 0.38,
     "expectedDamageTaken": 5.6,
     "damageRange": [3, 9],
