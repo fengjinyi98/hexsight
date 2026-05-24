@@ -24,6 +24,7 @@ pub mod data_ffi;
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use std::path::{Path, PathBuf};
 
 use hexsight_core::RegionConfig;
 use hexsight_engine::DecisionEngine;
@@ -72,6 +73,9 @@ pub extern "C" fn hexsight_init(
     let mut engine = DecisionEngine::new();
     // 尝试加载阵容库，失败不阻塞初始化
     let _ = engine.init(&lineup_dir_str);
+    if let Some(template_dir) = vision_template_dir_from_lineups(&lineup_dir_str) {
+        let _ = hexsight_vision::icon::init_templates(&template_dir.to_string_lossy());
+    }
 
     let ctx = Box::new(EngineContext {
         memory: GameMemory::new(),
@@ -168,4 +172,29 @@ fn to_c_string(s: &str) -> *mut c_char {
     CString::new(s)
         .unwrap_or_else(|_| CString::new("").unwrap())
         .into_raw()
+}
+
+fn vision_template_dir_from_lineups(lineup_dir: &str) -> Option<PathBuf> {
+    let config_root = Path::new(lineup_dir).parent()?;
+    let template_dir = config_root.join("vision_templates");
+    template_dir.is_dir().then_some(template_dir)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn locates_vision_template_dir_from_lineup_dir() {
+        let root =
+            std::env::temp_dir().join(format!("hexsight_ffi_templates_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("config/lineups")).unwrap();
+        std::fs::create_dir_all(root.join("config/vision_templates/heroes")).unwrap();
+
+        let found = vision_template_dir_from_lineups(root.join("config/lineups").to_str().unwrap());
+
+        assert_eq!(found, Some(root.join("config/vision_templates")));
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

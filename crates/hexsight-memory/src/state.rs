@@ -107,7 +107,53 @@ impl GameMemory {
 
     /// 两帧关键字段是否一致
     fn frames_equal(&self, a: &RecognizedFrame, b: &RecognizedFrame) -> bool {
-        a.gold == b.gold && a.hp == b.hp && a.level == b.level && a.round == b.round
+        a.gold == b.gold
+            && a.hp == b.hp
+            && a.level == b.level
+            && a.round == b.round
+            && a.own_heroes == b.own_heroes
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hexsight_core::Hero;
+
+    #[test]
+    fn hero_changes_reset_noise_gate_and_update_after_confirmation() {
+        let mut memory = GameMemory::new();
+        let first = frame_with_hero("布隆");
+        let second = frame_with_hero("塔里克");
+
+        assert!(memory.feed(first.clone()).unwrap().is_none());
+        assert!(memory.feed(first.clone()).unwrap().is_none());
+        assert!(memory.feed(second.clone()).unwrap().is_none());
+        assert!(memory.feed(second.clone()).unwrap().is_none());
+
+        let state = memory
+            .feed(second)
+            .unwrap()
+            .expect("连续三帧新英雄应确认更新");
+
+        assert_eq!(state.current.own_heroes[0].name, "塔里克");
+    }
+
+    fn frame_with_hero(name: &str) -> RecognizedFrame {
+        RecognizedFrame {
+            gold: 10,
+            hp: 100,
+            level: 5,
+            round: "2-1".into(),
+            own_heroes: vec![Hero {
+                name: name.into(),
+                cost: 0,
+                star: 1,
+                position: (0, 0),
+                items: Vec::new(),
+            }],
+            ..Default::default()
+        }
     }
 }
 
