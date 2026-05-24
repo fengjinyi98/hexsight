@@ -7,11 +7,11 @@
 use std::collections::HashMap;
 use std::path::Path;
 
+use hexsight_core::HexResult;
 use hexsight_core::{
-    EquipmentData, GodData, HeroData, HexData, LineupPieceData, MissionData,
-    RuleTraitSnapshot, TraitContactData, TraitData,
+    EquipmentData, GodData, HeroData, HexData, LineupPieceData, MissionData, RuleTraitSnapshot,
+    TraitContactData, TraitData,
 };
-use hexsight_core::{HexResult};
 
 use crate::GameDataLoader;
 
@@ -101,22 +101,32 @@ impl GameDataIndex {
 
     /// 种族名称
     pub fn race_name(&self, species_id: &str) -> &str {
-        self.race_names.get(species_id).map(|s| s.as_str()).unwrap_or("")
+        self.race_names
+            .get(species_id)
+            .map(|s| s.as_str())
+            .unwrap_or("")
     }
 
     /// 职业名称
     pub fn job_name(&self, class_id: &str) -> &str {
-        self.job_names.get(class_id).map(|s| s.as_str()).unwrap_or("")
+        self.job_names
+            .get(class_id)
+            .map(|s| s.as_str())
+            .unwrap_or("")
     }
 
     /// 装备名称（返回 owned String 以处理缺省回退）
     pub fn equip_name(&self, equip_id: &str) -> String {
-        self.equip_names.get(equip_id).cloned().unwrap_or_else(|| equip_id.to_string())
+        self.equip_names
+            .get(equip_id)
+            .cloned()
+            .unwrap_or_else(|| equip_id.to_string())
     }
 
     /// 获取羁绊的所有等级配置
     pub fn trait_levels(&self, check_id: &str) -> Vec<&TraitData> {
-        let mut levels: Vec<&TraitData> = self.traits
+        let mut levels: Vec<&TraitData> = self
+            .traits
             .iter()
             .filter(|t| t.checkId == check_id)
             .collect();
@@ -145,7 +155,9 @@ impl GameDataIndex {
         pieces: &[LineupPieceData],
         official_contacts: &[TraitContactData],
     ) -> Vec<RuleTraitSnapshot> {
-        if !official_contacts.is_empty() && official_contacts.iter().any(|c| c.color > 0 || c.count > 0) {
+        if !official_contacts.is_empty()
+            && official_contacts.iter().any(|c| c.color > 0 || c.count > 0)
+        {
             return self.summaries_from_contacts(official_contacts);
         }
         self.summaries_from_pieces(pieces)
@@ -157,9 +169,11 @@ impl GameDataIndex {
             .iter()
             .filter(|c| c.color > 0 || c.count > 0)
             .filter_map(|contact| {
-                let matched = self.traits.iter().find(|t| {
-                    t.checkId == contact.id && trait_matches(&contact.contact_type, t)
-                }).or_else(|| self.traits.iter().find(|t| t.checkId == contact.id));
+                let matched = self
+                    .traits
+                    .iter()
+                    .find(|t| t.checkId == contact.id && trait_matches(&contact.contact_type, t))
+                    .or_else(|| self.traits.iter().find(|t| t.checkId == contact.id));
 
                 matched.map(|t| RuleTraitSnapshot {
                     id: format!("{}-{}", contact.contact_type, contact.id),
@@ -176,7 +190,8 @@ impl GameDataIndex {
 
         // 按 color(降序) > count(降序) > name(升序) 排序
         summaries.sort_by(|a, b| {
-            b.color.cmp(&a.color)
+            b.color
+                .cmp(&a.color)
                 .then_with(|| b.count.cmp(&a.count))
                 .then_with(|| a.name.cmp(&b.name))
         });
@@ -205,16 +220,21 @@ impl GameDataIndex {
             .into_iter()
             .filter_map(|(key, count)| {
                 let parts: Vec<&str> = key.splitn(2, ':').collect();
-                if parts.len() != 2 { return None; }
+                if parts.len() != 2 {
+                    return None;
+                }
                 let trait_type = parts[0];
                 let check_id = parts[1].to_string();
                 let key_owned = key.clone();
 
-                let candidates: Vec<&TraitData> = self.traits.iter()
+                let candidates: Vec<&TraitData> = self
+                    .traits
+                    .iter()
                     .filter(|t| t.checkId == check_id && trait_matches(trait_type, t))
                     .collect();
 
-                let active = candidates.iter()
+                let active = candidates
+                    .iter()
                     .filter(|t| {
                         let required = t.num.parse::<i32>().unwrap_or(i32::MAX);
                         count >= required
@@ -235,7 +255,8 @@ impl GameDataIndex {
             .collect();
 
         summaries.sort_by(|a, b| {
-            b.color.cmp(&a.color)
+            b.color
+                .cmp(&a.color)
                 .then_with(|| b.count.cmp(&a.count))
                 .then_with(|| a.name.cmp(&b.name))
         });
@@ -270,8 +291,10 @@ mod tests {
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap()
-            .parent().unwrap()
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
             .join("config")
     }
 

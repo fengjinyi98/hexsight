@@ -36,17 +36,15 @@ impl VersionValidator {
             for piece in &card.detail.final_heroes {
                 seen_hero_ids.insert(piece.hero_id.clone());
                 if index.hero(&piece.hero_id).is_none() {
-                    missing_hero_ids.push(format!(
-                        "{} (阵容: {})", piece.hero_id, card.name
-                    ));
+                    missing_hero_ids.push(format!("{} (阵容: {})", piece.hero_id, card.name));
                 }
                 for eid in &piece.equipment_ids {
-                    if eid == "0" { continue; }
+                    if eid == "0" {
+                        continue;
+                    }
                     seen_equip_ids.insert(eid.clone());
                     if index.equipment(eid).is_none() {
-                        missing_equip_ids.push(format!(
-                            "{} (阵容: {})", eid, card.name
-                        ));
+                        missing_equip_ids.push(format!("{} (阵容: {})", eid, card.name));
                     }
                 }
             }
@@ -123,7 +121,11 @@ mod tests {
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     #[test]

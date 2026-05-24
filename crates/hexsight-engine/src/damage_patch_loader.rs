@@ -21,7 +21,9 @@ pub struct DamageProfile {
 impl DamageProfile {
     /// 从规则包加载伤害表
     pub fn from_rule_pack(pack: &RulePack) -> Self {
-        let stage_damage: HashMap<i32, i32> = pack.damage_profile.iter()
+        let stage_damage: HashMap<i32, i32> = pack
+            .damage_profile
+            .iter()
             .filter_map(|(k, v)| k.parse::<i32>().ok().map(|stage| (stage, *v)))
             .collect();
 
@@ -102,13 +104,9 @@ impl PatchOverrideLoader {
             return Ok(None);
         }
         let content = fs::read_to_string(&path)
-            .map_err(|e| HexError::Config(format!(
-                "读取覆写文件失败 {}: {}", path.display(), e
-            )))?;
+            .map_err(|e| HexError::Config(format!("读取覆写文件失败 {}: {}", path.display(), e)))?;
         let ov: PatchOverride = serde_json::from_str(&content)
-            .map_err(|e| HexError::Config(format!(
-                "解析覆写文件失败 {}: {}", path.display(), e
-            )))?;
+            .map_err(|e| HexError::Config(format!("解析覆写文件失败 {}: {}", path.display(), e)))?;
         Ok(Some(ov))
     }
 
@@ -167,7 +165,10 @@ impl PatchOverrideLoader {
     }
 
     fn override_path(config_root: &Path, version: &str) -> PathBuf {
-        config_root.join("rules").join(version).join("patch_overrides.json")
+        config_root
+            .join("rules")
+            .join(version)
+            .join("patch_overrides.json")
     }
 }
 
@@ -178,7 +179,11 @@ mod tests {
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     #[test]

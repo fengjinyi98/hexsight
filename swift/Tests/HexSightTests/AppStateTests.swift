@@ -27,11 +27,21 @@ final class AppStateTests: XCTestCase {
         XCTAssertEqual(state.suggestions, ["升8", "保利息"])
     }
 
-    func testKnowledgeDecisionLoadFallsBackToFirstLineupWhenLineupIdIsEmpty() async {
+    func testKnowledgeDecisionLoadSkipsWhenLineupIdIsEmpty() async {
         let state = AppState.shared
         state.resetGame()
 
         await state.loadKnowledgeDecision(mode: "17", lineupId: "")
+
+        XCTAssertNil(state.knowledgeDecision)
+        XCTAssertEqual(state.lineupName, "等待识别...")
+    }
+
+    func testKnowledgeDecisionLoadUsesExplicitLineupId() async {
+        let state = AppState.shared
+        state.resetGame()
+
+        await state.loadKnowledgeDecision(mode: "17", lineupId: "神谕龙王")
 
         XCTAssertNotNil(state.knowledgeDecision)
         XCTAssertFalse(state.lineupName.isEmpty)

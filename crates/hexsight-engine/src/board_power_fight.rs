@@ -3,8 +3,8 @@
 // - BoardPowerScorer：计算棋盘战力（前排EHP + 后排DPS + 爆发 + 羁绊 + 装备 + 控制）
 // - FightOutcomeEstimator：预测胜率、剩余棋子、掉血区间、风险等级
 
-use hexsight_core::{ChampionCombatProfile, FightOutcome, RulePack};
 use crate::DamageProfile;
+use hexsight_core::{ChampionCombatProfile, FightOutcome, RulePack};
 
 /// 棋盘战力评分器
 pub struct BoardPowerScorer;
@@ -35,10 +35,12 @@ impl BoardPowerScorer {
         let alive = profiles.len() as i32;
 
         // 前排：row 靠前（此处按 role_tags 中是否有 主坦/副坦 判断）
-        let frontliners: Vec<&ChampionCombatProfile> = profiles.iter()
+        let frontliners: Vec<&ChampionCombatProfile> = profiles
+            .iter()
             .filter(|p| p.role_tags.iter().any(|r| r == "主坦" || r == "副坦"))
             .collect();
-        let backliners: Vec<&ChampionCombatProfile> = profiles.iter()
+        let backliners: Vec<&ChampionCombatProfile> = profiles
+            .iter()
             .filter(|p| !frontliners.contains(&p))
             .collect();
 
@@ -50,27 +52,42 @@ impl BoardPowerScorer {
         };
 
         // 前排有效生命值
-        let frontline_ehp: f64 = effective_frontline.iter()
+        let frontline_ehp: f64 = effective_frontline
+            .iter()
             .map(|p| p.effective_hp as f64)
             .sum::<f64>()
-            / 1000.0;  // 归一化
+            / 1000.0; // 归一化
 
         // 后排 DPS（普攻 + 技能估算）
-        let backline_dps: f64 = backliners.iter()
+        let backline_dps: f64 = backliners
+            .iter()
             .map(|p| {
                 let ad_contrib = p.base_ad as f64 * p.base_as;
-                let skill_burst = if p.damage_type == "魔法" { ad_contrib * 0.8 } else { ad_contrib * 0.5 };
+                let skill_burst = if p.damage_type == "魔法" {
+                    ad_contrib * 0.8
+                } else {
+                    ad_contrib * 0.5
+                };
                 (ad_contrib + skill_burst) / 100.0
             })
             .sum::<f64>()
             .max(0.5);
 
         // 爆发力：快启动 + 高伤害 + 处决标签
-        let burst_power: f64 = profiles.iter()
+        let burst_power: f64 = profiles
+            .iter()
             .map(|p| {
-                let mut burst = if p.cast_tempo == "快启动" { 15.0 } else { 5.0 };
-                if p.special_tags.contains(&"处决".to_string()) { burst += 10.0; }
-                if p.special_tags.contains(&"技能暴击".to_string()) { burst += 5.0; }
+                let mut burst = if p.cast_tempo == "快启动" {
+                    15.0
+                } else {
+                    5.0
+                };
+                if p.special_tags.contains(&"处决".to_string()) {
+                    burst += 10.0;
+                }
+                if p.special_tags.contains(&"技能暴击".to_string()) {
+                    burst += 5.0;
+                }
                 burst
             })
             .sum::<f64>()
@@ -83,9 +100,12 @@ impl BoardPowerScorer {
         let item_power = (completed_item_count as f64 * 10.0) / 100.0;
 
         // 控制战力
-        let control_power: f64 = profiles.iter()
+        let control_power: f64 = profiles
+            .iter()
             .filter(|p| p.role_tags.contains(&"控制".to_string()))
-            .count() as f64 * 5.0 / 100.0;
+            .count() as f64
+            * 5.0
+            / 100.0;
         let control_bonus = if has_combat_augment { 5.0 } else { 0.0 };
 
         let total = frontline_ehp * w.frontline_ehp
@@ -150,7 +170,11 @@ impl FightOutcomeEstimator {
         };
 
         // 掉血区间：赢时包含 0，输时给从小入到大入的范围
-        let min_dmg = if win_prob > 0.5 { 0 } else { damage_profile.calculate_damage(stage, 0) };
+        let min_dmg = if win_prob > 0.5 {
+            0
+        } else {
+            damage_profile.calculate_damage(stage, 0)
+        };
         let max_dmg = damage_profile.calculate_damage(stage, enemy_power.alive_count);
         let damage_range = [min_dmg, max_dmg];
 
@@ -167,12 +191,20 @@ impl FightOutcomeEstimator {
         let confidence = (0.5 + power_diff.abs().min(1.0) * 0.35).clamp(0.45, 0.85);
 
         let mut reason = Vec::new();
-        if win_prob > 0.7 { reason.push("战力占优".into()); }
-        else if win_prob < 0.3 { reason.push("战力劣势".into()); }
-        else { reason.push("战力接近".into()); }
+        if win_prob > 0.7 {
+            reason.push("战力占优".into());
+        } else if win_prob < 0.3 {
+            reason.push("战力劣势".into());
+        } else {
+            reason.push("战力接近".into());
+        }
 
-        if expected_damage >= 8.0 { reason.push("可能被大入".into()); }
-        if our_hp < 35 && expected_damage >= 4.0 { reason.push("血量危险需止血".into()); }
+        if expected_damage >= 8.0 {
+            reason.push("可能被大入".into());
+        }
+        if our_hp < 35 && expected_damage >= 4.0 {
+            reason.push("血量危险需止血".into());
+        }
 
         let recommended_action = if risk_level == "high" && our_hp < 35 {
             "立即补战力或止血".to_string()
@@ -202,18 +234,35 @@ mod tests {
     use super::*;
     use crate::DamageProfile as DPExt;
 
-    fn make_profile(hp: i32, armor: i32, ad: i32, is_tank: bool, is_control: bool) -> ChampionCombatProfile {
+    fn make_profile(
+        hp: i32,
+        armor: i32,
+        ad: i32,
+        is_tank: bool,
+        is_control: bool,
+    ) -> ChampionCombatProfile {
         let mut roles = vec!["副C".to_string()];
-        if is_tank { roles.push("主坦".to_string()); }
-        if is_control { roles.push("控制".to_string()); }
+        if is_tank {
+            roles.push("主坦".to_string());
+        }
+        if is_control {
+            roles.push("控制".to_string());
+        }
         ChampionCombatProfile {
-            hero_id: "test".into(), name: "test".into(), cost: 3,
+            hero_id: "test".into(),
+            name: "test".into(),
+            cost: 3,
             role_tags: roles,
-            damage_type: "物理".into(), attack_pattern: vec!["单体".into()],
-            targeting: "当前目标".into(), cast_tempo: "中启动".into(),
+            damage_type: "物理".into(),
+            attack_pattern: vec!["单体".into()],
+            targeting: "当前目标".into(),
+            cast_tempo: "中启动".into(),
             special_tags: vec![],
-            base_hp: hp, base_armor: armor, base_mr: 30,
-            base_ad: ad, base_as: 0.7,
+            base_hp: hp,
+            base_armor: armor,
+            base_mr: 30,
+            base_ad: ad,
+            base_as: 0.7,
             effective_hp: (hp as f64 * (1.0 + armor as f64 / 100.0)) as i32,
         }
     }
@@ -221,9 +270,9 @@ mod tests {
     #[test]
     fn board_power_with_tank_and_carry() {
         let profiles = vec![
-            make_profile(900, 60, 50, true, false),   // 主坦
-            make_profile(600, 30, 85, false, false),  // 主C
-            make_profile(550, 25, 70, false, true),   // 控制
+            make_profile(900, 60, 50, true, false),  // 主坦
+            make_profile(600, 30, 85, false, false), // 主C
+            make_profile(550, 25, 70, false, true),  // 控制
         ];
         let pack = RulePack::default();
         let power = BoardPowerScorer::compute(&profiles, 3, 2, false, &pack);
@@ -238,14 +287,24 @@ mod tests {
         let pack = RulePack::default();
         let dp = DPExt::from_rule_pack(&pack);
         let our = BoardPower {
-            total_power: 2.5, frontline_ehp: 1.0, backline_dps: 0.8,
-            burst_power: 0.2, trait_power: 0.3, item_power: 0.2,
-            control_power: 0.1, alive_count: 5,
+            total_power: 2.5,
+            frontline_ehp: 1.0,
+            backline_dps: 0.8,
+            burst_power: 0.2,
+            trait_power: 0.3,
+            item_power: 0.2,
+            control_power: 0.1,
+            alive_count: 5,
         };
         let enemy = BoardPower {
-            total_power: 1.0, frontline_ehp: 0.5, backline_dps: 0.3,
-            burst_power: 0.1, trait_power: 0.1, item_power: 0.1,
-            control_power: 0.0, alive_count: 4,
+            total_power: 1.0,
+            frontline_ehp: 0.5,
+            backline_dps: 0.3,
+            burst_power: 0.1,
+            trait_power: 0.1,
+            item_power: 0.1,
+            control_power: 0.0,
+            alive_count: 4,
         };
         let outcome = FightOutcomeEstimator::predict(&our, &enemy, 80, 4, &dp);
         assert!(outcome.win_probability > 0.5);
@@ -257,14 +316,24 @@ mod tests {
         let pack = RulePack::default();
         let dp = DPExt::from_rule_pack(&pack);
         let our = BoardPower {
-            total_power: 0.5, frontline_ehp: 0.2, backline_dps: 0.2,
-            burst_power: 0.0, trait_power: 0.1, item_power: 0.0,
-            control_power: 0.0, alive_count: 3,
+            total_power: 0.5,
+            frontline_ehp: 0.2,
+            backline_dps: 0.2,
+            burst_power: 0.0,
+            trait_power: 0.1,
+            item_power: 0.0,
+            control_power: 0.0,
+            alive_count: 3,
         };
         let enemy = BoardPower {
-            total_power: 2.0, frontline_ehp: 1.0, backline_dps: 0.6,
-            burst_power: 0.2, trait_power: 0.2, item_power: 0.2,
-            control_power: 0.1, alive_count: 5,
+            total_power: 2.0,
+            frontline_ehp: 1.0,
+            backline_dps: 0.6,
+            burst_power: 0.2,
+            trait_power: 0.2,
+            item_power: 0.2,
+            control_power: 0.1,
+            alive_count: 5,
         };
         let outcome = FightOutcomeEstimator::predict(&our, &enemy, 30, 5, &dp);
         assert!(outcome.win_probability < 0.5);
@@ -276,14 +345,24 @@ mod tests {
         let pack = RulePack::default();
         let dp = DPExt::from_rule_pack(&pack);
         let our = BoardPower {
-            total_power: 1.0, frontline_ehp: 0.5, backline_dps: 0.3,
-            burst_power: 0.1, trait_power: 0.1, item_power: 0.1,
-            control_power: 0.0, alive_count: 4,
+            total_power: 1.0,
+            frontline_ehp: 0.5,
+            backline_dps: 0.3,
+            burst_power: 0.1,
+            trait_power: 0.1,
+            item_power: 0.1,
+            control_power: 0.0,
+            alive_count: 4,
         };
         let enemy = BoardPower {
-            total_power: 1.0, frontline_ehp: 0.5, backline_dps: 0.3,
-            burst_power: 0.1, trait_power: 0.1, item_power: 0.1,
-            control_power: 0.0, alive_count: 4,
+            total_power: 1.0,
+            frontline_ehp: 0.5,
+            backline_dps: 0.3,
+            burst_power: 0.1,
+            trait_power: 0.1,
+            item_power: 0.1,
+            control_power: 0.0,
+            alive_count: 4,
         };
         let outcome = FightOutcomeEstimator::predict(&our, &enemy, 80, 4, &dp);
         assert!(outcome.damage_range[0] <= outcome.damage_range[1]);

@@ -23,7 +23,9 @@ impl LineupAdapter {
             .collect();
         // 按 category 再按 name 排序
         cards.sort_by(|a, b| {
-            a.category.as_deref().unwrap_or("")
+            a.category
+                .as_deref()
+                .unwrap_or("")
                 .cmp(b.category.as_deref().unwrap_or(""))
                 .then_with(|| a.name.cmp(&b.name))
         });
@@ -41,13 +43,18 @@ impl LineupAdapter {
             .and_then(|v| v.as_str())
             .filter(|s| !s.is_empty())
             .or_else(|| {
-                raw.extra.get("name").and_then(|v| v.as_str()).filter(|s| !s.is_empty())
+                raw.extra
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .filter(|s| !s.is_empty())
             })
             .unwrap_or("未知阵容");
 
         // ID 优先级: raw.id > raw.extra.queue_id > resolvedName
         let rid = raw.id.clone();
-        let qid = raw.extra.get("queue_id")
+        let qid = raw
+            .extra
+            .get("queue_id")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string())
             .unwrap_or_default();
@@ -59,12 +66,14 @@ impl LineupAdapter {
         // 作者优先级：lineupauthor_data.name > detail.author_littlelegend.desc > raw.author
         let author_data = &raw.lineupauthor_data;
         let little_legend = detail_payload.get("author_littlelegend");
-        let author = author_data.get("name")
+        let author = author_data
+            .get("name")
             .and_then(|v| v.as_str())
             .filter(|s| !s.is_empty())
             .or_else(|| {
                 little_legend.and_then(|ll| {
-                    ll.get("desc").and_then(|v| v.as_str())
+                    ll.get("desc")
+                        .and_then(|v| v.as_str())
                         .or_else(|| ll.get("item_name").and_then(|v| v.as_str()))
                 })
             })
@@ -72,11 +81,13 @@ impl LineupAdapter {
             .unwrap_or("未知作者");
 
         // 头像优先级
-        let author_avatar = author_data.get("imgUrl")
+        let author_avatar = author_data
+            .get("imgUrl")
             .and_then(|v| v.as_str())
             .or_else(|| {
                 little_legend.and_then(|ll| {
-                    ll.get("imagePath").and_then(|v| v.as_str())
+                    ll.get("imagePath")
+                        .and_then(|v| v.as_str())
                         .or_else(|| ll.get("icon").and_then(|v| v.as_str()))
                 })
             })
@@ -84,7 +95,8 @@ impl LineupAdapter {
             .to_string();
 
         // 羁绊标签：优先 contact[].name > 从阵容名提取【】
-        let contacts = detail_payload.get("contact")
+        let contacts = detail_payload
+            .get("contact")
             .and_then(|v| v.as_array())
             .map(|a| a.as_slice())
             .unwrap_or(&[]);
@@ -99,15 +111,18 @@ impl LineupAdapter {
             contact_traits
         };
 
-        let line_tag = detail_payload.get("line_tag")
+        let line_tag = detail_payload
+            .get("line_tag")
             .and_then(|v| v.as_str())
             .and_then(|s| s.parse::<i32>().ok());
-        let category = line_tag.and_then(|t| match t {
-            1 => Some("新手推荐"),
-            2 => Some("高手进阶"),
-            3 => Some("趣味娱乐"),
-            _ => None,
-        }).map(|s| s.to_string());
+        let category = line_tag
+            .and_then(|t| match t {
+                1 => Some("新手推荐"),
+                2 => Some("高手进阶"),
+                3 => Some("趣味娱乐"),
+                _ => None,
+            })
+            .map(|s| s.to_string());
 
         let tags = Self::parse_tags(&detail_payload, category.as_deref());
         let top4_rate = Self::parse_top4_rate(&detail_payload);
@@ -117,7 +132,11 @@ impl LineupAdapter {
             name: resolved_name.to_string(),
             author: author.to_string(),
             author_avatar,
-            quality: if raw.quality.is_empty() { "A".to_string() } else { raw.quality.clone() },
+            quality: if raw.quality.is_empty() {
+                "A".to_string()
+            } else {
+                raw.quality.clone()
+            },
             traits,
             category,
             tags,
@@ -134,8 +153,16 @@ impl LineupAdapter {
             final_heroes: parse_pieces(payload.get("hero_location")),
             early_heroes: parse_pieces(payload.get("y21_early_heros")),
             mid_heroes: parse_pieces(payload.get("y21_metaphase_heros")),
-            recommended_hex_ids: split_ids(hex_buff.and_then(|h| h.get("recomm")).and_then(|v| v.as_str())),
-            replacement_hex_ids: split_ids(hex_buff.and_then(|h| h.get("replace")).and_then(|v| v.as_str())),
+            recommended_hex_ids: split_ids(
+                hex_buff
+                    .and_then(|h| h.get("recomm"))
+                    .and_then(|v| v.as_str()),
+            ),
+            replacement_hex_ids: split_ids(
+                hex_buff
+                    .and_then(|h| h.get("replace"))
+                    .and_then(|v| v.as_str()),
+            ),
             equipment_order_ids: split_ids(payload.get("equipment_order").and_then(|v| v.as_str())),
             level_3_hero_ids: split_ids(payload.get("level_3_heros").and_then(|v| v.as_str())),
             hero_replacements: parse_hero_replacements(payload.get("hero_replace")),
@@ -186,8 +213,12 @@ impl LineupAdapter {
     fn parse_tags(detail_payload: &Value, fallback_category: Option<&str>) -> Vec<String> {
         let smar_tag = detail_payload.get("smar_lineup_tag");
         let all_tag = smar_tag.and_then(|s| s.get("all"));
-        if let Some(tags) = all_tag.and_then(|a| a.get("tag")).and_then(|t| t.as_array()) {
-            return tags.iter()
+        if let Some(tags) = all_tag
+            .and_then(|a| a.get("tag"))
+            .and_then(|t| t.as_array())
+        {
+            return tags
+                .iter()
                 .filter_map(|t| t.as_str())
                 .map(|s| s.to_string())
                 .collect();
@@ -202,12 +233,14 @@ impl LineupAdapter {
     }
 
     fn parse_top4_rate(detail_payload: &Value) -> f64 {
-        detail_payload.get("smar_lineup_tag")
+        detail_payload
+            .get("smar_lineup_tag")
             .and_then(|s| s.get("all"))
             .and_then(|a| a.get("rate"))
             .and_then(|r| r.get("top4_rate"))
             .and_then(|v| v.as_f64())
-            .unwrap_or(0.0) * 100.0
+            .unwrap_or(0.0)
+            * 100.0
     }
 }
 
@@ -217,7 +250,8 @@ impl LineupAdapter {
 
 /// 解析棋子列表
 fn parse_pieces(value: Option<&Value>) -> Vec<LineupPieceData> {
-    value.and_then(|v| v.as_array())
+    value
+        .and_then(|v| v.as_array())
         .map(|arr| arr.iter().filter_map(parse_piece).collect())
         .unwrap_or_default()
 }
@@ -225,20 +259,38 @@ fn parse_pieces(value: Option<&Value>) -> Vec<LineupPieceData> {
 /// 解析单个棋子
 fn parse_piece(val: &Value) -> Option<LineupPieceData> {
     let hero_id = val.get("hero_id").and_then(|v| v.as_str()).unwrap_or("");
-    if hero_id.is_empty() { return None; }
+    if hero_id.is_empty() {
+        return None;
+    }
 
-    let location = val.get("location").and_then(|v| v.as_str()).unwrap_or("0,0");
-    let parts: Vec<i32> = location.split(',')
+    let location = val
+        .get("location")
+        .and_then(|v| v.as_str())
+        .unwrap_or("0,0");
+    let parts: Vec<i32> = location
+        .split(',')
         .filter_map(|s| s.trim().parse().ok())
         .collect();
-    if parts.len() != 2 { return None; }
+    if parts.len() != 2 {
+        return None;
+    }
 
     Some(LineupPieceData {
-        id_in_lineup: val.get("idInLineup").and_then(parse_flexible_int).unwrap_or(0),
-        chess_type: val.get("chess_type").and_then(|v| v.as_str()).unwrap_or("hero").to_string(),
+        id_in_lineup: val
+            .get("idInLineup")
+            .and_then(parse_flexible_int)
+            .unwrap_or(0),
+        chess_type: val
+            .get("chess_type")
+            .and_then(|v| v.as_str())
+            .unwrap_or("hero")
+            .to_string(),
         hero_id: hero_id.to_string(),
         equipment_ids: split_ids(val.get("equipment_id").and_then(|v| v.as_str())),
-        is_carry_hero: val.get("is_carry_hero").and_then(|v| v.as_bool()).unwrap_or(false),
+        is_carry_hero: val
+            .get("is_carry_hero")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
         row: parts[0],
         col: parts[1],
         location_key: format!("{},{}", parts[0], parts[1]),
@@ -247,17 +299,23 @@ fn parse_piece(val: &Value) -> Option<LineupPieceData> {
 
 /// 解析羁绊计数列表
 fn parse_trait_contacts(value: Option<&Value>) -> Vec<TraitContactData> {
-    value.and_then(|v| v.as_array())
+    value
+        .and_then(|v| v.as_array())
         .map(|arr| arr.iter().filter_map(parse_trait_contact).collect())
         .unwrap_or_default()
 }
 
 /// 解析单个羁绊计数
 fn parse_trait_contact(val: &Value) -> Option<TraitContactData> {
-    let id = parse_flexible_id_str(&val["id"])
-        .unwrap_or_default();
-    let contact_type = val.get("type").and_then(|v| v.as_str()).unwrap_or("").to_string();
-    if id.is_empty() && contact_type.is_empty() { return None; }
+    let id = parse_flexible_id_str(&val["id"]).unwrap_or_default();
+    let contact_type = val
+        .get("type")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    if id.is_empty() && contact_type.is_empty() {
+        return None;
+    }
 
     Some(TraitContactData {
         id,
@@ -271,64 +329,103 @@ fn parse_trait_contact(val: &Value) -> Option<TraitContactData> {
 /// 解析单个可选羁绊
 fn parse_single_trait(value: Option<&Value>) -> Option<TraitContactData> {
     value.and_then(|v| v.as_object()).and_then(|obj| {
-        if obj.is_empty() { return None; }
+        if obj.is_empty() {
+            return None;
+        }
         parse_trait_contact(value.unwrap())
     })
 }
 
 /// 解析英雄替换列表
 fn parse_hero_replacements(value: Option<&Value>) -> Vec<HeroReplacementData> {
-    value.and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(|v| {
-            let hero_id = v.get("hero_id").and_then(|s| s.as_str()).unwrap_or("").to_string();
-            if hero_id.is_empty() { return None; }
-            Some(HeroReplacementData {
-                hero_id,
-                replacement_hero_ids: split_ids(v.get("replace_heros").and_then(|s| s.as_str())),
-            })
-        }).collect())
+    value
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| {
+                    let hero_id = v
+                        .get("hero_id")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    if hero_id.is_empty() {
+                        return None;
+                    }
+                    Some(HeroReplacementData {
+                        hero_id,
+                        replacement_hero_ids: split_ids(
+                            v.get("replace_heros").and_then(|s| s.as_str()),
+                        ),
+                    })
+                })
+                .collect()
+        })
         .unwrap_or_default()
 }
 
 /// 解析解锁任务列表
 fn parse_unlock_tasks(value: Option<&Value>) -> Vec<UnlockTaskData> {
-    value.and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(|v| {
-            let task_id = v.get("task_id").and_then(parse_flexible_id_str).unwrap_or_default();
-            if task_id.is_empty() { return None; }
-            Some(UnlockTaskData {
-                // hero_id = task_id 去掉末尾 2 位任务序号（对齐 Swift dropLast(2)）
-                hero_id: if task_id.len() >= 2 {
-                    task_id[..task_id.len() - 2].to_string()
-                } else {
-                    task_id.clone()
-                },
-                chess_id: v.get("chess_id").and_then(parse_flexible_id_str).unwrap_or_default(),
-                task_id,
-            })
-        }).collect())
+    value
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| {
+                    let task_id = v
+                        .get("task_id")
+                        .and_then(parse_flexible_id_str)
+                        .unwrap_or_default();
+                    if task_id.is_empty() {
+                        return None;
+                    }
+                    Some(UnlockTaskData {
+                        // hero_id = task_id 去掉末尾 2 位任务序号（对齐 Swift dropLast(2)）
+                        hero_id: if task_id.len() >= 2 {
+                            task_id[..task_id.len() - 2].to_string()
+                        } else {
+                            task_id.clone()
+                        },
+                        chess_id: v
+                            .get("chess_id")
+                            .and_then(parse_flexible_id_str)
+                            .unwrap_or_default(),
+                        task_id,
+                    })
+                })
+                .collect()
+        })
         .unwrap_or_default()
 }
 
 /// 解析星神奖励列表
 fn parse_god_rewards(value: Option<&Value>) -> Vec<GodRewardData> {
-    value.and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(|v| {
-            let god_id = v.get("god_id").and_then(parse_flexible_id_str).unwrap_or_default();
-            if god_id.is_empty() { return None; }
-            Some(GodRewardData {
-                stage: v.get("stage_num").and_then(parse_flexible_int).unwrap_or(0),
-                god_id,
-                wish_ids: parse_wish_ids(v.get("wishes")),
-            })
-        }).collect())
+    value
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| {
+                    let god_id = v
+                        .get("god_id")
+                        .and_then(parse_flexible_id_str)
+                        .unwrap_or_default();
+                    if god_id.is_empty() {
+                        return None;
+                    }
+                    Some(GodRewardData {
+                        stage: v.get("stage_num").and_then(parse_flexible_int).unwrap_or(0),
+                        god_id,
+                        wish_ids: parse_wish_ids(v.get("wishes")),
+                    })
+                })
+                .collect()
+        })
         .unwrap_or_default()
 }
 
 /// 解析 wish ID 列表（兼容字符串和数组格式）
 fn parse_wish_ids(value: Option<&Value>) -> Vec<String> {
     match value {
-        Some(Value::Array(arr)) => arr.iter()
+        Some(Value::Array(arr)) => arr
+            .iter()
             .filter_map(|v| parse_flexible_id_str(v))
             .filter(|s| !s.is_empty())
             .collect(),
@@ -339,17 +436,36 @@ fn parse_wish_ids(value: Option<&Value>) -> Vec<String> {
 
 /// 解析天选备选列表
 fn parse_chosen_backups(value: Option<&Value>) -> Vec<ChosenBackupData> {
-    value.and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(|v| {
-            let hero_id = v.get("hero_$key_id").and_then(|s| s.as_str()).unwrap_or("").to_string();
-            let trait_id = v.get("id").and_then(|s| s.as_str()).unwrap_or("").to_string();
-            if hero_id.is_empty() && trait_id.is_empty() { return None; }
-            Some(ChosenBackupData {
-                hero_id,
-                trait_id,
-                backup_type: v.get("type").and_then(|s| s.as_str()).unwrap_or("").to_string(),
-            })
-        }).collect())
+    value
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| {
+                    let hero_id = v
+                        .get("hero_$key_id")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    let trait_id = v
+                        .get("id")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    if hero_id.is_empty() && trait_id.is_empty() {
+                        return None;
+                    }
+                    Some(ChosenBackupData {
+                        hero_id,
+                        trait_id,
+                        backup_type: v
+                            .get("type")
+                            .and_then(|s| s.as_str())
+                            .unwrap_or("")
+                            .to_string(),
+                    })
+                })
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -377,7 +493,8 @@ fn parse_flexible_int(val: &Value) -> Option<i32> {
 
 /// 拆分逗号分隔的 ID 列表
 fn split_ids(value: Option<&str>) -> Vec<String> {
-    value.unwrap_or("")
+    value
+        .unwrap_or("")
         .split(',')
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty() && s != "0")
@@ -397,7 +514,7 @@ fn value_str(value: Option<&Value>) -> String {
 fn extract_bracket_traits(name: &str) -> Vec<String> {
     if let (Some(start), Some(end)) = (name.find('【'), name.find('】')) {
         if start < end {
-            return name[start + 3..end]  // skip 3 bytes for '【'
+            return name[start + 3..end] // skip 3 bytes for '【'
                 .split(|c: char| c == ' ' || c == '/' || c == '、')
                 .map(|s| s.to_string())
                 .filter(|s| !s.is_empty())
@@ -414,13 +531,15 @@ fn extract_bracket_traits(name: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::LineupLoader;
+    use std::path::PathBuf;
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap()
-            .parent().unwrap()
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
             .join("config")
     }
 

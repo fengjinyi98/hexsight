@@ -49,6 +49,11 @@ final class LineupRepository: ObservableObject {
         bridge.getKnowledgeRuleOutput(mode: mode, lineupId: lineupId)
     }
 
+    /// 获取带当前局面上下文的 Rust 知识决策 RuleOutput
+    func loadKnowledgeRuleOutput(mode: String, context: [String: Any]) -> [String: Any]? {
+        bridge.getKnowledgeRuleOutput(mode: mode, context: context)
+    }
+
     /// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
     func refreshRemoteCache(mode: String) -> Bool {
         bridge.refreshLineups(mode: mode)

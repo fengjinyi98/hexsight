@@ -128,9 +128,14 @@ struct DecisionPanel: View {
             )
         )
         .opacity(opacityVal / 100.0) // 响应透明度滑块
-        .task(id: mode) {
-            await appState.loadKnowledgeDecision(mode: mode, lineupId: "")
+        .task(id: knowledgeDecisionTaskKey) {
+            guard appState.lineupName != "等待识别..." else { return }
+            await appState.loadKnowledgeDecision(mode: mode, lineupId: appState.lineupName)
         }
+    }
+
+    private var knowledgeDecisionTaskKey: String {
+        "\(mode)-\(appState.lineupName)"
     }
 
     // MARK: - 1. 顶部通栏

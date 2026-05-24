@@ -68,6 +68,13 @@ char* hexsight_get_lineup_rules_context_json(const char* config_root, const char
 /// 返回：JSON 格式 RuleOutput，调用方需用 hexsight_free_string 释放
 char* hexsight_get_knowledge_rule_output_json(const char* config_root, const char* mode, const char* lineup_id);
 
+/// 获取带当前局面上下文的 Rust 知识决策 RuleOutput（JSON 对象）
+/// config_root: config/ 目录路径
+/// mode: 模式 ID
+/// context_json: 当前局面上下文 JSON
+/// 返回：JSON 格式 RuleOutput，调用方需用 hexsight_free_string 释放
+char* hexsight_get_knowledge_rule_output_with_context_json(const char* config_root, const char* mode, const char* context_json);
+
 /// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
 /// config_root: config/ 目录路径
 /// mode: 模式 ID

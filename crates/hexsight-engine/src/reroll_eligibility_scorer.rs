@@ -13,15 +13,18 @@ impl RerollEligibilityScorer {
     /// 评估某套阵容的赌狗资格
     pub fn assess(
         profile: &LineupProfile,
-        core_hero_counts: &[(String, i32)],  // (hero_id, 当前持有数)
+        core_hero_counts: &[(String, i32)], // (hero_id, 当前持有数)
         current_gold: i32,
         current_hp: i32,
         _current_level: i32,
         rival_count: i32,
-        round_stage: f64,  // e.g., 2.1, 3.2, 4.1
+        round_stage: f64, // e.g., 2.1, 3.2, 4.1
     ) -> RerollEligibility {
         let is_reroll = profile.playstyle_tags.iter().any(|t| {
-            matches!(t, PlaystyleTag::Reroll1Cost | PlaystyleTag::Reroll2Cost | PlaystyleTag::Reroll3Cost)
+            matches!(
+                t,
+                PlaystyleTag::Reroll1Cost | PlaystyleTag::Reroll2Cost | PlaystyleTag::Reroll3Cost
+            )
         });
 
         if !is_reroll || profile.carry_costs.is_empty() {
@@ -44,7 +47,8 @@ impl RerollEligibilityScorer {
         let core_hero_ids: Vec<&str> = profile.carry_hero_ids.iter().map(|s| s.as_str()).collect();
 
         // 统计当前持有的核心牌数
-        let current_core_count: i32 = core_hero_counts.iter()
+        let current_core_count: i32 = core_hero_counts
+            .iter()
             .filter(|(id, _)| core_hero_ids.contains(&id.as_str()))
             .map(|(_, count)| *count)
             .sum();
@@ -53,25 +57,44 @@ impl RerollEligibilityScorer {
         let mut score = (current_core_count as f64 / 9.0 * 50.0) as i32;
 
         // 经济加分
-        if current_gold >= 30 { score += 15; }
-        else if current_gold >= 20 { score += 10; }
-        else if current_gold >= 10 { score += 5; }
+        if current_gold >= 30 {
+            score += 15;
+        } else if current_gold >= 20 {
+            score += 10;
+        } else if current_gold >= 10 {
+            score += 5;
+        }
 
         // 血量安全加分
-        if current_hp >= 70 { score += 15; }
-        else if current_hp >= 50 { score += 8; }
-        else if current_hp < 35 { score -= 20; }
+        if current_hp >= 70 {
+            score += 15;
+        } else if current_hp >= 50 {
+            score += 8;
+        } else if current_hp < 35 {
+            score -= 20;
+        }
 
         // 同行扣分
-        if rival_count == 0 { score += 10; }
-        else if rival_count == 1 { score -= 5; }
-        else if rival_count >= 2 { score -= 20; }
+        if rival_count == 0 {
+            score += 10;
+        } else if rival_count == 1 {
+            score -= 5;
+        } else if rival_count >= 2 {
+            score -= 20;
+        }
 
         // 阶段适配
-        if core_cost == 1 && round_stage <= 3.5 { score += 10; }
-        else if core_cost == 1 && round_stage > 3.5 { score -= 30; }
-        if core_cost == 2 && round_stage <= 4.5 { score += 5; }
-        if core_cost == 3 && round_stage >= 3.5 && round_stage <= 5.5 { score += 10; }
+        if core_cost == 1 && round_stage <= 3.5 {
+            score += 10;
+        } else if core_cost == 1 && round_stage > 3.5 {
+            score -= 30;
+        }
+        if core_cost == 2 && round_stage <= 4.5 {
+            score += 5;
+        }
+        if core_cost == 3 && round_stage >= 3.5 && round_stage <= 5.5 {
+            score += 10;
+        }
 
         // 确定推荐等级
         let recommended_level = match core_cost {
@@ -121,11 +144,19 @@ impl RerollEligibilityScorer {
 
     /// 从阵容列表中筛选适合赌狗的阵容
     pub fn find_reroll_candidates(profiles: &[LineupProfile]) -> Vec<&LineupProfile> {
-        profiles.iter().filter(|p| {
-            p.playstyle_tags.iter().any(|t| {
-                matches!(t, PlaystyleTag::Reroll1Cost | PlaystyleTag::Reroll2Cost | PlaystyleTag::Reroll3Cost)
+        profiles
+            .iter()
+            .filter(|p| {
+                p.playstyle_tags.iter().any(|t| {
+                    matches!(
+                        t,
+                        PlaystyleTag::Reroll1Cost
+                            | PlaystyleTag::Reroll2Cost
+                            | PlaystyleTag::Reroll3Cost
+                    )
+                })
             })
-        }).collect()
+            .collect()
     }
 }
 
@@ -160,31 +191,31 @@ mod tests {
     #[test]
     fn non_reroll_lineup_returns_zero() {
         let profile = make_profile(vec![4], vec![PlaystyleTag::Standard]);
-        let result = RerollEligibilityScorer::assess(
-            &profile, &[], 40, 100, 6, 0, 3.1,
-        );
+        let result = RerollEligibilityScorer::assess(&profile, &[], 40, 100, 6, 0, 3.1);
         assert!(!result.is_recommended);
         assert_eq!(result.score, 0);
     }
 
     #[test]
     fn reroll_with_good_conditions() {
-        let profile = make_profile(vec![1], vec![PlaystyleTag::Standard, PlaystyleTag::Reroll1Cost]);
-        let counts = vec![("hero_1".into(), 5)];
-        let result = RerollEligibilityScorer::assess(
-            &profile, &counts, 40, 100, 5, 0, 2.5,
+        let profile = make_profile(
+            vec![1],
+            vec![PlaystyleTag::Standard, PlaystyleTag::Reroll1Cost],
         );
+        let counts = vec![("hero_1".into(), 5)];
+        let result = RerollEligibilityScorer::assess(&profile, &counts, 40, 100, 5, 0, 2.5);
         assert!(result.is_recommended);
         assert!(result.score >= 60);
     }
 
     #[test]
     fn reroll_with_rival_and_low_hp() {
-        let profile = make_profile(vec![1], vec![PlaystyleTag::Standard, PlaystyleTag::Reroll1Cost]);
-        let counts = vec![("hero_1".into(), 3)];
-        let result = RerollEligibilityScorer::assess(
-            &profile, &counts, 15, 30, 5, 2, 3.5,
+        let profile = make_profile(
+            vec![1],
+            vec![PlaystyleTag::Standard, PlaystyleTag::Reroll1Cost],
         );
+        let counts = vec![("hero_1".into(), 3)];
+        let result = RerollEligibilityScorer::assess(&profile, &counts, 15, 30, 5, 2, 3.5);
         assert!(!result.is_recommended);
     }
 }

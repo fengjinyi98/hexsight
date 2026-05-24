@@ -22,50 +22,60 @@ impl ItemFitScorer {
             all_available.push(c.as_str());
         }
 
-        let mut results: Vec<ItemFitResult> = profiles.iter().map(|profile| {
-            let core_match = profile.core_equipment_ids.iter()
-                .filter(|eid| all_available.contains(&eid.as_str()))
-                .count();
-            let equipment_match = profile.equipment_order_ids.iter()
-                .filter(|eid| all_available.contains(&eid.as_str()))
-                .count();
-            let total_core = profile.core_equipment_ids.len().max(1);
-            let match_ratio = (core_match as f64 / total_core as f64).min(1.0);
+        let mut results: Vec<ItemFitResult> = profiles
+            .iter()
+            .map(|profile| {
+                let core_match = profile
+                    .core_equipment_ids
+                    .iter()
+                    .filter(|eid| all_available.contains(&eid.as_str()))
+                    .count();
+                let equipment_match = profile
+                    .equipment_order_ids
+                    .iter()
+                    .filter(|eid| all_available.contains(&eid.as_str()))
+                    .count();
+                let total_core = profile.core_equipment_ids.len().max(1);
+                let match_ratio = (core_match as f64 / total_core as f64).min(1.0);
 
-            let (action, reasons) = if match_ratio >= 0.6 {
-                let reasons = vec![format!(
-                    "核心装备匹配 {}/{}", core_match, total_core
-                )];
-                (ItemAction::BuildCombatNow, reasons)
-            } else if match_ratio >= 0.3 {
-                let reasons = vec![format!(
-                    "核心装备部分匹配 {}/{}，可继续观察", core_match, total_core
-                )];
-                (ItemAction::WaitCore, reasons)
-            } else if equipment_match > 0 {
-                let reasons = vec![format!(
-                    "装备优先级部分匹配 {} 件", equipment_match
-                )];
-                (ItemAction::BuildGeneric, reasons)
-            } else {
-                let reasons = vec!["当前装备不匹配此阵容核心装".to_string()];
-                (ItemAction::HoldComponents, reasons)
-            };
+                let (action, reasons) = if match_ratio >= 0.6 {
+                    let reasons = vec![format!("核心装备匹配 {}/{}", core_match, total_core)];
+                    (ItemAction::BuildCombatNow, reasons)
+                } else if match_ratio >= 0.3 {
+                    let reasons = vec![format!(
+                        "核心装备部分匹配 {}/{}，可继续观察",
+                        core_match, total_core
+                    )];
+                    (ItemAction::WaitCore, reasons)
+                } else if equipment_match > 0 {
+                    let reasons = vec![format!("装备优先级部分匹配 {} 件", equipment_match)];
+                    (ItemAction::BuildGeneric, reasons)
+                } else {
+                    let reasons = vec!["当前装备不匹配此阵容核心装".to_string()];
+                    (ItemAction::HoldComponents, reasons)
+                };
 
-            let flexibility = if profile.playstyle_tags.iter().any(|t| {
-                matches!(t, hexsight_core::PlaystyleTag::ItemFlexible)
-            }) { 80 } else { 40 };
+                let flexibility = if profile
+                    .playstyle_tags
+                    .iter()
+                    .any(|t| matches!(t, hexsight_core::PlaystyleTag::ItemFlexible))
+                {
+                    80
+                } else {
+                    40
+                };
 
-            ItemFitResult {
-                best_fit_lineup_ids: vec![profile.lineup_id.clone()],
-                direction: Self::classify_direction(&profile.core_equipment_ids),
-                core_component_count: profile.core_equipment_ids.len() as i32,
-                can_build_core_count: core_match as i32,
-                flexibility,
-                recommended_action: action,
-                reasons,
-            }
-        }).collect();
+                ItemFitResult {
+                    best_fit_lineup_ids: vec![profile.lineup_id.clone()],
+                    direction: Self::classify_direction(&profile.core_equipment_ids),
+                    core_component_count: profile.core_equipment_ids.len() as i32,
+                    can_build_core_count: core_match as i32,
+                    flexibility,
+                    recommended_action: action,
+                    reasons,
+                }
+            })
+            .collect();
 
         // 按核心装匹配数排序
         results.sort_by(|a, b| b.can_build_core_count.cmp(&a.can_build_core_count));
@@ -85,10 +95,15 @@ impl ItemFitScorer {
                 _ => {}
             }
         }
-        if ad_count > ap_count && ad_count > tank_count { "AD".into() }
-        else if ap_count > ad_count && ap_count > tank_count { "AP".into() }
-        else if tank_count > ad_count && tank_count > ap_count { "坦".into() }
-        else { "混合".into() }
+        if ad_count > ap_count && ad_count > tank_count {
+            "AD".into()
+        } else if ap_count > ad_count && ap_count > tank_count {
+            "AP".into()
+        } else if tank_count > ad_count && tank_count > ap_count {
+            "坦".into()
+        } else {
+            "混合".into()
+        }
     }
 
     /// 根据装备 ID 判断方向（使用简单 ID 前缀规则）
@@ -108,22 +123,31 @@ impl ItemFitScorer {
                 _ => {}
             }
         }
-        if ad > ap && ad > tank { "AD".into() }
-        else if ap > ad && ap > tank { "AP".into() }
-        else if tank > ad && tank > ap { "坦".into() }
-        else { "混合".into() }
+        if ad > ap && ad > tank {
+            "AD".into()
+        } else if ap > ad && ap > tank {
+            "AP".into()
+        } else if tank > ad && tank > ap {
+            "坦".into()
+        } else {
+            "混合".into()
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::{GameDataIndex, LineupAdapter, LineupLoader, LineupProfileBuilder};
+    use std::path::PathBuf;
 
     fn load_profiles(mode: &str) -> Vec<LineupProfile> {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config");
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config");
         let index = GameDataIndex::load(&root, mode).unwrap();
         let raw = LineupLoader::load_cached_lineups(&root, mode, "S18").unwrap();
         let cards = LineupAdapter::cards_from_raw_list(&raw, mode);

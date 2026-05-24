@@ -41,7 +41,10 @@ pub struct EngineContext {
 /// config_json: JSON 格式配置（包含 region 坐标、阵容目录等）
 /// 返回：引擎上下文指针，失败时返回 null
 #[no_mangle]
-pub extern "C" fn hexsight_init(config_json: *const c_char, lineup_dir: *const c_char) -> *mut EngineContext {
+pub extern "C" fn hexsight_init(
+    config_json: *const c_char,
+    lineup_dir: *const c_char,
+) -> *mut EngineContext {
     if config_json.is_null() {
         return std::ptr::null_mut();
     }

@@ -7,8 +7,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use hexsight_core::{HexError, HexResult, RulePack};
 use crate::PatchOverrideLoader;
+use hexsight_core::{HexError, HexResult, RulePack};
 
 /// 规则包加载器
 pub struct RulePackLoader;
@@ -25,7 +25,8 @@ impl RulePackLoader {
             Err(e) => {
                 warnings.push(format!(
                     "规则包加载失败 {}: {}，回退到默认规则包",
-                    path.display(), e
+                    path.display(),
+                    e
                 ));
                 RulePack::default()
             }
@@ -48,13 +49,10 @@ impl RulePackLoader {
     /// 从指定路径加载规则包
     pub fn load_from_path(path: &Path) -> HexResult<RulePack> {
         let content = fs::read_to_string(path)
-            .map_err(|e| HexError::Config(format!(
-                "读取规则包失败 {}: {}", path.display(), e
-            )))?;
-        let pack: RulePack = serde_json::from_str(&content)
-            .map_err(|e| HexError::Config(format!(
-                "解析规则包 JSON 失败 {}: {}", path.display(), e
-            )))?;
+            .map_err(|e| HexError::Config(format!("读取规则包失败 {}: {}", path.display(), e)))?;
+        let pack: RulePack = serde_json::from_str(&content).map_err(|e| {
+            HexError::Config(format!("解析规则包 JSON 失败 {}: {}", path.display(), e))
+        })?;
         Ok(pack)
     }
 
@@ -79,7 +77,10 @@ impl RulePackLoader {
 
     /// 规则包文件路径
     fn rule_pack_path(config_root: &Path, version: &str) -> PathBuf {
-        config_root.join("rules").join(version).join("rule_pack.json")
+        config_root
+            .join("rules")
+            .join(version)
+            .join("rule_pack.json")
     }
 }
 
@@ -89,7 +90,11 @@ mod tests {
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     #[test]
@@ -120,8 +125,14 @@ mod tests {
     fn rule_pack_weights_sum_near_one() {
         let (pack, _) = RulePackLoader::load(&test_config_root(), "S18.1");
         let w = &pack.weights.lineup_fit;
-        let sum = w.base_score + w.item_fit + w.champion_hit + w.augment_fit
-            + w.trait_fit + w.stage_fit + w.economy_fit + w.health_safety
+        let sum = w.base_score
+            + w.item_fit
+            + w.champion_hit
+            + w.augment_fit
+            + w.trait_fit
+            + w.stage_fit
+            + w.economy_fit
+            + w.health_safety
             + w.playstyle_switch;
         assert!((sum - 1.0).abs() < 0.01, "权重和不为 1.0: {}", sum);
     }
@@ -149,12 +160,16 @@ mod tests {
 #[cfg(test)]
 mod regression_tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::*;
+    use std::path::PathBuf;
 
     fn config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     /// 回归：规则包加载 + 阵容档案生成 + 评分完整链路
@@ -176,7 +191,14 @@ mod regression_tests {
 
         // 4. 规则包权重驱动评分
         let scores = LineupFitScorer::score_all(
-            &profiles, &[], &[], &[], 20, 100, 6, 3.5,
+            &profiles,
+            &[],
+            &[],
+            &[],
+            20,
+            100,
+            6,
+            3.5,
             &std::collections::HashMap::new(),
             &pack,
         );
@@ -222,7 +244,14 @@ mod regression_tests {
 
         // 默认权重
         let default_scores = LineupFitScorer::score_all(
-            &profiles, &[], &[], &[], 20, 100, 6, 3.5,
+            &profiles,
+            &[],
+            &[],
+            &[],
+            20,
+            100,
+            6,
+            3.5,
             &std::collections::HashMap::new(),
             &RulePack::default(),
         );
@@ -231,7 +260,14 @@ mod regression_tests {
         let mut alt_pack = RulePack::default();
         alt_pack.weights.lineup_fit.item_fit = 0.50;
         let alt_scores = LineupFitScorer::score_all(
-            &profiles, &[], &[], &[], 20, 100, 6, 3.5,
+            &profiles,
+            &[],
+            &[],
+            &[],
+            20,
+            100,
+            6,
+            3.5,
             &std::collections::HashMap::new(),
             &alt_pack,
         );
@@ -240,7 +276,9 @@ mod regression_tests {
         let _default_top = default_scores.iter().max_by_key(|s| s.total_score).unwrap();
         let _alt_top = alt_scores.iter().max_by_key(|s| s.total_score).unwrap();
         // 至少有一个阵容的分数变了
-        let any_diff = default_scores.iter().zip(alt_scores.iter())
+        let any_diff = default_scores
+            .iter()
+            .zip(alt_scores.iter())
             .any(|(d, a)| d.total_score != a.total_score);
         assert!(any_diff, "权重变化后所有阵容分数完全相同");
     }

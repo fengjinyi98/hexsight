@@ -12,4 +12,5 @@ hexsight-vision = { path = "../hexsight-vision" }
 hexsight-memory = { path = "../hexsight-memory" }
 hexsight-engine = { path = "../hexsight-engine" }
 hexsight-llm = { path = "../hexsight-llm" }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"

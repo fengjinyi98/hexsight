@@ -6,7 +6,7 @@
 // - 装备劣势补救规则
 // - 海克斯基础匹配规则
 
-use hexsight_core::{Equipment, HexResult, RiskLevel, RecognizedFrame};
+use hexsight_core::{Equipment, HexResult, RecognizedFrame, RiskLevel};
 
 /// 固定规则引擎
 pub struct RulesEngine;
@@ -29,7 +29,11 @@ impl RulesEngine {
     /// 开局选阵决策
     /// 输入：3件散件 + 初始来牌
     /// 输出：推荐体系（物理/法系/重装）
-    pub fn classify_opening(&self, _equipment: &[Equipment], _heroes: &[String]) -> HexResult<String> {
+    pub fn classify_opening(
+        &self,
+        _equipment: &[Equipment],
+        _heroes: &[String],
+    ) -> HexResult<String> {
         // TODO: 按装备分类：攻击散件→物理，大棒水滴→法系，锁子甲腰带→重装
         Ok("物理".to_string())
     }

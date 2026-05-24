@@ -377,6 +377,7 @@ dependencies = [
  "hexsight-llm",
  "hexsight-memory",
  "hexsight-vision",
+ "serde",
  "serde_json",
 ]
 

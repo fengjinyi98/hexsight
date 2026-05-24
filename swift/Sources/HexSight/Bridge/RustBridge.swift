@@ -152,6 +152,25 @@ final class RustBridge: @unchecked Sendable {
         } ?? nil
     }
 
+    /// 获取带当前局面上下文的 Rust 知识决策 RuleOutput
+    func getKnowledgeRuleOutput(mode: String, context: [String: Any]) -> [String: Any]? {
+        guard JSONSerialization.isValidJSONObject(context),
+              let data = try? JSONSerialization.data(withJSONObject: context),
+              let contextJson = String(data: data, encoding: .utf8)
+        else { return nil }
+
+        return callWithConfigRoot { root in
+            mode.withCString { modePtr in
+                contextJson.withCString { contextPtr in
+                    guard let ptr = hexsight_get_knowledge_rule_output_with_context_json(root, modePtr, contextPtr),
+                          let json = String(validatingCString: ptr) else { return nil }
+                    hexsight_free_string(ptr)
+                    return (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+                }
+            }
+        } ?? nil
+    }
+
     /// 刷新远端阵容缓存（Rust 负责 CDN URL 拼装和 HTTP 请求）
     func refreshLineups(mode: String) -> Bool {
         callWithConfigRoot { root in
@@ -260,6 +279,14 @@ private func hexsight_get_knowledge_rule_output_json(
     _ config_root: UnsafePointer<CChar>,
     _ mode: UnsafePointer<CChar>,
     _ lineup_id: UnsafePointer<CChar>
+) -> UnsafeMutablePointer<CChar>?
+
+/// 获取带当前局面上下文的 Rust 知识决策 RuleOutput（JSON）
+@_silgen_name("hexsight_get_knowledge_rule_output_with_context_json")
+private func hexsight_get_knowledge_rule_output_with_context_json(
+    _ config_root: UnsafePointer<CChar>,
+    _ mode: UnsafePointer<CChar>,
+    _ context_json: UnsafePointer<CChar>
 ) -> UnsafeMutablePointer<CChar>?
 
 /// 刷新远端阵容缓存

@@ -13,7 +13,9 @@ impl LlmContextBuilder {
     /// 从规则上下文构建 LLM 输入 JSON
     /// 输出精简的阵容摘要，适合作为 LLM prompt 的一部分
     pub fn build(context: &RulesContextOutput) -> String {
-        let hero_summaries: Vec<String> = context.final_heroes.iter()
+        let hero_summaries: Vec<String> = context
+            .final_heroes
+            .iter()
             .map(|h| {
                 let carry_tag = if h.is_carry { "[C]" } else { "" };
                 let equip_str = if h.equipment_names.is_empty() {
@@ -28,28 +30,47 @@ impl LlmContextBuilder {
             })
             .collect();
 
-        let trait_summaries: Vec<String> = context.traits.iter()
+        let trait_summaries: Vec<String> = context
+            .traits
+            .iter()
             .map(|t| format!("{}({}) x{}", t.name, t.trait_type, t.count))
             .collect();
 
-        let hex_summaries: Vec<String> = context.augments.recommended.iter()
+        let hex_summaries: Vec<String> = context
+            .augments
+            .recommended
+            .iter()
             .chain(context.augments.replacement.iter())
             .map(|h| format!("{} (Lv.{})", h.name, h.level))
             .collect();
 
-        let equip_order: Vec<String> = context.equipment.order.iter()
+        let equip_order: Vec<String> = context
+            .equipment
+            .order
+            .iter()
             .map(|e| e.name.clone())
             .collect();
 
-        let strategy_parts: Vec<String> = context.strategy_texts.iter()
+        let strategy_parts: Vec<String> = context
+            .strategy_texts
+            .iter()
             .filter(|(_, v)| !v.is_empty())
             .map(|(k, v)| format!("{}: {}", k, v))
             .collect();
 
         let mut lines = Vec::new();
-        lines.push(format!("模式: {} (S{})", context.mode.name, context.mode.season));
-        lines.push(format!("阵容: {} by {}", context.lineup.name, context.lineup.author));
-        lines.push(format!("评级: {} 标签: {:?}", context.lineup.quality, context.lineup.tags));
+        lines.push(format!(
+            "模式: {} (S{})",
+            context.mode.name, context.mode.season
+        ));
+        lines.push(format!(
+            "阵容: {} by {}",
+            context.lineup.name, context.lineup.author
+        ));
+        lines.push(format!(
+            "评级: {} 标签: {:?}",
+            context.lineup.quality, context.lineup.tags
+        ));
         lines.push(format!("英雄: {}", hero_summaries.join(" | ")));
         lines.push(format!("羁绊: {}", trait_summaries.join(", ")));
 
@@ -99,12 +120,16 @@ impl LlmContextBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::{GameDataIndex, LineupAdapter, LineupLoader, RulesContextBuilder};
+    use std::path::PathBuf;
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     #[test]

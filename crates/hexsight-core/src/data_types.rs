@@ -217,7 +217,11 @@ pub struct MissionData {
 /// 神明数据容器（mode17 特有）
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GodData {
-    #[serde(default, rename = "godId", deserialize_with = "deserialize_flexible_id")]
+    #[serde(
+        default,
+        rename = "godId",
+        deserialize_with = "deserialize_flexible_id"
+    )]
     pub god_id: String,
     #[serde(default, rename = "godName")]
     pub god_name: String,

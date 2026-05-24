@@ -93,8 +93,12 @@ impl ChampionCombatProfileBuilder {
         }
 
         // 控制判断
-        if desc.contains("眩晕") || desc.contains("击飞") || desc.contains("冰冻")
-            || desc.contains("恐惧") || desc.contains("嘲讽") {
+        if desc.contains("眩晕")
+            || desc.contains("击飞")
+            || desc.contains("冰冻")
+            || desc.contains("恐惧")
+            || desc.contains("嘲讽")
+        {
             roles.push("控制".to_string());
         }
 
@@ -114,10 +118,18 @@ impl ChampionCombatProfileBuilder {
         let has_ap = desc.contains("法术强度") || desc.contains("法强") || desc.contains("魔法");
         let has_true = desc.contains("真实伤害") || desc.contains("最大生命值");
 
-        if has_true { return "真实".into(); }
-        if has_ad && has_ap { return "混合".into(); }
-        if has_ap { return "魔法".into(); }
-        if has_ad { return "物理".into(); }
+        if has_true {
+            return "真实".into();
+        }
+        if has_ad && has_ap {
+            return "混合".into();
+        }
+        if has_ap {
+            return "魔法".into();
+        }
+        if has_ad {
+            return "物理".into();
+        }
         // 默认根据技能描述推断
         if hero.skillBriefValue.contains("%") || hero.skillDesc.contains("法术") {
             return "魔法".into();
@@ -127,7 +139,11 @@ impl ChampionCombatProfileBuilder {
 
     fn classify_attack_pattern(desc: &str) -> Vec<String> {
         let mut patterns = Vec::new();
-        if desc.contains("范围") || desc.contains("周围") || desc.contains("所有敌人") || desc.contains("全场") {
+        if desc.contains("范围")
+            || desc.contains("周围")
+            || desc.contains("所有敌人")
+            || desc.contains("全场")
+        {
             patterns.push("范围".into());
         }
         if desc.contains("弹射") {
@@ -146,10 +162,18 @@ impl ChampionCombatProfileBuilder {
     }
 
     fn classify_targeting(desc: &str) -> String {
-        if desc.contains("距离最远") { return "最远".into(); }
-        if desc.contains("血量最低") { return "最低血量".into(); }
-        if desc.contains("敌人最多") || desc.contains("最密集") { return "最密集".into(); }
-        if desc.contains("后排") { return "后排".into(); }
+        if desc.contains("距离最远") {
+            return "最远".into();
+        }
+        if desc.contains("血量最低") {
+            return "最低血量".into();
+        }
+        if desc.contains("敌人最多") || desc.contains("最密集") {
+            return "最密集".into();
+        }
+        if desc.contains("后排") {
+            return "后排".into();
+        }
         "当前目标".into()
     }
 
@@ -158,22 +182,45 @@ impl ChampionCombatProfileBuilder {
         let max_mp = hero.maxMP.parse::<i32>().unwrap_or(100);
         let ratio = init_mp as f64 / max_mp.max(1) as f64;
 
-        if ratio > 0.5 { return "快启动".into(); }
-        if ratio > 0.25 { return "中启动".into(); }
-        if max_mp <= 50 { return "快启动".into(); }
-        if max_mp >= 120 { return "慢启动".into(); }
+        if ratio > 0.5 {
+            return "快启动".into();
+        }
+        if ratio > 0.25 {
+            return "中启动".into();
+        }
+        if max_mp <= 50 {
+            return "快启动".into();
+        }
+        if max_mp >= 120 {
+            return "慢启动".into();
+        }
         "中启动".into()
     }
 
     fn classify_special_tags(desc: &str) -> Vec<String> {
         let mut tags = Vec::new();
-        if desc.contains("处决") || desc.contains("最大生命值") { tags.push("处决".into()); }
-        if desc.contains("护甲击碎") || desc.contains("降低护甲") || desc.contains("破甲") { tags.push("破甲".into()); }
-        if desc.contains("魔抗击碎") || desc.contains("降低魔抗") { tags.push("魔抗击碎".into()); }
-        if desc.contains("重伤") || desc.contains("减疗") || desc.contains("治疗降低") { tags.push("减疗".into()); }
-        if desc.contains("护盾") { tags.push("护盾".into()); }
-        if desc.contains("治疗") || desc.contains("回复") || desc.contains("吸血") { tags.push("治疗".into()); }
-        if desc.contains("暴击") || desc.contains("会心") { tags.push("技能暴击".into()); }
+        if desc.contains("处决") || desc.contains("最大生命值") {
+            tags.push("处决".into());
+        }
+        if desc.contains("护甲击碎") || desc.contains("降低护甲") || desc.contains("破甲")
+        {
+            tags.push("破甲".into());
+        }
+        if desc.contains("魔抗击碎") || desc.contains("降低魔抗") {
+            tags.push("魔抗击碎".into());
+        }
+        if desc.contains("重伤") || desc.contains("减疗") || desc.contains("治疗降低") {
+            tags.push("减疗".into());
+        }
+        if desc.contains("护盾") {
+            tags.push("护盾".into());
+        }
+        if desc.contains("治疗") || desc.contains("回复") || desc.contains("吸血") {
+            tags.push("治疗".into());
+        }
+        if desc.contains("暴击") || desc.contains("会心") {
+            tags.push("技能暴击".into());
+        }
         tags
     }
 }
@@ -184,16 +231,29 @@ mod tests {
 
     fn make_hero(name: &str, skill: &str, hp: i32, ad: i32, armor: i32) -> HeroData {
         HeroData {
-            id: "test".into(), name: name.into(), price: "3".into(),
+            id: "test".into(),
+            name: name.into(),
+            price: "3".into(),
             picture: "".into(),
-            skillName: "测试技能".into(), skillDesc: skill.into(),
-            skillIcon: "".into(), skillBriefValue: "100%".into(), skillValueDesc: "".into(),
-            species: "".into(), hero_class: "".into(),
-            initHP: hp.to_string(), initAttackDamage: ad.to_string(),
-            attackSpeed: "0.7".into(), armor: armor.to_string(),
-            magicResist: "30".into(), attackRange: "1".into(),
-            initMP: "0".into(), maxMP: "80".into(), criticalStrikeChance: "25".into(),
-            cost: 3, base_key: "".into(), star_level: 1,
+            skillName: "测试技能".into(),
+            skillDesc: skill.into(),
+            skillIcon: "".into(),
+            skillBriefValue: "100%".into(),
+            skillValueDesc: "".into(),
+            species: "".into(),
+            hero_class: "".into(),
+            initHP: hp.to_string(),
+            initAttackDamage: ad.to_string(),
+            attackSpeed: "0.7".into(),
+            armor: armor.to_string(),
+            magicResist: "30".into(),
+            attackRange: "1".into(),
+            initMP: "0".into(),
+            maxMP: "80".into(),
+            criticalStrikeChance: "25".into(),
+            cost: 3,
+            base_key: "".into(),
+            star_level: 1,
         }
     }
 

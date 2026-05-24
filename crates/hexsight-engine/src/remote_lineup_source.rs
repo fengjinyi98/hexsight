@@ -11,11 +11,8 @@ use hexsight_core::HexResult;
 use crate::LineupLoader;
 
 /// 支持的模式远端配置
-const MODE_REMOTE_CONFIGS: &[(&str, &str, &str)] = &[
-    ("17", "m18", "11"),
-    ("16", "m17", "11"),
-    ("4", "m17", "11"),
-];
+const MODE_REMOTE_CONFIGS: &[(&str, &str, &str)] =
+    &[("17", "m18", "11"), ("16", "m17", "11"), ("4", "m17", "11")];
 
 /// 远端阵容数据源
 pub struct RemoteLineupSource;
@@ -36,26 +33,22 @@ impl RemoteLineupSource {
     /// 从远端拉取阵容数据，写入本地缓存
     pub fn refresh(config_root: &Path, mode: &str) -> HexResult<usize> {
         let url = Self::cdn_url(mode)
-            .ok_or_else(|| hexsight_core::HexError::Config(format!(
-                "模式 {} 无远端配置", mode
-            )))?;
+            .ok_or_else(|| hexsight_core::HexError::Config(format!("模式 {} 无远端配置", mode)))?;
 
         let response = ureq::get(&url)
             .call()
-            .map_err(|e| hexsight_core::HexError::Config(format!(
-                "远端请求失败 {}: {}", url, e
-            )))?;
+            .map_err(|e| hexsight_core::HexError::Config(format!("远端请求失败 {}: {}", url, e)))?;
 
-        let raw_json = response.into_body().read_to_string()
-            .map_err(|e| hexsight_core::HexError::Config(format!(
-                "读取响应失败: {}", e
-            )))?;
+        let raw_json = response
+            .into_body()
+            .read_to_string()
+            .map_err(|e| hexsight_core::HexError::Config(format!("读取响应失败: {}", e)))?;
 
         // 校验 JSON 合法性
         let container: hexsight_core::LineupListContainer = serde_json::from_str(&raw_json)
-            .map_err(|e| hexsight_core::HexError::Config(format!(
-                "远端返回 JSON 格式错误: {}", e
-            )))?;
+            .map_err(|e| {
+                hexsight_core::HexError::Config(format!("远端返回 JSON 格式错误: {}", e))
+            })?;
 
         let count = container.lineup_list.len();
         LineupLoader::save_remote_cache(config_root, mode, "S18", &raw_json)?;

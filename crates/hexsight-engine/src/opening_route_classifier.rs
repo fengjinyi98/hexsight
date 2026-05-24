@@ -90,27 +90,21 @@ mod tests {
 
     #[test]
     fn classify_strong_opening() {
-        let result = OpeningRouteClassifier::classify(
-            5, 3, true, true, 100, 15, 0, "2-1",
-        );
+        let result = OpeningRouteClassifier::classify(5, 3, true, true, 100, 15, 0, "2-1");
         assert_eq!(result.route, OpeningRoute::WinStreak);
         assert!(result.confidence > 0.7);
     }
 
     #[test]
     fn classify_weak_opening() {
-        let result = OpeningRouteClassifier::classify(
-            3, 0, false, false, 100, 10, 0, "2-1",
-        );
+        let result = OpeningRouteClassifier::classify(3, 0, false, false, 100, 10, 0, "2-1");
         assert_eq!(result.route, OpeningRoute::LossStreak);
         assert!(result.confidence > 0.6);
     }
 
     #[test]
     fn classify_low_hp() {
-        let result = OpeningRouteClassifier::classify(
-            4, 1, true, false, 60, 20, 0, "3-1",
-        );
+        let result = OpeningRouteClassifier::classify(4, 1, true, false, 60, 20, 0, "3-1");
         // 血量低时不推荐连败
         assert_ne!(result.route, OpeningRoute::LossStreak);
     }

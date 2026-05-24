@@ -6,9 +6,7 @@
 
 use std::collections::HashMap;
 
-use hexsight_core::{
-    LineupCardData, LineupProfile, PlaystyleTag,
-};
+use hexsight_core::{LineupCardData, LineupProfile, PlaystyleTag};
 
 use crate::GameDataIndex;
 
@@ -21,52 +19,68 @@ impl LineupProfileBuilder {
         let detail = &card.detail;
 
         // 提取主 C/主坦
-        let carry_ids: Vec<String> = detail.final_heroes.iter()
+        let carry_ids: Vec<String> = detail
+            .final_heroes
+            .iter()
             .filter(|p| p.is_carry_hero)
             .map(|p| p.hero_id.clone())
             .collect();
-        let tank_ids: Vec<String> = detail.final_heroes.iter()
+        let tank_ids: Vec<String> = detail
+            .final_heroes
+            .iter()
             .filter(|p| {
-                if p.is_carry_hero { return false; }
+                if p.is_carry_hero {
+                    return false;
+                }
                 // 前排棋子通常 row <= 2
                 let hero = index.hero(&p.hero_id);
                 let is_frontline = p.row <= 2;
-                let has_defense = hero.map(|h| {
-                    let armor = h.armor.parse::<i32>().unwrap_or(0);
-                    let hp = h.initHP.parse::<i32>().unwrap_or(0);
-                    armor > 30 || hp > 700
-                }).unwrap_or(false);
+                let has_defense = hero
+                    .map(|h| {
+                        let armor = h.armor.parse::<i32>().unwrap_or(0);
+                        let hp = h.initHP.parse::<i32>().unwrap_or(0);
+                        armor > 30 || hp > 700
+                    })
+                    .unwrap_or(false);
                 is_frontline && has_defense
             })
             .map(|p| p.hero_id.clone())
             .collect();
 
         // 核心装备（主 C 身上的装备）
-        let core_equipment_ids: Vec<String> = detail.final_heroes.iter()
+        let core_equipment_ids: Vec<String> = detail
+            .final_heroes
+            .iter()
             .filter(|p| p.is_carry_hero)
             .flat_map(|p| p.equipment_ids.clone())
             .collect();
 
         // 主坦装备（前排坦克身上的装备）
-        let tank_equipment_ids: Vec<String> = detail.final_heroes.iter()
+        let tank_equipment_ids: Vec<String> = detail
+            .final_heroes
+            .iter()
             .filter(|p| !p.is_carry_hero && p.row <= 2 && !p.equipment_ids.is_empty())
             .flat_map(|p| p.equipment_ids.clone())
             .collect();
 
         // 羁绊目标：优先官方 contacts，否则从棋子反推
         let trait_targets: HashMap<String, i32> = if !detail.official_traits.is_empty() {
-            detail.official_traits.iter()
+            detail
+                .official_traits
+                .iter()
                 .map(|t| (t.id.clone(), t.count))
                 .collect()
         } else {
             let summaries = index.trait_summaries(&detail.final_heroes, &[]);
-            summaries.into_iter()
+            summaries
+                .into_iter()
                 .map(|s| (s.trait_id, s.count))
                 .collect()
         };
 
         // 主 C 费用
-        let carry_costs: Vec<i32> = carry_ids.iter()
+        let carry_costs: Vec<i32> = carry_ids
+            .iter()
             .filter_map(|id| index.hero(id).map(|h| h.cost))
             .collect();
 
@@ -80,11 +94,21 @@ impl LineupProfileBuilder {
 
         // 策略文本
         let mut strategy_texts = HashMap::new();
-        if !detail.early_info.is_empty() { strategy_texts.insert("early".into(), detail.early_info.clone()); }
-        if !detail.d_time.is_empty() { strategy_texts.insert("roll_timing".into(), detail.d_time.clone()); }
-        if !detail.location_info.is_empty() { strategy_texts.insert("positioning".into(), detail.location_info.clone()); }
-        if !detail.equipment_info.is_empty() { strategy_texts.insert("equipment".into(), detail.equipment_info.clone()); }
-        if !detail.hex_info.is_empty() { strategy_texts.insert("augment".into(), detail.hex_info.clone()); }
+        if !detail.early_info.is_empty() {
+            strategy_texts.insert("early".into(), detail.early_info.clone());
+        }
+        if !detail.d_time.is_empty() {
+            strategy_texts.insert("roll_timing".into(), detail.d_time.clone());
+        }
+        if !detail.location_info.is_empty() {
+            strategy_texts.insert("positioning".into(), detail.location_info.clone());
+        }
+        if !detail.equipment_info.is_empty() {
+            strategy_texts.insert("equipment".into(), detail.equipment_info.clone());
+        }
+        if !detail.hex_info.is_empty() {
+            strategy_texts.insert("augment".into(), detail.hex_info.clone());
+        }
 
         // 推断玩法标签
         let playstyle_tags = Self::infer_playstyle_tags(
@@ -100,7 +124,11 @@ impl LineupProfileBuilder {
             name: card.name.clone(),
             base_tier,
             playstyle_tags,
-            final_hero_ids: detail.final_heroes.iter().map(|p| p.hero_id.clone()).collect(),
+            final_hero_ids: detail
+                .final_heroes
+                .iter()
+                .map(|p| p.hero_id.clone())
+                .collect(),
             carry_hero_ids: carry_ids,
             tank_hero_ids: tank_ids,
             core_equipment_ids,
@@ -108,8 +136,16 @@ impl LineupProfileBuilder {
             equipment_order_ids: detail.equipment_order_ids.clone(),
             recommended_hex_ids: detail.recommended_hex_ids.clone(),
             replacement_hex_ids: detail.replacement_hex_ids.clone(),
-            early_hero_ids: detail.early_heroes.iter().map(|p| p.hero_id.clone()).collect(),
-            mid_hero_ids: detail.mid_heroes.iter().map(|p| p.hero_id.clone()).collect(),
+            early_hero_ids: detail
+                .early_heroes
+                .iter()
+                .map(|p| p.hero_id.clone())
+                .collect(),
+            mid_hero_ids: detail
+                .mid_heroes
+                .iter()
+                .map(|p| p.hero_id.clone())
+                .collect(),
             trait_targets,
             strategy_texts,
             mode_specific: serde_json::json!({
@@ -202,12 +238,16 @@ impl LineupProfileBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::{GameDataIndex, LineupAdapter, LineupLoader};
+    use std::path::PathBuf;
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config")
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config")
     }
 
     #[test]
@@ -233,12 +273,15 @@ mod tests {
         let raw = LineupLoader::load_cached_lineups(&test_config_root(), "17", "S18").unwrap();
         let cards = LineupAdapter::cards_from_raw_list(&raw, "17");
         // 找有主 C 标记的阵容
-        let card_with_carry = cards.iter().find(|c| {
-            c.detail.final_heroes.iter().any(|p| p.is_carry_hero)
-        });
+        let card_with_carry = cards
+            .iter()
+            .find(|c| c.detail.final_heroes.iter().any(|p| p.is_carry_hero));
         if let Some(card) = card_with_carry {
             let profile = LineupProfileBuilder::build(card, &index);
-            assert!(!profile.carry_hero_ids.is_empty(), "有 is_carry_hero 但 carry_hero_ids 为空");
+            assert!(
+                !profile.carry_hero_ids.is_empty(),
+                "有 is_carry_hero 但 carry_hero_ids 为空"
+            );
         }
     }
 

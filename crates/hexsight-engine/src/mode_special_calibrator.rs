@@ -3,7 +3,6 @@
 // - ModeSpecialPlanner：星神奖励/任务解锁/天选机制的模式特殊规则
 // - DamagePredictionCalibrator：记录预测vs实际结果，输出误差分桶
 
-
 use hexsight_core::LineupProfile;
 
 /// 模式特殊规则输出
@@ -47,10 +46,7 @@ pub struct ModeSpecialPlanner;
 
 impl ModeSpecialPlanner {
     /// 根据模式和阵容档案输出特殊规则
-    pub fn plan(
-        mode: &str,
-        profiles: &[LineupProfile],
-    ) -> ModeSpecialPlan {
+    pub fn plan(mode: &str, profiles: &[LineupProfile]) -> ModeSpecialPlan {
         let mut god_reward_picks = Vec::new();
         let mut task_priorities = Vec::new();
         let mut chosen_advice = None;
@@ -60,13 +56,18 @@ impl ModeSpecialPlanner {
             "17" => {
                 // 星神模式：分析 god_rewards
                 for profile in profiles.iter().take(3) {
-                    if let Some(god_list) = profile.mode_specific.get("god_rewards").and_then(|v| v.as_array()) {
+                    if let Some(god_list) = profile
+                        .mode_specific
+                        .get("god_rewards")
+                        .and_then(|v| v.as_array())
+                    {
                         for god in god_list {
                             if let (Some(stage), Some(god_id)) = (
                                 god.get("stage").and_then(|v| v.as_i64()),
                                 god.get("god_id").and_then(|v| v.as_str()),
                             ) {
-                                let wish_count = god.get("wish_ids")
+                                let wish_count = god
+                                    .get("wish_ids")
                                     .and_then(|v| v.as_array())
                                     .map(|a| a.len())
                                     .unwrap_or(0);
@@ -82,15 +83,22 @@ impl ModeSpecialPlanner {
                         }
                     }
                 }
-                extra_rules.push("星神模式：优先选择经济/战力神祇，2阶段偏经济，3阶段后偏战力".into());
+                extra_rules
+                    .push("星神模式：优先选择经济/战力神祇，2阶段偏经济，3阶段后偏战力".into());
             }
             "16" => {
                 // 任务模式：分析 unlock_tasks
                 for profile in profiles.iter().take(3) {
-                    if let Some(tasks) = profile.mode_specific.get("unlock_tasks").and_then(|v| v.as_array()) {
+                    if let Some(tasks) = profile
+                        .mode_specific
+                        .get("unlock_tasks")
+                        .and_then(|v| v.as_array())
+                    {
                         for task in tasks {
-                            let task_id = task.get("task_id").and_then(|v| v.as_str()).unwrap_or("");
-                            let hero_id = task.get("hero_id").and_then(|v| v.as_str()).unwrap_or("");
+                            let task_id =
+                                task.get("task_id").and_then(|v| v.as_str()).unwrap_or("");
+                            let hero_id =
+                                task.get("hero_id").and_then(|v| v.as_str()).unwrap_or("");
                             task_priorities.push(TaskPriority {
                                 task_id: task_id.to_string(),
                                 hero_name: hero_id.to_string(),
@@ -101,7 +109,8 @@ impl ModeSpecialPlanner {
                     }
                 }
                 task_priorities.sort_by(|a, b| b.priority.cmp(&a.priority));
-                extra_rules.push("任务模式：优先完成主C/主坦的解锁任务，3-2前至少完成一个关键任务".into());
+                extra_rules
+                    .push("任务模式：优先完成主C/主坦的解锁任务，3-2前至少完成一个关键任务".into());
             }
             "4" => {
                 // 天选模式
@@ -116,7 +125,9 @@ impl ModeSpecialPlanner {
                         });
                     }
                 }
-                extra_rules.push("天选模式：优先拿阵容核心羁绊天选，若4-1前未拿到核心天选考虑转阵容".into());
+                extra_rules.push(
+                    "天选模式：优先拿阵容核心羁绊天选，若4-1前未拿到核心天选考虑转阵容".into(),
+                );
             }
             _ => {}
         }
@@ -173,15 +184,23 @@ impl DamagePredictionCalibrator {
     ) -> CalibrationEntry {
         let mut tags = Vec::new();
         let error = predicted_damage as i32 - actual_damage;
-        if error.abs() > 4 { tags.push("大偏差".into()); }
-        if error > 0 { tags.push("高估伤害".into()); }
-        else if error < 0 { tags.push("低估伤害".into()); }
+        if error.abs() > 4 {
+            tags.push("大偏差".into());
+        }
+        if error > 0 {
+            tags.push("高估伤害".into());
+        } else if error < 0 {
+            tags.push("低估伤害".into());
+        }
 
         CalibrationEntry {
-            timestamp: format!("{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_secs())
-                .unwrap_or(0)),
+            timestamp: format!(
+                "{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs())
+                    .unwrap_or(0)
+            ),
             stage,
             predicted_win_prob,
             predicted_damage,
@@ -198,24 +217,32 @@ impl DamagePredictionCalibrator {
     pub fn compute_buckets(entries: &[CalibrationEntry]) -> ErrorBuckets {
         if entries.is_empty() {
             return ErrorBuckets {
-                damage_mae: 0.0, survivor_mae: 0.0,
-                win_direction_accuracy: 0.0, total_samples: 0,
+                damage_mae: 0.0,
+                survivor_mae: 0.0,
+                win_direction_accuracy: 0.0,
+                total_samples: 0,
             };
         }
         let n = entries.len();
-        let damage_mae = entries.iter()
+        let damage_mae = entries
+            .iter()
             .map(|e| e.error_damage.abs() as f64)
-            .sum::<f64>() / n as f64;
-        let survivor_mae = entries.iter()
+            .sum::<f64>()
+            / n as f64;
+        let survivor_mae = entries
+            .iter()
             .map(|e| e.error_survivors.abs() as f64)
-            .sum::<f64>() / n as f64;
-        let correct_direction = entries.iter()
+            .sum::<f64>()
+            / n as f64;
+        let correct_direction = entries
+            .iter()
             .filter(|e| (e.predicted_win_prob >= 0.5) == e.actual_win)
             .count();
         let win_direction_accuracy = correct_direction as f64 / n as f64;
 
         ErrorBuckets {
-            damage_mae, survivor_mae,
+            damage_mae,
+            survivor_mae,
             win_direction_accuracy,
             total_samples: n,
         }
@@ -229,17 +256,27 @@ mod tests {
     #[test]
     fn mode17_god_rewards_planned() {
         let profile = LineupProfile {
-            lineup_id: "test".into(), name: "测试".into(), base_tier: 80,
-            playstyle_tags: vec![], final_hero_ids: vec![], carry_hero_ids: vec![],
-            tank_hero_ids: vec![], core_equipment_ids: vec![], tank_equipment_ids: vec![],
+            lineup_id: "test".into(),
+            name: "测试".into(),
+            base_tier: 80,
+            playstyle_tags: vec![],
+            final_hero_ids: vec![],
+            carry_hero_ids: vec![],
+            tank_hero_ids: vec![],
+            core_equipment_ids: vec![],
+            tank_equipment_ids: vec![],
             equipment_order_ids: vec![],
-            recommended_hex_ids: vec![], replacement_hex_ids: vec![],
-            early_hero_ids: vec![], mid_hero_ids: vec![],
-            trait_targets: Default::default(), strategy_texts: Default::default(),
+            recommended_hex_ids: vec![],
+            replacement_hex_ids: vec![],
+            early_hero_ids: vec![],
+            mid_hero_ids: vec![],
+            trait_targets: Default::default(),
+            strategy_texts: Default::default(),
             mode_specific: serde_json::json!({
                 "god_rewards": [{"stage": 2, "god_id": "2", "wish_ids": ["a", "b"]}]
             }),
-            carry_costs: vec![4], category: None,
+            carry_costs: vec![4],
+            category: None,
         };
         let plan = ModeSpecialPlanner::plan("17", &[profile]);
         assert!(!plan.god_reward_picks.is_empty());
@@ -248,9 +285,7 @@ mod tests {
 
     #[test]
     fn calibration_records_error() {
-        let entry = DamagePredictionCalibrator::record(
-            4, 0.65, 3.5, 1.5, 6, false, 3,
-        );
+        let entry = DamagePredictionCalibrator::record(4, 0.65, 3.5, 1.5, 6, false, 3);
         assert_eq!(entry.error_damage, -3); // 预测 3.5 伤害，实际 6
         assert!(entry.tags.contains(&"低估伤害".to_string()));
     }

@@ -542,7 +542,7 @@ flowchart LR
 
 ---
 
-## 十四、P0-P7 实施路径
+## 十四、P0-P10 实施路径
 
 这一阶段按 P 级逐步实现，每个 P 级都必须独立可验收。核心目标是先把每个版本的说明书数据吃成结构化知识，再逐步接入装备、海克斯、版本、实时局面决策。
 
@@ -676,6 +676,19 @@ P8 负责完成“Rust 计算、Swift 展示”的边界收口。Swift 层只消
 
 P9 负责把 P8 的桥接结果变成真实 UI 消费路径。Swift 只做展示摘要解析和状态映射，规则评分、装备收益、版本修正仍由 Rust 输出。
 
+### P10：真实知识决策 FFI 入口收口
+
+| 项 | 内容 |
+|---|---|
+| 目标 | 把 P1-P6 的真实规则结果从测试链路推进到 FFI 与 Swift 实际消费链路 |
+| 核心模块 | `crates/hexsight-ffi/src/data_ffi.rs`、`swift/Sources/HexSight/Bridge/RustBridge.swift`、`swift/Sources/HexSight/App/AppState.swift`、`swift/Sources/HexSight/Views/Panels/DecisionPanel.swift` |
+| 配置产物 | 复用 `config/rules/<version>/*.json`、本地阵容缓存和 Rust 规则包 |
+| 输入 | `KnowledgeRuleInput` 上下文 JSON，包含阵容、棋盘、备战席、装备席、候选海克斯、血量、金币、等级、阶段和环境参数 |
+| 输出 | 真实 `RuleOutput.knowledgeActions`，包含 holder、combat、augment、patch、pivot 和短解释 |
+| 验收 | FFI 入口调用 `LineupFitScorer::score_all_with_item_context`、`HolderScorer`、`AugmentRerollScorer`、`CombatValueEstimator` 后传入 `KnowledgeDecisionPlanner`；Swift 在未识别阵容时不默认消费首套阵容 |
+
+P10 是本阶段端到端收口点。旧三参 FFI 入口保持兼容，新上下文 JSON 入口用于后续识别链路逐步填入真实棋盘、装备席、候选海克斯和环境参数。
+
 ### P 级依赖顺序
 
 ```text
@@ -689,6 +702,7 @@ P0 知识底座
  -> P7 RuleOutput 集成与回归
  -> P8 Swift 展示桥接
  -> P9 Swift 知识决策展示消费
+ -> P10 真实知识决策 FFI 入口收口
 ```
 
 | P 级 | 可以并行的内容 | 依赖 |
@@ -703,6 +717,7 @@ P0 知识底座
 | P7 | 集成和回归 | P0-P6 |
 | P8 | Swift 展示桥接 | P7 |
 | P9 | Swift 展示消费 | P8 |
+| P10 | 真实 FFI 推理入口 | P0-P9 |
 
 ---
 
@@ -720,6 +735,8 @@ P0 知识底座
 | 转阵容建议可触发 | 装备严重错配时能推荐更适配阵容 |
 | Rust 测试覆盖 | `cargo test --workspace` 覆盖棋子、装备、海克斯刷新、版本修正 |
 | Swift 只展示 | Swift 不参与装备收益和版本修正计算 |
+| FFI 真实推理 | Rust FFI 能把装备适配、装备冲突、承载者、海克斯刷新、版本修正和收益估算汇总为同一份 `RuleOutput` |
+| 空态安全 | Swift 未识别阵容时不默认消费首套阵容 |
 
 ---
 

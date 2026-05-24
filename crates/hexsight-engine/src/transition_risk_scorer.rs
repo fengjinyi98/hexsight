@@ -32,56 +32,71 @@ impl TransitionLineupMatcher {
     pub fn match_transitions(
         profiles: &[LineupProfile],
         current_hero_ids: &[String],
-        round_stage: f64,  // 当前阶段
+        round_stage: f64, // 当前阶段
     ) -> Vec<TransitionMatch> {
-        profiles.iter().map(|profile| {
-            let early_hits = profile.early_hero_ids.iter()
-                .filter(|id| current_hero_ids.contains(id))
-                .count() as i32;
-            let mid_hits = profile.mid_hero_ids.iter()
-                .filter(|id| current_hero_ids.contains(id))
-                .count() as i32;
+        profiles
+            .iter()
+            .map(|profile| {
+                let early_hits = profile
+                    .early_hero_ids
+                    .iter()
+                    .filter(|id| current_hero_ids.contains(id))
+                    .count() as i32;
+                let mid_hits = profile
+                    .mid_hero_ids
+                    .iter()
+                    .filter(|id| current_hero_ids.contains(id))
+                    .count() as i32;
 
-            // 前期优先 early，中后期优先 mid
-            let (effective_hits, _weight) = if round_stage <= 3.5 {
-                (early_hits * 2 + mid_hits, "early")
-            } else {
-                (early_hits + mid_hits * 2, "mid")
-            };
+                // 前期优先 early，中后期优先 mid
+                let (effective_hits, _weight) = if round_stage <= 3.5 {
+                    (early_hits * 2 + mid_hits, "early")
+                } else {
+                    (early_hits + mid_hits * 2, "mid")
+                };
 
-            let keep_ids: Vec<String> = current_hero_ids.iter()
-                .filter(|id| {
-                    profile.early_hero_ids.contains(id) || profile.mid_hero_ids.contains(id)
-                })
-                .cloned()
-                .collect();
+                let keep_ids: Vec<String> = current_hero_ids
+                    .iter()
+                    .filter(|id| {
+                        profile.early_hero_ids.contains(id) || profile.mid_hero_ids.contains(id)
+                    })
+                    .cloned()
+                    .collect();
 
-            // 提取过渡羁绊（从 trait_targets 中取前 3 个）
-            let mut traits: Vec<(&String, &i32)> = profile.trait_targets.iter().collect();
-            traits.sort_by(|a, b| b.1.cmp(a.1));
-            let transition_traits: Vec<String> = traits.iter()
-                .take(3)
-                .map(|(id, count)| format!("{} x{}", id, count))
-                .collect();
+                // 提取过渡羁绊（从 trait_targets 中取前 3 个）
+                let mut traits: Vec<(&String, &i32)> = profile.trait_targets.iter().collect();
+                traits.sort_by(|a, b| b.1.cmp(a.1));
+                let transition_traits: Vec<String> = traits
+                    .iter()
+                    .take(3)
+                    .map(|(id, count)| format!("{} x{}", id, count))
+                    .collect();
 
-            let max_possible = (profile.early_hero_ids.len() + profile.mid_hero_ids.len()).max(1) as f64;
-            let transition_score = (effective_hits as f64 / max_possible * 100.0).min(100.0) as i32;
+                let max_possible =
+                    (profile.early_hero_ids.len() + profile.mid_hero_ids.len()).max(1) as f64;
+                let transition_score =
+                    (effective_hits as f64 / max_possible * 100.0).min(100.0) as i32;
 
-            TransitionMatch {
-                lineup_id: profile.lineup_id.clone(),
-                lineup_name: profile.name.clone(),
-                early_hits,
-                mid_hits,
-                transition_score,
-                keep_hero_ids: keep_ids,
-                transition_traits,
-            }
-        }).collect()
+                TransitionMatch {
+                    lineup_id: profile.lineup_id.clone(),
+                    lineup_name: profile.name.clone(),
+                    early_hits,
+                    mid_hits,
+                    transition_score,
+                    keep_hero_ids: keep_ids,
+                    transition_traits,
+                }
+            })
+            .collect()
     }
 
     /// 获取过渡最匹配的阵容
-    pub fn best_transition<'a>(matches: &'a [TransitionMatch], min_hits: i32) -> Option<&'a TransitionMatch> {
-        matches.iter()
+    pub fn best_transition<'a>(
+        matches: &'a [TransitionMatch],
+        min_hits: i32,
+    ) -> Option<&'a TransitionMatch> {
+        matches
+            .iter()
             .filter(|m| m.early_hits + m.mid_hits >= min_hits)
             .max_by_key(|m| m.transition_score)
     }
@@ -136,11 +151,11 @@ impl RiskScorer {
         current_level: i32,
         lineup_locked: bool,
         rival_count: i32,
-        item_match_ratio: f64,       // 装备匹配率 (0.0-1.0)
-        _core_hero_hits: i32,         // 核心英雄命中数
-        target_carry_costs: &[i32],  // 目标阵容的核心费用
-        requires_augment: bool,      // 需要专属海克斯
-        has_required_augment: bool,  // 已拿到关键海克斯
+        item_match_ratio: f64,      // 装备匹配率 (0.0-1.0)
+        _core_hero_hits: i32,       // 核心英雄命中数
+        target_carry_costs: &[i32], // 目标阵容的核心费用
+        requires_augment: bool,     // 需要专属海克斯
+        has_required_augment: bool, // 已拿到关键海克斯
         _round_stage: f64,
     ) -> RiskReport {
         let mut details = Vec::new();
@@ -201,7 +216,9 @@ impl RiskScorer {
             }
             if target_carry_costs.iter().any(|&c| c >= 5) && current_level < 7 {
                 details.push("核心高费但等级不足".into());
-                if risk == RiskLevel::Low { risk = RiskLevel::Medium; }
+                if risk == RiskLevel::Low {
+                    risk = RiskLevel::Medium;
+                }
             }
             if target_carry_costs.iter().any(|&c| c >= 5) && current_gold < 20 {
                 details.push("核心高费但经济不足".into());
@@ -249,9 +266,7 @@ impl RiskScorer {
             (&economy_risk, 1),
             (&lock_risk, 1),
         ];
-        let total_score: i32 = risk_values.iter()
-            .map(|(r, w)| risk_to_int(r) * w)
-            .sum();
+        let total_score: i32 = risk_values.iter().map(|(r, w)| risk_to_int(r) * w).sum();
         let overall = if total_score >= 24 {
             RiskLevel::Critical
         } else if total_score >= 16 {
@@ -298,23 +313,29 @@ mod tests {
     #[test]
     fn transition_matches_early_stage() {
         let profile = LineupProfile {
-            lineup_id: "test".into(), name: "测试阵容".into(), base_tier: 80,
-            playstyle_tags: vec![], final_hero_ids: vec![], carry_hero_ids: vec![],
-            tank_hero_ids: vec![], core_equipment_ids: vec![], tank_equipment_ids: vec![],
+            lineup_id: "test".into(),
+            name: "测试阵容".into(),
+            base_tier: 80,
+            playstyle_tags: vec![],
+            final_hero_ids: vec![],
+            carry_hero_ids: vec![],
+            tank_hero_ids: vec![],
+            core_equipment_ids: vec![],
+            tank_equipment_ids: vec![],
             equipment_order_ids: vec![],
-            recommended_hex_ids: vec![], replacement_hex_ids: vec![],
+            recommended_hex_ids: vec![],
+            replacement_hex_ids: vec![],
             early_hero_ids: vec!["h1".into(), "h2".into()],
             mid_hero_ids: vec!["h3".into()],
             trait_targets: HashMap::from([("t1".into(), 3)]),
             strategy_texts: Default::default(),
-            mode_specific: serde_json::Value::Null, carry_costs: vec![3],
+            mode_specific: serde_json::Value::Null,
+            carry_costs: vec![3],
             category: None,
         };
 
         let current = vec!["h1".to_string(), "h4".to_string()];
-        let matches = TransitionLineupMatcher::match_transitions(
-            &[profile], &current, 2.5,
-        );
+        let matches = TransitionLineupMatcher::match_transitions(&[profile], &current, 2.5);
         assert_eq!(matches[0].early_hits, 1);
         assert_eq!(matches[0].mid_hits, 0);
         assert_eq!(matches[0].keep_hero_ids, vec!["h1"]);
@@ -322,27 +343,21 @@ mod tests {
 
     #[test]
     fn risk_low_when_everything_good() {
-        let report = RiskScorer::assess(
-            100, 50, 6, false, 0, 0.8, 5, &[3], false, false, 3.0,
-        );
+        let report = RiskScorer::assess(100, 50, 6, false, 0, 0.8, 5, &[3], false, false, 3.0);
         assert_eq!(report.overall, RiskLevel::Low);
         assert!(!report.should_pivot);
     }
 
     #[test]
     fn risk_critical_when_hp_low_and_no_items() {
-        let report = RiskScorer::assess(
-            20, 5, 5, true, 3, 0.1, 1, &[5], true, false, 4.5,
-        );
+        let report = RiskScorer::assess(20, 5, 5, true, 3, 0.1, 1, &[5], true, false, 4.5);
         assert_eq!(report.overall, RiskLevel::Critical);
         assert!(report.should_pivot);
     }
 
     #[test]
     fn risk_medium_with_rival() {
-        let report = RiskScorer::assess(
-            80, 30, 6, false, 2, 0.6, 4, &[4], false, false, 4.0,
-        );
+        let report = RiskScorer::assess(80, 30, 6, false, 2, 0.6, 4, &[4], false, false, 4.0);
         assert_eq!(report.rival_risk, RiskLevel::Medium);
     }
 }

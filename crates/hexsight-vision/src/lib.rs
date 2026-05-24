@@ -15,7 +15,12 @@ use hexsight_core::{HexResult, RecognizedFrame, RegionConfig};
 /// 识别单帧画面
 /// pixels: BGRA 格式像素数据
 /// regions: 固定分辨率 ROI 坐标配置
-pub fn recognize(pixels: &[u8], regions: &RegionConfig, _width: u32, _height: u32) -> HexResult<RecognizedFrame> {
+pub fn recognize(
+    pixels: &[u8],
+    regions: &RegionConfig,
+    _width: u32,
+    _height: u32,
+) -> HexResult<RecognizedFrame> {
     let mut frame = RecognizedFrame::default();
 
     frame.gold = digit::parse_digits(pixels, &regions.gold_rect)?;

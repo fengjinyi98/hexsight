@@ -107,10 +107,7 @@ impl GameMemory {
 
     /// 两帧关键字段是否一致
     fn frames_equal(&self, a: &RecognizedFrame, b: &RecognizedFrame) -> bool {
-        a.gold == b.gold
-            && a.hp == b.hp
-            && a.level == b.level
-            && a.round == b.round
+        a.gold == b.gold && a.hp == b.hp && a.level == b.level && a.round == b.round
     }
 }
 

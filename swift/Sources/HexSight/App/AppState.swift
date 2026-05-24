@@ -55,7 +55,19 @@ final class AppState: ObservableObject {
 
     /// 加载 Rust 知识决策并更新展示状态
     func loadKnowledgeDecision(mode: String, lineupId: String) async {
-        guard let output = LineupRepository.shared.loadKnowledgeRuleOutput(mode: mode, lineupId: lineupId),
+        let normalizedLineupId = lineupId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedLineupId.isEmpty, normalizedLineupId != "等待识别..." else { return }
+
+        guard let output = LineupRepository.shared.loadKnowledgeRuleOutput(mode: mode, lineupId: normalizedLineupId),
+              let summary = KnowledgeDecisionSummary(ruleOutput: output)
+        else { return }
+
+        applyKnowledgeDecision(summary)
+    }
+
+    /// 加载带当前局面上下文的 Rust 知识决策
+    func loadKnowledgeDecision(mode: String, context: [String: Any]) async {
+        guard let output = LineupRepository.shared.loadKnowledgeRuleOutput(mode: mode, context: context),
               let summary = KnowledgeDecisionSummary(ruleOutput: output)
         else { return }
 

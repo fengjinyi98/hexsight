@@ -7,8 +7,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use hexsight_core::{LineupListContainer, LineupRawItem};
 use hexsight_core::{HexError, HexResult};
+use hexsight_core::{LineupListContainer, LineupRawItem};
 
 /// 阵容数据加载器
 pub struct LineupLoader;
@@ -23,13 +23,10 @@ impl LineupLoader {
     ) -> HexResult<Vec<LineupRawItem>> {
         let path = Self::cache_path(config_root, mode, season);
         let content = fs::read_to_string(&path)
-            .map_err(|e| HexError::Config(format!(
-                "读取阵容缓存失败 {}: {}", path.display(), e
-            )))?;
-        let container: LineupListContainer = serde_json::from_str(&content)
-            .map_err(|e| HexError::Config(format!(
-                "解析阵容 JSON 失败 {}: {}", path.display(), e
-            )))?;
+            .map_err(|e| HexError::Config(format!("读取阵容缓存失败 {}: {}", path.display(), e)))?;
+        let container: LineupListContainer = serde_json::from_str(&content).map_err(|e| {
+            HexError::Config(format!("解析阵容 JSON 失败 {}: {}", path.display(), e))
+        })?;
         Ok(container.lineup_list)
     }
 
@@ -75,8 +72,10 @@ mod tests {
 
     fn test_config_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap()
-            .parent().unwrap()
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
             .join("config")
     }
 
