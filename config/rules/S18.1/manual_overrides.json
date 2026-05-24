@@ -1,0 +1,9 @@
+[
+  {
+    "id": "example_hero_id",
+    "type": "champion",
+    "tags_add": [],
+    "tags_remove": [],
+    "notes": "示例：当自动解析置信度低时，在此手动补充标签"
+  }
+]

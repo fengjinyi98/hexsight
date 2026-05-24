@@ -17,6 +17,7 @@ pub mod decision_planner;
 pub mod game_data_index;
 pub mod game_data_loader;
 pub mod item_fit_scorer;
+pub mod knowledge_builders;
 pub mod lineup;
 pub mod lineup_adapter;
 pub mod lineup_fit_scorer;
@@ -43,6 +44,12 @@ pub use decision_planner::DecisionPlanner;
 pub use game_data_index::GameDataIndex;
 pub use game_data_loader::GameDataLoader;
 pub use item_fit_scorer::ItemFitScorer;
+pub use knowledge_builders::{
+    ChampionCapabilityBuilder, ItemValueBuilder, KnowledgeKeywordLoader,
+    AugmentEffectProfileBuilder, TraitEffectProfileBuilder,
+    KnowledgeBase, KnowledgeBaseBuilder, KnowledgeCoverageReport,
+    ManualOverrideLoader,
+};
 pub use lineup::LineupDB;
 pub use lineup_adapter::LineupAdapter;
 pub use lineup_fit_scorer::{LineupFitScorer, TransitionStrengthScorer};
