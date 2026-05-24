@@ -62,8 +62,18 @@ final class OCREvaluator {
         )
         return urls
             .filter { $0.pathExtension.lowercased() == "png" }
-            .filter { !$0.deletingPathExtension().lastPathComponent.contains("_") }
+            .filter { !Self.isDebugArtifact($0.deletingPathExtension().lastPathComponent) }
             .sorted { $0.lastPathComponent < $1.lastPathComponent }
+    }
+
+    private static func isDebugArtifact(_ basename: String) -> Bool {
+        let debugSuffixes = [
+            "_bottom",
+            "_opponent_roi",
+            "_roi_sheet",
+            "_trait_roi",
+        ]
+        return debugSuffixes.contains { basename.hasSuffix($0) }
     }
 }
 

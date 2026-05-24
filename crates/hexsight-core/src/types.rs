@@ -45,7 +45,7 @@ pub enum GamePhase {
 }
 
 /// 棋子信息
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Hero {
     /// 英雄名称 (e.g. "金克丝", "盖伦")
     pub name: String,
@@ -60,7 +60,7 @@ pub struct Hero {
 }
 
 /// 装备信息
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Equipment {
     /// 装备名称
     pub name: String,

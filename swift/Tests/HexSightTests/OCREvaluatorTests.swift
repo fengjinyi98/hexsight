@@ -29,4 +29,58 @@ final class OCREvaluatorTests: XCTestCase {
 
         XCTAssertEqual(images.map(\.lastPathComponent), ["截屏2026-05-24 10.43.23.png"])
     }
+
+    func testSampleImageDiscoveryKeepsUnderscoreNamedSourceScreenshots() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        for name in [
+            "20260525_5-3_shop_001.png",
+            "20260525_5-3_shop_001_opponent_roi.png",
+            "20260525_5-3_shop_001_roi_sheet.jpg",
+            "ocr_eval_output.json",
+        ] {
+            FileManager.default.createFile(
+                atPath: directory.appendingPathComponent(name).path,
+                contents: Data(),
+                attributes: nil
+            )
+        }
+
+        let images = try OCREvaluator.sampleImageFiles(in: directory)
+
+        XCTAssertEqual(images.map(\.lastPathComponent), ["20260525_5-3_shop_001.png"])
+    }
+
+    func testOCRSamplesContainMinimalRegressionSet() throws {
+        let samples = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("docs/ocr_samples", isDirectory: true)
+
+        let images = try OCREvaluator.sampleImageFiles(in: samples)
+
+        XCTAssertEqual(images.count, 30)
+    }
+
+    func testOCREvalOutputContainsShopHeroRecognitionBaseline() throws {
+        let output = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("docs/ocr_samples/ocr_eval_output.json")
+        let data = try Data(contentsOf: output)
+        let frames = try JSONDecoder().decode([OCRFrameResult].self, from: data)
+        let heroes = Set(frames.flatMap { frame in
+            frame.summary.shop.compactMap(\.heroName)
+        })
+
+        XCTAssertEqual(frames.count, 30)
+        XCTAssertTrue(heroes.isSuperset(of: ["璐璐", "克格莫", "布隆", "塔里克", "萨勒芬妮", "安妮"]))
+    }
 }
