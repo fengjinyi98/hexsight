@@ -2,6 +2,20 @@ import AppKit
 import ScreenCaptureKit
 import AVFoundation
 
+/// CapturedFrame 采集帧快照
+/// 核心职责：
+/// - 保存连续 BGRA 像素数据
+/// - 隔离 CVPixelBuffer 行跨度与生命周期差异
+struct CapturedFrame {
+    let pixels: Data
+    let width: Int
+    let height: Int
+
+    var bytesPerRow: Int {
+        width * 4
+    }
+}
+
 /// 屏幕采集引擎
 /// 核心职责：
 /// - ScreenCaptureKit 封装
@@ -9,8 +23,8 @@ import AVFoundation
 /// - 输出 BGRA 像素缓冲区
 /// - 动态帧率控制
 final class ScreenCapture: NSObject, @unchecked Sendable {
-    /// 帧回调：BGRA 像素数据指针、宽度、高度
-    var onFrameCaptured: ((UnsafePointer<UInt8>, Int, Int) -> Void)?
+    /// 帧回调：连续 BGRA 像素快照
+    var onFrameCaptured: ((CapturedFrame) -> Void)?
 
     private var stream: SCStream?
     private var streamOutput: CaptureOutput?
@@ -81,8 +95,49 @@ final class ScreenCapture: NSObject, @unchecked Sendable {
 
         let width = CVPixelBufferGetWidth(imageBuffer)
         let height = CVPixelBufferGetHeight(imageBuffer)
+        let sourceBytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
 
-        onFrameCaptured?(baseAddress.assumingMemoryBound(to: UInt8.self), width, height)
+        guard let frame = makeContiguousFrame(
+            baseAddress: baseAddress,
+            width: width,
+            height: height,
+            sourceBytesPerRow: sourceBytesPerRow
+        ) else { return }
+
+        onFrameCaptured?(frame)
+    }
+
+    private func makeContiguousFrame(
+        baseAddress: UnsafeMutableRawPointer,
+        width: Int,
+        height: Int,
+        sourceBytesPerRow: Int
+    ) -> CapturedFrame? {
+        guard width > 0, height > 0 else { return nil }
+        let targetBytesPerRow = width * 4
+
+        if sourceBytesPerRow == targetBytesPerRow {
+            return CapturedFrame(
+                pixels: Data(bytes: baseAddress, count: targetBytesPerRow * height),
+                width: width,
+                height: height
+            )
+        }
+
+        var data = Data(count: targetBytesPerRow * height)
+        data.withUnsafeMutableBytes { destination in
+            guard let rawDestinationBase = destination.baseAddress else { return }
+            let sourceBase = baseAddress.assumingMemoryBound(to: UInt8.self)
+            let destinationBase = rawDestinationBase.assumingMemoryBound(to: UInt8.self)
+
+            for row in 0..<height {
+                destinationBase
+                    .advanced(by: row * targetBytesPerRow)
+                    .update(from: sourceBase.advanced(by: row * sourceBytesPerRow), count: targetBytesPerRow)
+            }
+        }
+
+        return CapturedFrame(pixels: data, width: width, height: height)
     }
 }
 

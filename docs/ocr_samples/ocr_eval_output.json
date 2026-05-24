@@ -1,0 +1,2833 @@
+[
+  {
+    "gameContentRect" : [
+      [
+        0,
+        68
+      ],
+      [
+        3840,
+        2346
+      ]
+    ],
+    "imagePath" : "/Users/fengjinyi/.config/superpowers/worktrees/hexsight/ocr-recognition/docs/ocr_samples/截屏2026-05-24 10.43.23.png",
+    "imageSize" : [
+      3840,
+      2414
+    ],
+    "regions" : [
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "1-3"
+          }
+        ],
+        "normalizedText" : "1-3",
+        "region" : {
+          "id" : "round",
+          "kind" : "round",
+          "rect" : [
+            [
+              1400,
+              68
+            ],
+            [
+              250,
+              105
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "璐璐路"
+          }
+        ],
+        "normalizedText" : "璐璐",
+        "region" : {
+          "id" : "shop_hero_name_0",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              810,
+              2270
+            ],
+            [
+              290,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "F"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "shop_trait_name_0",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              802,
+              2044
+            ],
+            [
+              236,
+              158
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "古格莧"
+          }
+        ],
+        "normalizedText" : "克格莫",
+        "region" : {
+          "id" : "shop_hero_name_1",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              1430,
+              2270
+            ],
+            [
+              290,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "So"
+          },
+          {
+            "confidence" : 0.5,
+            "text" : "虚空"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "k 法师"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "shop_trait_name_1",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              1422,
+              2044
+            ],
+            [
+              236,
+              158
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_2",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2050,
+              2270
+            ],
+            [
+              290,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "欧尼亚"
+          }
+        ],
+        "normalizedText" : "艾欧尼亚",
+        "region" : {
+          "id" : "shop_trait_name_2",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2042,
+              2044
+            ],
+            [
+              236,
+              158
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_3",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2670,
+              2270
+            ],
+            [
+              290,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_3",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2662,
+              2044
+            ],
+            [
+              236,
+              158
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_4",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              3290,
+              2270
+            ],
+            [
+              290,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_4",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              3282,
+              2044
+            ],
+            [
+              236,
+              158
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_0",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              220
+            ],
+            [
+              500,
+              74
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_0",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              302
+            ],
+            [
+              176,
+              79
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_1",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              393
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_1",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              476
+            ],
+            [
+              176,
+              79
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_2",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              589
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_2",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              671
+            ],
+            [
+              176,
+              80
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_3",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              784
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_3",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              867
+            ],
+            [
+              176,
+              79
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_4",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              980
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_4",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              1062
+            ],
+            [
+              176,
+              80
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_5",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              1175
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_5",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              1258
+            ],
+            [
+              176,
+              79
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_6",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              1371
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "◎宇"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "opponent_hp_6",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              1453
+            ],
+            [
+              176,
+              80
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_7",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2910,
+              1566
+            ],
+            [
+              500,
+              75
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_7",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3236,
+              1649
+            ],
+            [
+              176,
+              79
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "虚空"
+          }
+        ],
+        "normalizedText" : "虚空",
+        "region" : {
+          "id" : "active_trait_name_0",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              280
+            ],
+            [
+              270,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "1"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "12"
+          }
+        ],
+        "normalizedText" : "1",
+        "region" : {
+          "id" : "active_trait_count_0",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              346
+            ],
+            [
+              190,
+              57
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "法师"
+          }
+        ],
+        "normalizedText" : "法师",
+        "region" : {
+          "id" : "active_trait_name_1",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              428
+            ],
+            [
+              270,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_1",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              493
+            ],
+            [
+              190,
+              58
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "狙仲"
+          },
+          {
+            "confidence" : 1,
+            "text" : "1"
+          },
+          {
+            "confidence" : 1,
+            "text" : "2"
+          }
+        ],
+        "normalizedText" : "狙神",
+        "region" : {
+          "id" : "active_trait_name_2",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              576
+            ],
+            [
+              270,
+              70
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_2",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              641
+            ],
+            [
+              190,
+              57
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_3",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              724
+            ],
+            [
+              270,
+              70
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_3",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              789
+            ],
+            [
+              190,
+              57
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_4",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              871
+            ],
+            [
+              270,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_4",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              936
+            ],
+            [
+              190,
+              58
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_5",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              1019
+            ],
+            [
+              270,
+              70
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_5",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              1084
+            ],
+            [
+              190,
+              58
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_6",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              1167
+            ],
+            [
+              270,
+              70
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_6",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              1232
+            ],
+            [
+              190,
+              57
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_7",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              290,
+              1314
+            ],
+            [
+              270,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_7",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              284,
+              1380
+            ],
+            [
+              190,
+              57
+            ]
+          ]
+        }
+      }
+    ],
+    "summary" : {
+      "activeTraits" : [
+        {
+          "count" : "1",
+          "index" : 0,
+          "name" : "虚空"
+        },
+        {
+          "index" : 1,
+          "name" : "法师"
+        },
+        {
+          "index" : 2,
+          "name" : "狙神"
+        }
+      ],
+      "opponents" : [
+
+      ],
+      "round" : "1-3",
+      "shop" : [
+        {
+          "heroName" : "璐璐",
+          "index" : 0,
+          "traits" : [
+
+          ]
+        },
+        {
+          "heroName" : "克格莫",
+          "index" : 1,
+          "traits" : [
+
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "gameContentRect" : [
+      [
+        0,
+        68
+      ],
+      [
+        3796,
+        2246
+      ]
+    ],
+    "imagePath" : "/Users/fengjinyi/.config/superpowers/worktrees/hexsight/ocr-recognition/docs/ocr_samples/截屏2026-05-24 11.09.06.png",
+    "imageSize" : [
+      3796,
+      2314
+    ],
+    "regions" : [
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "round",
+          "kind" : "round",
+          "rect" : [
+            [
+              1383,
+              68
+            ],
+            [
+              249,
+              100
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_0",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              800,
+              2176
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "F"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "shop_trait_name_0",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              792,
+              1960
+            ],
+            [
+              235,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_1",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              1413,
+              2176
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_1",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              1405,
+              1960
+            ],
+            [
+              235,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_2",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2026,
+              2176
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_2",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2018,
+              1960
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_3",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2639,
+              2176
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_3",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2631,
+              1960
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_4",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              3252,
+              2176
+            ],
+            [
+              287,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_4",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              3244,
+              1960
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_0",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              213
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_0",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              292
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_1",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              379
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_1",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              458
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_2",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              567
+            ],
+            [
+              495,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_2",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              646
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_3",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              754
+            ],
+            [
+              495,
+              71
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_3",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              833
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_4",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              941
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_4",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1020
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_5",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1128
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_5",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1207
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_6",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1315
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "德王"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "opponent_hp_6",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1394
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_7",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1502
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_7",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1581
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_0",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              271
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "弗雷介"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "active_trait_count_0",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              334
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_1",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              413
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "2"
+          },
+          {
+            "confidence" : 0.5,
+            "text" : "护卫"
+          }
+        ],
+        "normalizedText" : "2",
+        "region" : {
+          "id" : "active_trait_count_1",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              475
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_2",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              554
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "2"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "裁决改"
+          }
+        ],
+        "normalizedText" : "2",
+        "region" : {
+          "id" : "active_trait_count_2",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              617
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_3",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              696
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "2"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "f刖仨"
+          }
+        ],
+        "normalizedText" : "2",
+        "region" : {
+          "id" : "active_trait_count_3",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              758
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_4",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              837
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_4",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              899
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "袖盾使"
+          }
+        ],
+        "normalizedText" : "神盾使",
+        "region" : {
+          "id" : "active_trait_name_5",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              978
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "1/2"
+          }
+        ],
+        "normalizedText" : "1/2",
+        "region" : {
+          "id" : "active_trait_count_5",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1041
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_6",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              1120
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "1/2"
+          }
+        ],
+        "normalizedText" : "1/2",
+        "region" : {
+          "id" : "active_trait_count_6",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1182
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_7",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              1261
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_7",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1324
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      }
+    ],
+    "summary" : {
+      "activeTraits" : [
+        {
+          "count" : "2",
+          "index" : 1
+        },
+        {
+          "count" : "2",
+          "index" : 2
+        },
+        {
+          "count" : "2",
+          "index" : 3
+        },
+        {
+          "count" : "1/2",
+          "index" : 5,
+          "name" : "神盾使"
+        },
+        {
+          "count" : "1/2",
+          "index" : 6
+        }
+      ],
+      "opponents" : [
+
+      ],
+      "shop" : [
+
+      ]
+    }
+  },
+  {
+    "gameContentRect" : [
+      [
+        0,
+        68
+      ],
+      [
+        3796,
+        2254
+      ]
+    ],
+    "imagePath" : "/Users/fengjinyi/.config/superpowers/worktrees/hexsight/ocr-recognition/docs/ocr_samples/截屏2026-05-24 11.09.12.png",
+    "imageSize" : [
+      3796,
+      2322
+    ],
+    "regions" : [
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "round",
+          "kind" : "round",
+          "rect" : [
+            [
+              1383,
+              68
+            ],
+            [
+              249,
+              101
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "布隆"
+          }
+        ],
+        "normalizedText" : "布隆",
+        "region" : {
+          "id" : "shop_hero_name_0",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              800,
+              2184
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "F"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "shop_trait_name_0",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              792,
+              1967
+            ],
+            [
+              235,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "塔甲克"
+          }
+        ],
+        "normalizedText" : "塔里克",
+        "region" : {
+          "id" : "shop_hero_name_1",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              1413,
+              2184
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_1",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              1405,
+              1967
+            ],
+            [
+              235,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "妮"
+          }
+        ],
+        "normalizedText" : "妮蔻",
+        "region" : {
+          "id" : "shop_hero_name_2",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2026,
+              2184
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "尔特沃夫"
+          },
+          {
+            "confidence" : 1,
+            "text" : "3"
+          }
+        ],
+        "normalizedText" : "皮尔特沃夫",
+        "region" : {
+          "id" : "shop_trait_name_2",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2018,
+              1967
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "安"
+          }
+        ],
+        "normalizedText" : "卢锡安与赛娜",
+        "region" : {
+          "id" : "shop_hero_name_3",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              2639,
+              2184
+            ],
+            [
+              288,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_3",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              2631,
+              1967
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_hero_name_4",
+          "kind" : "shopHeroName",
+          "rect" : [
+            [
+              3252,
+              2184
+            ],
+            [
+              287,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "shop_trait_name_4",
+          "kind" : "shopTraitName",
+          "rect" : [
+            [
+              3244,
+              1967
+            ],
+            [
+              234,
+              151
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_0",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              214
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_0",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              293
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_1",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              381
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_1",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              460
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_2",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              568
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_2",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              648
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_3",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              756
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_3",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              836
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_4",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              944
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_4",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1023
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_5",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1132
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_5",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1211
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_6",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1320
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_6",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1399
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_name_7",
+          "kind" : "opponentName",
+          "rect" : [
+            [
+              2876,
+              1508
+            ],
+            [
+              495,
+              72
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "opponent_hp_7",
+          "kind" : "opponentHP",
+          "rect" : [
+            [
+              3198,
+              1587
+            ],
+            [
+              175,
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_0",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              272
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "龙血武"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "active_trait_count_0",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              335
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_1",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              414
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.5,
+            "text" : "山隐之"
+          },
+          {
+            "confidence" : 0.5,
+            "text" : "1"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "active_trait_count_1",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              477
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_2",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              556
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "1"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "腕家"
+          }
+        ],
+        "normalizedText" : "1",
+        "region" : {
+          "id" : "active_trait_count_2",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              618
+            ],
+            [
+              189,
+              56
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_3",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              698
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "5"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "71D"
+          }
+        ],
+        "normalizedText" : "5",
+        "region" : {
+          "id" : "active_trait_count_3",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              760
+            ],
+            [
+              189,
+              56
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "至中"
+          }
+        ],
+        "normalizedText" : "",
+        "region" : {
+          "id" : "active_trait_name_4",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              840
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "2"
+          },
+          {
+            "confidence" : 0.3,
+            "text" : "21 4"
+          }
+        ],
+        "normalizedText" : "2",
+        "region" : {
+          "id" : "active_trait_count_4",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              902
+            ],
+            [
+              189,
+              56
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 1,
+            "text" : "法师"
+          }
+        ],
+        "normalizedText" : "法师",
+        "region" : {
+          "id" : "active_trait_name_5",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              982
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "2/4"
+          }
+        ],
+        "normalizedText" : "2/4",
+        "region" : {
+          "id" : "active_trait_count_5",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1044
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "•迅击战士"
+          }
+        ],
+        "normalizedText" : "迅击战士",
+        "region" : {
+          "id" : "active_trait_name_6",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              1124
+            ],
+            [
+              268,
+              67
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+          {
+            "confidence" : 0.3,
+            "text" : "2/3"
+          }
+        ],
+        "normalizedText" : "2/3",
+        "region" : {
+          "id" : "active_trait_count_6",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1186
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_name_7",
+          "kind" : "activeTraitName",
+          "rect" : [
+            [
+              286,
+              1265
+            ],
+            [
+              268,
+              68
+            ]
+          ]
+        }
+      },
+      {
+        "candidates" : [
+
+        ],
+        "region" : {
+          "id" : "active_trait_count_7",
+          "kind" : "activeTraitCount",
+          "rect" : [
+            [
+              280,
+              1328
+            ],
+            [
+              189,
+              55
+            ]
+          ]
+        }
+      }
+    ],
+    "summary" : {
+      "activeTraits" : [
+        {
+          "count" : "1",
+          "index" : 2
+        },
+        {
+          "count" : "5",
+          "index" : 3
+        },
+        {
+          "count" : "2",
+          "index" : 4
+        },
+        {
+          "count" : "2/4",
+          "index" : 5,
+          "name" : "法师"
+        },
+        {
+          "count" : "2/3",
+          "index" : 6,
+          "name" : "迅击战士"
+        }
+      ],
+      "opponents" : [
+
+      ],
+      "shop" : [
+        {
+          "heroName" : "布隆",
+          "index" : 0,
+          "traits" : [
+
+          ]
+        },
+        {
+          "heroName" : "塔里克",
+          "index" : 1,
+          "traits" : [
+
+          ]
+        },
+        {
+          "heroName" : "妮蔻",
+          "index" : 2,
+          "traits" : [
+            "皮尔特沃夫"
+          ]
+        },
+        {
+          "heroName" : "卢锡安与赛娜",
+          "index" : 3,
+          "traits" : [
+
+          ]
+        }
+      ]
+    }
+  }
+]

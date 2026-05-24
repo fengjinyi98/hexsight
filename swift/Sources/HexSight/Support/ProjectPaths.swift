@@ -7,6 +7,7 @@ import Foundation
 /// - 避免各模块重复拼接路径
 enum ProjectPaths {
     private static let anchorFilePath = #filePath
+    private static let configRootEnvironmentKey = "HEXSIGHT_CONFIG_ROOT"
 
     static func repoRoot() -> URL {
         repoRoot(sourceFilePath: anchorFilePath)
@@ -26,8 +27,8 @@ enum ProjectPaths {
     }
 
     static func configFile(named name: String, sourceFilePath: String) -> URL {
-        repoRoot(sourceFilePath: sourceFilePath)
-            .appendingPathComponent("config/\(name)")
+        configDirectory(sourceFilePath: sourceFilePath)
+            .appendingPathComponent(name)
     }
 
     static func configDirectory() -> URL {
@@ -35,7 +36,12 @@ enum ProjectPaths {
     }
 
     static func configDirectory(sourceFilePath: String) -> URL {
-        repoRoot(sourceFilePath: sourceFilePath)
+        if let overridePath = ProcessInfo.processInfo.environment[configRootEnvironmentKey],
+           !overridePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return URL(fileURLWithPath: overridePath, isDirectory: true).standardizedFileURL
+        }
+
+        return repoRoot(sourceFilePath: sourceFilePath)
             .appendingPathComponent("config", isDirectory: true)
     }
 

@@ -27,6 +27,12 @@ final class AppState: ObservableObject {
     @Published var transition: [String] = []
     @Published var llmAdvice: String? = nil
 
+    // MARK: - OCR 识别摘要
+
+    @Published var ocrShop: [OCRShopSlot] = []
+    @Published var ocrOpponents: [OCROpponentRow] = []
+    @Published var ocrActiveTraits: [OCRActiveTraitRow] = []
+
     // MARK: - 运行状态
 
     @Published var engineReady: Bool = false
@@ -48,6 +54,16 @@ final class AppState: ObservableObject {
         llmAdvice = json["llm_advice"] as? String
     }
 
+    /// 应用 OCR 业务摘要
+    func applyOCRSummary(_ summary: OCRFrameSummary) {
+        if let round = summary.round, !round.isEmpty {
+            self.round = round
+        }
+        ocrShop = summary.shop
+        ocrOpponents = summary.opponents
+        ocrActiveTraits = summary.activeTraits
+    }
+
     /// 重置对局状态
     func resetGame() {
         gold = 0
@@ -62,6 +78,9 @@ final class AppState: ObservableObject {
         equipRoute = []
         transition = []
         llmAdvice = nil
+        ocrShop = []
+        ocrOpponents = []
+        ocrActiveTraits = []
         RustBridge.shared.reset()
     }
 }

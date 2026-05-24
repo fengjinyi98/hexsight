@@ -74,6 +74,38 @@ struct DecisionPanel: View {
         }
     }
 
+    private var visibleOCRShopNames: [String] {
+        let names = appState.ocrShop.compactMap { slot in
+            slot.heroName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        }.filter { !$0.isEmpty }
+        return Array(names.prefix(5))
+    }
+
+    private var visibleOCRTraitLabels: [String] {
+        let labels = appState.ocrActiveTraits.compactMap { row -> String? in
+            guard let name = row.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
+                return nil
+            }
+            if let count = row.count?.trimmingCharacters(in: .whitespacesAndNewlines), !count.isEmpty {
+                return "\(name) \(count)"
+            }
+            return name
+        }
+        return Array(labels.prefix(6))
+    }
+
+    private var visibleOCROpponentLabels: [String] {
+        let labels = appState.ocrOpponents.compactMap { row -> String? in
+            let name = row.name?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let displayName = (name?.isEmpty == false) ? name! : "玩家\(row.index + 1)"
+            if let hp = row.hp {
+                return "\(displayName) \(hp)"
+            }
+            return name?.isEmpty == false ? displayName : nil
+        }
+        return Array(labels.prefix(8))
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             // 顶部大标题与系统定位 (设计图顶部通栏)
@@ -636,31 +668,49 @@ struct DecisionPanel: View {
                                 SmallStatBadge(val: "⚡ 连胜")
                             }
                             
-                            // 我方阵容缩影
-                            Text("我方阵容").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary).padding(.top, 4)
-                            HStack(spacing: 6) {
-                                ForEach(["卢锡安", "蔚", "艾克", "卡莎", "锐雯"].indices, id: \.self) { idx in
-                                    let name = ["卢锡安", "蔚", "艾克", "卡莎", "锐雯"][idx]
-                                    VStack(spacing: 2) {
-                                        SafeAsyncImage(urlString: getHeroIconUrl(name: name), size: 24, cornerRadius: 4)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 4)
-                                                    .stroke(idx == 3 ? Color.purple : Color.white.opacity(0.1), lineWidth: 1)
-                                            )
-                                        Text(idx == 0 || idx == 1 ? "★★★" : "★★")
-                                            .font(.system(size: 6))
-                                            .foregroundStyle(.yellow)
+                            Text("OCR商店").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary).padding(.top, 4)
+                            if visibleOCRShopNames.isEmpty {
+                                HStack(spacing: 6) {
+                                    ForEach(["卢锡安", "蔚", "艾克", "卡莎", "锐雯"].indices, id: \.self) { idx in
+                                        let name = ["卢锡安", "蔚", "艾克", "卡莎", "锐雯"][idx]
+                                        VStack(spacing: 2) {
+                                            SafeAsyncImage(urlString: getHeroIconUrl(name: name), size: 24, cornerRadius: 4)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 4)
+                                                        .stroke(idx == 3 ? Color.purple : Color.white.opacity(0.1), lineWidth: 1)
+                                                )
+                                            Text(idx == 0 || idx == 1 ? "★★★" : "★★")
+                                                .font(.system(size: 6))
+                                                .foregroundStyle(.yellow)
+                                        }
+                                    }
+                                }
+                            } else {
+                                HStack(spacing: 6) {
+                                    ForEach(visibleOCRShopNames, id: \.self) { name in
+                                        VStack(spacing: 2) {
+                                            SafeAsyncImage(urlString: getHeroIconUrl(name: name), size: 24, cornerRadius: 4)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 4)
+                                                        .stroke(Color.cyan.opacity(0.65), lineWidth: 1)
+                                                )
+                                            Text(name)
+                                                .font(.system(size: 7, weight: .semibold))
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                                .frame(width: 34)
                                     }
                                 }
                             }
+                            }
                             
                             // 羁绊效果
-                            Text("羁绊效果").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary).padding(.top, 4)
+                            Text("OCR羁绊").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary).padding(.top, 4)
                             HStack(spacing: 6) {
-                                TraitBadge(name: "暗星 6/6", isPrimary: true)
-                                TraitBadge(name: "法师 2/4", isPrimary: false)
-                                TraitBadge(name: "狙神 2/4", isPrimary: false)
-                                TraitBadge(name: "格斗家 2/4", isPrimary: false)
+                                let traits = visibleOCRTraitLabels.isEmpty ? ["暗星 6/6", "法师 2/4", "狙神 2/4", "格斗家 2/4"] : visibleOCRTraitLabels
+                                ForEach(Array(traits.enumerated()), id: \.offset) { idx, label in
+                                    TraitBadge(name: label, isPrimary: idx == 0)
+                                }
                             }
                             
                             // 运营节奏 (横向时间轴)
@@ -696,8 +746,14 @@ struct DecisionPanel: View {
                         case 2: // 对手信息
                             Text("本局可能遇到的主要威胁：").font(.system(size: 10, weight: .bold))
                             VStack(alignment: .leading, spacing: 4) {
-                                Label("同行1：AP小法 (强力法爆威胁)", systemImage: "exclamationmark.circle")
-                                Label("同行2：福星男枪 (金币及成型压制)", systemImage: "exclamationmark.circle")
+                                if visibleOCROpponentLabels.isEmpty {
+                                    Label("同行1：AP小法 (强力法爆威胁)", systemImage: "exclamationmark.circle")
+                                    Label("同行2：福星男枪 (金币及成型压制)", systemImage: "exclamationmark.circle")
+                                } else {
+                                    ForEach(visibleOCROpponentLabels, id: \.self) { label in
+                                        Label(label, systemImage: "person.crop.circle")
+                                    }
+                                }
                             }
                             .font(.system(size: 9))
                             .foregroundStyle(.orange)
