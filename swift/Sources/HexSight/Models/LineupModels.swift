@@ -234,6 +234,125 @@ struct LineupDetailData {
     }
 }
 
+/// KnowledgeDecisionSummary Rust 知识决策展示摘要
+/// 核心职责：
+/// - 从 Rust RuleOutput JSON 提取 SwiftUI 可直接展示的短结论
+/// - 保留装备、海克斯、过渡、版本修正和短解释字段
+/// - 隔离 camelCase FFI 字段与 AppState 展示字段
+struct KnowledgeDecisionSummary: Equatable {
+    let lineupName: String
+    let score: Int
+    let suggestions: [String]
+    let equipmentActions: [String]
+    let transitionActions: [String]
+    let patchNotes: [String]
+    let advice: String
+    let riskLevel: String
+
+    init?(ruleOutput: [String: Any]) {
+        if ruleOutput["error"] != nil { return nil }
+        guard
+            ruleOutput["lineupRecommendations"] is [[String: Any]],
+            ruleOutput["economyAction"] is [String: Any],
+            ruleOutput["itemAction"] is [String: Any],
+            ruleOutput["augmentAction"] is [String: Any],
+            ruleOutput["transitionAction"] is [String: Any]
+        else { return nil }
+
+        let lineupRecommendations = ruleOutput["lineupRecommendations"] as? [[String: Any]] ?? []
+        let bestLineup = lineupRecommendations.first ?? [:]
+        let parsedName = lineupString(bestLineup["name"])
+        let parsedScore = KnowledgeDecisionSummary.intValue(bestLineup["score"])
+
+        let economyAction = ruleOutput["economyAction"] as? [String: Any] ?? [:]
+        let itemAction = ruleOutput["itemAction"] as? [String: Any] ?? [:]
+        let augmentAction = ruleOutput["augmentAction"] as? [String: Any] ?? [:]
+        let transitionAction = ruleOutput["transitionAction"] as? [String: Any] ?? [:]
+        let knowledgeActions = ruleOutput["knowledgeActions"] as? [String: Any] ?? [:]
+        let holder = knowledgeActions["holder"] as? [String: Any]
+        let combat = knowledgeActions["combat"] as? [String: Any]
+
+        let shortExplanations = KnowledgeDecisionSummary.stringArray(knowledgeActions["shortExplanations"])
+        let pivotConditions = KnowledgeDecisionSummary.stringArray(ruleOutput["pivotConditions"])
+        let patchNotes = KnowledgeDecisionSummary.stringArray(knowledgeActions["patch"])
+        let bestRisks = KnowledgeDecisionSummary.stringArray(bestLineup["risk"])
+
+        var suggestions = [String]()
+        KnowledgeDecisionSummary.appendNonEmpty("经济：\(lineupString(economyAction["reason"]))", to: &suggestions)
+        KnowledgeDecisionSummary.appendNonEmpty("海克斯：\(lineupString(augmentAction["recommended"]))", to: &suggestions)
+        suggestions.append(contentsOf: shortExplanations.prefix(2))
+        if suggestions.isEmpty {
+            suggestions.append("查看 Rust 规则引擎结论")
+        }
+
+        var equipmentActions = [String]()
+        if let holder {
+            let item = lineupString(holder["item"])
+            let temporaryHolder = lineupString(holder["temporaryHolder"])
+            let finalHolder = lineupString(holder["finalHolder"])
+            let holderText = finalHolder.isEmpty
+                ? "\(item) 给 \(temporaryHolder)"
+                : "\(item) 给 \(temporaryHolder)，后续转给 \(finalHolder)"
+            KnowledgeDecisionSummary.appendNonEmpty(holderText, to: &equipmentActions)
+        }
+        KnowledgeDecisionSummary.appendNonEmpty(lineupString(itemAction["reason"]), to: &equipmentActions)
+
+        var transitionActions = [String]()
+        KnowledgeDecisionSummary.appendNonEmpty(lineupString(transitionAction["route"]), to: &transitionActions)
+        transitionActions.append(contentsOf: pivotConditions.prefix(2))
+        if transitionActions.isEmpty {
+            transitionActions.append("按当前最高分阵容过渡")
+        }
+
+        var adviceParts = shortExplanations
+        if let combat {
+            let reason = lineupString(combat["reason"])
+            let scoreDiff = KnowledgeDecisionSummary.intValue(combat["scoreDiff"])
+            if !reason.isEmpty {
+                adviceParts.append("收益差 \(scoreDiff)：\(reason)")
+            }
+        }
+        if !patchNotes.isEmpty {
+            adviceParts.append(contentsOf: patchNotes.prefix(2))
+        }
+        if let name = nonEmptyString(parsedName) {
+            adviceParts.append("当前优先阵容 \(name)，评分 \(parsedScore)")
+        }
+
+        self.lineupName = parsedName.isEmpty ? "知识决策" : parsedName
+        self.score = parsedScore
+        self.suggestions = suggestions
+        self.equipmentActions = equipmentActions.isEmpty ? ["保留装备弹性"] : equipmentActions
+        self.transitionActions = transitionActions
+        self.patchNotes = patchNotes
+        self.advice = adviceParts.joined(separator: "；")
+        self.riskLevel = KnowledgeDecisionSummary.riskLevel(score: parsedScore, risks: bestRisks, pivots: pivotConditions)
+    }
+
+    private static func stringArray(_ value: Any?) -> [String] {
+        (value as? [String]) ?? (value as? [Any] ?? []).compactMap { nonEmptyString($0) }
+    }
+
+    private static func intValue(_ value: Any?) -> Int {
+        if let int = value as? Int { return int }
+        if let double = value as? Double { return Int(double) }
+        return Int(lineupString(value)) ?? 0
+    }
+
+    private static func appendNonEmpty(_ value: String, to array: inout [String]) {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+            array.append(trimmed)
+        }
+    }
+
+    private static func riskLevel(score: Int, risks: [String], pivots: [String]) -> String {
+        if score >= 95 && risks.isEmpty && pivots.isEmpty { return "低" }
+        if score >= 80 && risks.count <= 1 { return "中" }
+        return "高"
+    }
+}
+
 
 /// LineupUnlockTask 英雄解锁任务模型
 /// 核心职责：

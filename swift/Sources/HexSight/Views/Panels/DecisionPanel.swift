@@ -7,6 +7,7 @@ import SwiftUI
 /// - 所有组件与卡片均支持自适应拉伸，防止内容溢出或窗口过小。
 struct DecisionPanel: View {
     @ObservedObject var appState: AppState
+    let mode: String
     
     // MARK: - 内部控制状态
     @State private var settingTab: Int = 0
@@ -127,6 +128,9 @@ struct DecisionPanel: View {
             )
         )
         .opacity(opacityVal / 100.0) // 响应透明度滑块
+        .task(id: mode) {
+            await appState.loadKnowledgeDecision(mode: mode, lineupId: "")
+        }
     }
 
     // MARK: - 1. 顶部通栏
@@ -338,6 +342,10 @@ struct DecisionPanel: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                    if let knowledge = appState.knowledgeDecision {
+                        knowledgeDecisionBox(knowledge)
+                    }
                 }
                 .padding(12)
             }
@@ -688,6 +696,11 @@ struct DecisionPanel: View {
                                 .background(Color.purple.opacity(0.08))
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.purple.opacity(0.2), lineWidth: 1))
+
+                            if let knowledge = appState.knowledgeDecision {
+                                Text("Rust 知识决策").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary).padding(.top, 4)
+                                knowledgeDecisionBox(knowledge)
+                            }
                             
                         case 1: // 我方阵容
                             Text("精细站位建议").font(.system(size: 10, weight: .bold))
@@ -829,6 +842,45 @@ struct DecisionPanel: View {
     
     private func getHeroIconUrl(name: String) -> String {
         GameDataService.shared.heroPicture(named: name)
+    }
+
+    /// 知识决策摘要区块
+    /// 核心职责：
+    /// - 展示 Rust RuleOutput 中的装备、海克斯、过渡和版本修正结论
+    /// - 保持 SwiftUI 只读取 AppState 中的结构化摘要
+    @ViewBuilder
+    private func knowledgeDecisionBox(_ summary: KnowledgeDecisionSummary) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "bolt.badge.clock.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.cyan)
+                Text("Rust 知识决策")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.cyan)
+                Spacer()
+                Text("\(summary.score)")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.cyan.opacity(0.14))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+
+            KnowledgeLine(title: "装备", value: summary.equipmentActions.first ?? "保留装备弹性", color: .yellow)
+            KnowledgeLine(title: "海克斯", value: summary.suggestions.first(where: { $0.contains("海克斯") }) ?? summary.suggestions.first ?? "保留通用战力", color: .purple)
+            KnowledgeLine(title: "过渡", value: summary.transitionActions.first ?? "按最高分阵容过渡", color: .green)
+
+            if let patch = summary.patchNotes.first {
+                KnowledgeLine(title: "版本", value: patch, color: .orange)
+            }
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.cyan.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.cyan.opacity(0.18), lineWidth: 1))
     }
 }
 
@@ -984,6 +1036,27 @@ private struct SmallStatBadge: View {
             .padding(.horizontal, 6).padding(.vertical, 3)
             .background(Color.white.opacity(0.05))
             .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
+}
+
+private struct KnowledgeLine: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 6) {
+            Text(title)
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(color)
+                .frame(width: 28, alignment: .leading)
+            Text(value)
+                .font(.system(size: 9))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
     }
 }
 

@@ -89,4 +89,18 @@ final class LineupRepositoryTests: XCTestCase {
         XCTAssertNotNil(output?["lineupRecommendations"])
         XCTAssertNotNil((output?["knowledgeActions"] as? [String: Any])?["shortExplanations"])
     }
+
+    func testKnowledgeDecisionSummaryParsesRustRuleOutputForDisplay() async throws {
+        let repo = LineupRepository.shared
+        let output = try XCTUnwrap(repo.loadKnowledgeRuleOutput(mode: "17", lineupId: "神谕龙王"))
+        let summary = try XCTUnwrap(KnowledgeDecisionSummary(ruleOutput: output))
+
+        XCTAssertFalse(summary.lineupName.isEmpty)
+        XCTAssertFalse(summary.suggestions.isEmpty)
+        XCTAssertTrue(summary.suggestions.contains { $0.contains("经济") || $0.contains("海克斯") })
+        XCTAssertFalse(summary.equipmentActions.isEmpty)
+        XCTAssertFalse(summary.transitionActions.isEmpty)
+        XCTAssertFalse(summary.advice.isEmpty)
+        XCTAssertTrue(summary.advice.contains("当前优先阵容"))
+    }
 }

@@ -663,6 +663,19 @@ P7 是阶段收口点。之后每次规则争议都必须沉淀为回归样例�
 
 P8 负责完成“Rust 计算、Swift 展示”的边界收口。Swift 层只消费结构化 JSON，不重新实现 P0-P7 的规则逻辑。
 
+### P9：Swift 知识决策展示消费
+
+| 项 | 内容 |
+|---|---|
+| 目标 | 把 Rust `RuleOutput.knowledgeActions` 转成 Swift 可展示摘要，并接入决策大盘 |
+| 核心模块 | `swift/Sources/HexSight/Models/LineupModels.swift`、`swift/Sources/HexSight/App/AppState.swift`、`swift/Sources/HexSight/Views/Panels/DecisionPanel.swift` |
+| 配置产物 | 复用 `config/rules/<version>/*.json` 与 Rust FFI 输出 |
+| 输入 | Rust `RuleOutput` camelCase JSON |
+| 输出 | `KnowledgeDecisionSummary`、`AppState.knowledgeDecision`、决策面板知识决策区块 |
+| 验收 | Swift 能展示装备、海克斯、过渡、版本修正和短解释；状态更新发生在显式加载入口；Swift 展示层不重建规则评分 |
+
+P9 负责把 P8 的桥接结果变成真实 UI 消费路径。Swift 只做展示摘要解析和状态映射，规则评分、装备收益、版本修正仍由 Rust 输出。
+
 ### P 级依赖顺序
 
 ```text
@@ -675,6 +688,7 @@ P0 知识底座
  -> P6 简化收益估算
  -> P7 RuleOutput 集成与回归
  -> P8 Swift 展示桥接
+ -> P9 Swift 知识决策展示消费
 ```
 
 | P 级 | 可以并行的内容 | 依赖 |
@@ -688,6 +702,7 @@ P0 知识底座
 | P6 | 收益估算依赖装备/棋子/冲突 | P1/P2/P3 |
 | P7 | 集成和回归 | P0-P6 |
 | P8 | Swift 展示桥接 | P7 |
+| P9 | Swift 展示消费 | P8 |
 
 ---
 

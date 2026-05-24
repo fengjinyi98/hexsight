@@ -97,7 +97,7 @@ struct MainView: View {
     private var contentArea: some View {
         switch selectedNav {
         case .decision:
-            DecisionPanel(appState: appState)
+            DecisionPanel(appState: appState, mode: dataService.selectedMode)
         case .hero:
             HeroPanel()
         case .equip:

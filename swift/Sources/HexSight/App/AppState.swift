@@ -26,6 +26,7 @@ final class AppState: ObservableObject {
     @Published var equipRoute: [String] = []
     @Published var transition: [String] = []
     @Published var llmAdvice: String? = nil
+    @Published var knowledgeDecision: KnowledgeDecisionSummary? = nil
 
     // MARK: - 运行状态
 
@@ -46,6 +47,19 @@ final class AppState: ObservableObject {
         equipRoute = json["equip_route"] as? [String] ?? equipRoute
         transition = json["transition"] as? [String] ?? transition
         llmAdvice = json["llm_advice"] as? String
+
+        if let summary = KnowledgeDecisionSummary(ruleOutput: json) {
+            applyKnowledgeDecision(summary)
+        }
+    }
+
+    /// 加载 Rust 知识决策并更新展示状态
+    func loadKnowledgeDecision(mode: String, lineupId: String) async {
+        guard let output = LineupRepository.shared.loadKnowledgeRuleOutput(mode: mode, lineupId: lineupId),
+              let summary = KnowledgeDecisionSummary(ruleOutput: output)
+        else { return }
+
+        applyKnowledgeDecision(summary)
     }
 
     /// 重置对局状态
@@ -62,6 +76,18 @@ final class AppState: ObservableObject {
         equipRoute = []
         transition = []
         llmAdvice = nil
+        knowledgeDecision = nil
         RustBridge.shared.reset()
+    }
+
+    /// 应用 Rust 知识决策展示摘要
+    private func applyKnowledgeDecision(_ summary: KnowledgeDecisionSummary) {
+        knowledgeDecision = summary
+        lineupName = summary.lineupName
+        suggestions = summary.suggestions
+        riskLevel = summary.riskLevel
+        equipRoute = summary.equipmentActions
+        transition = summary.transitionActions
+        llmAdvice = summary.advice
     }
 }
