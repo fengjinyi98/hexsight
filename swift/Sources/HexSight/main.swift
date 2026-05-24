@@ -20,9 +20,11 @@ enum OCRCliRunner {
                 normalizer: dictionary.normalizer()
             )
             let results = try evaluator.evaluateDirectory(sampleURL)
+            let annotations = try OCREvaluator.loadAnnotations(in: sampleURL)
+            let report = OCREvaluationReport.build(frames: results, annotations: annotations)
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-            let data = try encoder.encode(results)
+            let data = try encoder.encode(report)
             print(String(decoding: data, as: UTF8.self))
             writeStderr("[HexSight] OCR 样本评测完成: \(results.count) 张截图")
             return true

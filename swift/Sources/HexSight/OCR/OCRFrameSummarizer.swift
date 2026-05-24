@@ -10,7 +10,8 @@ final class OCRFrameSummarizer {
             round: text(for: "round", in: regions),
             shop: summarizeShop(regions),
             opponents: summarizeOpponents(regions),
-            activeTraits: summarizeActiveTraits(regions)
+            activeTraits: summarizeActiveTraits(regions),
+            augments: summarizeAugments(regions)
         )
     }
 
@@ -62,6 +63,14 @@ final class OCRFrameSummarizer {
         }
 
         return rows
+    }
+
+    private func summarizeAugments(_ regions: [OCRRegionResult]) -> [OCRAugmentOption] {
+        (0..<3).compactMap { index in
+            let name = text(for: "augment_name_\(index)", in: regions)
+            guard name != nil else { return nil }
+            return OCRAugmentOption(index: index, name: name)
+        }
     }
 
     private func text(for id: String, in regions: [OCRRegionResult]) -> String? {

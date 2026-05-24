@@ -22,8 +22,14 @@ pub struct RecognizedFrame {
     /// 备战席棋子列表
     #[serde(default)]
     pub bench_heroes: Vec<Hero>,
+    /// 对手场上棋子列表
+    #[serde(default)]
+    pub opponent_heroes: Vec<Hero>,
     /// 装备席 + 棋子穿戴装备列表
     pub own_equipment: Vec<Equipment>,
+    /// 选秀阶段可见装备候选
+    #[serde(default)]
+    pub carousel_equipment: Vec<Equipment>,
     /// 已选海克斯列表
     pub hextechs: Vec<Hextech>,
     /// 对手基本信息（侧边栏可见部分）
@@ -35,6 +41,10 @@ pub struct RecognizedFrame {
 pub enum GamePhase {
     #[default]
     Unknown,
+    /// HUD / 备战常规界面
+    Hud,
+    /// 商店打开界面
+    Shop,
     /// PVE 野怪回合
     PvE,
     /// PVP 对战回合
@@ -271,6 +281,12 @@ pub struct RegionConfig {
     /// 备战席槽位
     #[serde(default)]
     pub bench_slots: Vec<Rect>,
+    /// 对手棋盘格子
+    #[serde(default)]
+    pub opponent_board_grid: Vec<Rect>,
+    /// 选秀装备槽位
+    #[serde(default)]
+    pub carousel_slots: Vec<Rect>,
     /// 海克斯区域
     pub hextech_rects: Vec<Rect>,
     /// 对手侧边栏 (7个对手)

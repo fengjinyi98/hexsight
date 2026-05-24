@@ -112,6 +112,11 @@ impl GameMemory {
             && a.level == b.level
             && a.round == b.round
             && a.own_heroes == b.own_heroes
+            && a.bench_heroes == b.bench_heroes
+            && a.opponent_heroes == b.opponent_heroes
+            && a.own_equipment == b.own_equipment
+            && a.carousel_equipment == b.carousel_equipment
+            && a.phase == b.phase
     }
 }
 
@@ -143,6 +148,33 @@ mod tests {
             .expect("连续三帧新英雄应确认更新");
 
         assert_eq!(state.current.own_heroes[0].name, "塔里克");
+    }
+
+    #[test]
+    fn equipment_and_scene_changes_reset_noise_gate() {
+        let mut memory = GameMemory::new();
+        let mut first = frame_with_hero("布隆");
+        first.phase = hexsight_core::GamePhase::Hud;
+        let mut second = first.clone();
+        second.phase = hexsight_core::GamePhase::Shop;
+        second.own_equipment = vec![hexsight_core::Equipment {
+            name: "暴风大剑".into(),
+            equip_type: hexsight_core::EquipmentType::Offensive,
+            completed: false,
+        }];
+
+        assert!(memory.feed(first.clone()).unwrap().is_none());
+        assert!(memory.feed(first.clone()).unwrap().is_none());
+        assert!(memory.feed(second.clone()).unwrap().is_none());
+        assert!(memory.feed(second.clone()).unwrap().is_none());
+
+        let state = memory
+            .feed(second)
+            .unwrap()
+            .expect("连续三帧新装备和场景应确认更新");
+
+        assert_eq!(state.current.phase, hexsight_core::GamePhase::Shop);
+        assert_eq!(state.current.own_equipment[0].name, "暴风大剑");
     }
 
     fn frame_with_hero(name: &str) -> RecognizedFrame {

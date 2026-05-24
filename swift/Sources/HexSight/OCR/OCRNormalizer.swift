@@ -51,6 +51,8 @@ final class OCRNormalizer {
             normalizeHero(text)
         case .shopTraitName, .activeTraitName:
             normalizeTrait(text)
+        case .augmentName:
+            normalizeAugment(text)
         case .round:
             cleanRound(text)
         case .opponentHP:

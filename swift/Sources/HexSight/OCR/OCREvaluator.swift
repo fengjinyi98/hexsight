@@ -66,6 +66,34 @@ final class OCREvaluator {
             .sorted { $0.lastPathComponent < $1.lastPathComponent }
     }
 
+    static func loadAnnotations(in directory: URL) throws -> [String: OCRFrameAnnotation] {
+        var annotations: [String: OCRFrameAnnotation] = [:]
+        let decoder = JSONDecoder()
+        let batchURL = directory.appendingPathComponent("ocr_annotations.json")
+        if FileManager.default.fileExists(atPath: batchURL.path) {
+            let data = try Data(contentsOf: batchURL)
+            let batch = try decoder.decode([String: OCRFrameAnnotation].self, from: data)
+            annotations.merge(batch) { _, new in new }
+        }
+
+        let urls = try FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        )
+        for url in urls where url.pathExtension.lowercased() == "json" && url.lastPathComponent != "ocr_annotations.json" {
+            let basename = url.deletingPathExtension().lastPathComponent
+            guard !Self.isDebugArtifact(basename),
+                  basename != "ocr_eval_output"
+            else { continue }
+            let data = try Data(contentsOf: url)
+            let annotation = try decoder.decode(OCRFrameAnnotation.self, from: data)
+            annotations["\(basename).png"] = annotation
+        }
+
+        return annotations
+    }
+
     private static func isDebugArtifact(_ basename: String) -> Bool {
         let debugSuffixes = [
             "_bottom",

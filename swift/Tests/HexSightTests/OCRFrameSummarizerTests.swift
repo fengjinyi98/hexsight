@@ -16,6 +16,7 @@ final class OCRFrameSummarizerTests: XCTestCase {
             result(id: "opponent_hp_0", kind: .opponentHP, text: "76"),
             result(id: "active_trait_name_0", kind: .activeTraitName, text: "虚空"),
             result(id: "active_trait_count_0", kind: .activeTraitCount, text: "1/2"),
+            result(id: "augment_name_0", kind: .augmentName, text: "潘朵拉的装备"),
         ]
 
         let summary = OCRFrameSummarizer().summarize(regions)
@@ -24,6 +25,7 @@ final class OCRFrameSummarizerTests: XCTestCase {
         XCTAssertEqual(summary.shop, [OCRShopSlot(index: 0, heroName: "璐璐", traits: ["法师"])])
         XCTAssertEqual(summary.opponents, [OCROpponentRow(index: 0, name: "屋屋z", hp: 76)])
         XCTAssertEqual(summary.activeTraits, [OCRActiveTraitRow(index: 0, name: "虚空", count: "1/2")])
+        XCTAssertEqual(summary.augments, [OCRAugmentOption(index: 0, name: "潘朵拉的装备")])
     }
 
     func testSkipsBlankSummaryRows() {

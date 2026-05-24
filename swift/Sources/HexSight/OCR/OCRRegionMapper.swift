@@ -175,6 +175,15 @@ final class OCRRegionMapper {
             ))
         }
 
+        let augmentX: [CGFloat] = [430, 830, 1230]
+        for (index, x) in augmentX.enumerated() {
+            regions.append(OCRRegion(
+                id: "augment_name_\(index)",
+                kind: .augmentName,
+                rect: CGRect(x: x, y: 520, width: 260, height: 52)
+            ))
+        }
+
         return regions
     }
 
@@ -222,6 +231,15 @@ final class OCRRegionMapper {
                 id: "active_trait_count_\(index)",
                 kind: .activeTraitCount,
                 rect: CGRect(x: 80, y: y + 28, width: 105, height: 30)
+            ))
+        }
+
+        let augmentX: [CGFloat] = [400, 830, 1260]
+        for (index, x) in augmentX.enumerated() {
+            regions.append(OCRRegion(
+                id: "augment_name_\(index)",
+                kind: .augmentName,
+                rect: CGRect(x: x, y: 500, width: 300, height: 58)
             ))
         }
 
