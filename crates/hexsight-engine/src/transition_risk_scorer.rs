@@ -91,10 +91,7 @@ impl TransitionLineupMatcher {
     }
 
     /// 获取过渡最匹配的阵容
-    pub fn best_transition<'a>(
-        matches: &'a [TransitionMatch],
-        min_hits: i32,
-    ) -> Option<&'a TransitionMatch> {
+    pub fn best_transition(matches: &[TransitionMatch], min_hits: i32) -> Option<&TransitionMatch> {
         matches
             .iter()
             .filter(|m| m.early_hits + m.mid_hits >= min_hits)
@@ -187,8 +184,6 @@ impl RiskScorer {
         } else if rival_count >= 2 {
             details.push(format!("同行 {} 家", rival_count));
             RiskLevel::Medium
-        } else if rival_count == 1 {
-            RiskLevel::Low
         } else {
             RiskLevel::Low
         };

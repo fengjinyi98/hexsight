@@ -20,6 +20,8 @@
 //     hexsight_refresh_lineups_json(config_root, mode, raw_json)
 //     hexsight_validate_data_snapshot_json(config_root, mode)
 
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+
 pub mod data_ffi;
 
 use std::ffi::{CStr, CString};
@@ -29,7 +31,6 @@ use std::path::{Path, PathBuf};
 use hexsight_core::RegionConfig;
 use hexsight_engine::DecisionEngine;
 use hexsight_memory::GameMemory;
-use hexsight_vision;
 
 /// 引擎上下文 —— 持有所有子模块实例
 pub struct EngineContext {

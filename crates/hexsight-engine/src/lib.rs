@@ -8,6 +8,8 @@
 // - 规则包加载、版本覆写、Schema校验
 // - 规则引擎输出结构化 RuleOutput JSON
 
+#![allow(clippy::too_many_arguments)]
+
 pub mod augment_economy_planner;
 pub mod augment_effect_interpreter;
 pub mod augment_option_ranker;

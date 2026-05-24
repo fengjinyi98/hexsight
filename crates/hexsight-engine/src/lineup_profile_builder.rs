@@ -186,13 +186,13 @@ impl LineupProfileBuilder {
         tags.push(PlaystyleTag::Standard);
 
         // 赌狗判断：主C 是低费且需要三星
-        if min_cost == 1 && carry_costs.iter().any(|&c| c == 1) {
+        if min_cost == 1 && carry_costs.contains(&1) {
             tags.push(PlaystyleTag::Reroll1Cost);
         }
-        if carry_costs.iter().any(|&c| c == 2) && avg_cost <= 2.5 {
+        if carry_costs.contains(&2) && avg_cost <= 2.5 {
             tags.push(PlaystyleTag::Reroll2Cost);
         }
-        if carry_costs.iter().any(|&c| c == 3) && avg_cost <= 3.5 && max_cost <= 4 {
+        if carry_costs.contains(&3) && avg_cost <= 3.5 && max_cost <= 4 {
             tags.push(PlaystyleTag::Reroll3Cost);
         }
 

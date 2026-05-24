@@ -17,10 +17,8 @@ pub struct LineupAdapter;
 impl LineupAdapter {
     /// 从原始条目列表解析为阵容卡片列表
     pub fn cards_from_raw_list(raw_list: &[LineupRawItem], _mode: &str) -> Vec<LineupCardData> {
-        let mut cards: Vec<LineupCardData> = raw_list
-            .iter()
-            .filter_map(|raw| Self::card_from_raw(raw))
-            .collect();
+        let mut cards: Vec<LineupCardData> =
+            raw_list.iter().filter_map(Self::card_from_raw).collect();
         // 按 category 再按 name 排序
         cards.sort_by(|a, b| {
             a.category
@@ -77,7 +75,7 @@ impl LineupAdapter {
                         .or_else(|| ll.get("item_name").and_then(|v| v.as_str()))
                 })
             })
-            .or_else(|| Some(raw.author.as_str()))
+            .or(Some(raw.author.as_str()))
             .unwrap_or("未知作者");
 
         // 头像优先级
@@ -426,7 +424,7 @@ fn parse_wish_ids(value: Option<&Value>) -> Vec<String> {
     match value {
         Some(Value::Array(arr)) => arr
             .iter()
-            .filter_map(|v| parse_flexible_id_str(v))
+            .filter_map(parse_flexible_id_str)
             .filter(|s| !s.is_empty())
             .collect(),
         Some(Value::String(s)) => split_ids(Some(s)),
@@ -515,7 +513,7 @@ fn extract_bracket_traits(name: &str) -> Vec<String> {
     if let (Some(start), Some(end)) = (name.find('【'), name.find('】')) {
         if start < end {
             return name[start + 3..end] // skip 3 bytes for '【'
-                .split(|c: char| c == ' ' || c == '/' || c == '、')
+                .split([' ', '/', '、'])
                 .map(|s| s.to_string())
                 .filter(|s| !s.is_empty())
                 .collect();

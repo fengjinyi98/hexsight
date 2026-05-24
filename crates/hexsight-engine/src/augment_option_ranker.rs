@@ -254,11 +254,11 @@ impl AugmentOptionRanker {
             }
         }
 
-        if context.current_gold >= 60 {
-            if tags.contains(&"generic_econ".into()) || tags.contains(&"late_cap".into()) {
-                bias += 28;
-                reasons.push("经济很好，经济/高上限收益提高".into());
-            }
+        if context.current_gold >= 60
+            && (tags.contains(&"generic_econ".into()) || tags.contains(&"late_cap".into()))
+        {
+            bias += 28;
+            reasons.push("经济很好，经济/高上限收益提高".into());
         }
 
         if context.item_gap_level > 0 && tags.contains(&"generic_item".into()) {

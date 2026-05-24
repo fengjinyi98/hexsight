@@ -19,6 +19,9 @@ pub struct RecognizedFrame {
     pub streak: i32,
     /// 自身场上棋子列表
     pub own_heroes: Vec<Hero>,
+    /// 备战席棋子列表
+    #[serde(default)]
+    pub bench_heroes: Vec<Hero>,
     /// 装备席 + 棋子穿戴装备列表
     pub own_equipment: Vec<Equipment>,
     /// 已选海克斯列表
@@ -265,6 +268,9 @@ pub struct RegionConfig {
     pub board_grid: Vec<Rect>,
     /// 商店5个槽位
     pub shop_slots: Vec<Rect>,
+    /// 备战席槽位
+    #[serde(default)]
+    pub bench_slots: Vec<Rect>,
     /// 海克斯区域
     pub hextech_rects: Vec<Rect>,
     /// 对手侧边栏 (7个对手)

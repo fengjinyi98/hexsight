@@ -92,7 +92,7 @@ impl RerollEligibilityScorer {
         if core_cost == 2 && round_stage <= 4.5 {
             score += 5;
         }
-        if core_cost == 3 && round_stage >= 3.5 && round_stage <= 5.5 {
+        if core_cost == 3 && (3.5..=5.5).contains(&round_stage) {
             score += 10;
         }
 

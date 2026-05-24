@@ -50,6 +50,12 @@ impl MlxlLlm {
     }
 }
 
+impl Default for MlxlLlm {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LlmInference for MlxlLlm {
     fn infer(&self, _state: &GameState) -> HexResult<String> {
         // TODO: 构建 prompt → 模型推理 → 返回自然语言建议

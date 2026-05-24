@@ -273,7 +273,7 @@ impl AugmentEffectInterpreter {
         }
 
         // 阵容覆盖度修正
-        let lineup_coverage = (lineup_recommended_count as i32).min(5);
+        let lineup_coverage = lineup_recommended_count.min(5);
         if lineup_coverage >= 3 {
             lock_risk = (lock_risk as f64 * 0.6) as i32;
         }

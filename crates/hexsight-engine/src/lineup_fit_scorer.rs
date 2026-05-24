@@ -708,7 +708,7 @@ mod tests {
         let rule_pack = RulePack::default();
 
         let missing = LineupFitScorer::score_all(
-            &[profile.clone()],
+            std::slice::from_ref(&profile),
             &["hero1".into()],
             &["wrong_item".into()],
             &[],
@@ -875,7 +875,7 @@ mod tests {
 
         let score = |context: &LineupItemFitContext<'_>| {
             LineupFitScorer::score_all_with_item_context(
-                &[profile.clone()],
+                std::slice::from_ref(&profile),
                 &["hero1".into()],
                 &[],
                 30,
@@ -939,7 +939,7 @@ mod tests {
 
         let score = |context: &LineupItemFitContext<'_>| {
             LineupFitScorer::score_all_with_item_context(
-                &[profile.clone()],
+                std::slice::from_ref(&profile),
                 &["hero1".into()],
                 &[],
                 30,
@@ -1032,7 +1032,7 @@ mod tests {
         .unwrap();
 
         let component_score = LineupFitScorer::score_all_with_item_context(
-            &[profile.clone()],
+            std::slice::from_ref(profile),
             &profile.final_hero_ids,
             &[],
             30,
@@ -1045,7 +1045,7 @@ mod tests {
         )
         .remove(0);
         let wrong_score = LineupFitScorer::score_all_with_item_context(
-            &[profile.clone()],
+            std::slice::from_ref(profile),
             &profile.final_hero_ids,
             &[],
             30,
@@ -1118,7 +1118,7 @@ mod tests {
 
         let score = |context: &LineupItemFitContext<'_>| {
             LineupFitScorer::score_all_with_item_context(
-                &[profile.clone()],
+                std::slice::from_ref(profile),
                 &profile.final_hero_ids,
                 &[],
                 30,

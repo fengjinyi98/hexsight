@@ -21,15 +21,14 @@ pub fn recognize(
     width: u32,
     height: u32,
 ) -> HexResult<RecognizedFrame> {
-    let mut frame = RecognizedFrame::default();
-
-    frame.gold = digit::parse_digits(pixels, &regions.gold_rect)?;
-    frame.hp = bar::scan_hp_bar(pixels, &regions.hp_bar)?;
-    frame.level = digit::parse_digits(pixels, &regions.level_rect)?;
-    frame.exp = bar::scan_exp_bar(pixels, &regions.exp_bar)?;
-    frame.own_heroes = recognize_board_heroes(pixels, regions, width, height)?;
-
-    Ok(frame)
+    Ok(RecognizedFrame {
+        gold: digit::parse_digits(pixels, &regions.gold_rect)?,
+        hp: bar::scan_hp_bar(pixels, &regions.hp_bar)?,
+        level: digit::parse_digits(pixels, &regions.level_rect)?,
+        exp: bar::scan_exp_bar(pixels, &regions.exp_bar)?,
+        own_heroes: recognize_board_heroes(pixels, regions, width, height)?,
+        ..Default::default()
+    })
 }
 
 fn recognize_board_heroes(
@@ -156,6 +155,7 @@ mod tests {
                 h: 8,
             }],
             shop_slots: Vec::new(),
+            bench_slots: Vec::new(),
             hextech_rects: Vec::new(),
             opponent_rects: Vec::new(),
             streak_rect: Rect {

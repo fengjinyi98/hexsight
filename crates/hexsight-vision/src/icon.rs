@@ -6,7 +6,7 @@
 // - 模板库加载与缓存管理
 
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 #[cfg(test)]
 use std::sync::Mutex;
 use std::sync::{OnceLock, RwLock};
@@ -136,7 +136,7 @@ fn load_image_templates(dir: &Path) -> HexResult<Vec<IconTemplate>> {
     Ok(templates)
 }
 
-fn is_supported_image(path: &PathBuf) -> bool {
+fn is_supported_image(path: &Path) -> bool {
     matches!(
         path.extension()
             .and_then(|value| value.to_str())
@@ -192,7 +192,7 @@ fn feature_similarity(lhs: &[f32], rhs: &[f32]) -> f32 {
 }
 
 fn inferred_square_side(pixels: &[u8]) -> Option<u32> {
-    if pixels.len() % 4 != 0 {
+    if !pixels.len().is_multiple_of(4) {
         return None;
     }
     let pixel_count = pixels.len() / 4;

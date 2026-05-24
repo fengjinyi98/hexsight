@@ -366,18 +366,13 @@ impl Default for KnowledgeRuleInput {
 /// 核心职责：
 /// - 兼容 JSON 中的海克斯刷新阶段字段
 /// - 转换为规则引擎内部 AugmentStage
-#[derive(Debug, Clone, Copy, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum FfiAugmentStage {
     First,
+    #[default]
     Second,
     Third,
-}
-
-impl Default for FfiAugmentStage {
-    fn default() -> Self {
-        Self::Second
-    }
 }
 
 impl From<FfiAugmentStage> for AugmentStage {

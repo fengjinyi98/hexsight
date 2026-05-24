@@ -35,10 +35,10 @@ impl DecisionEngine {
 
     /// 核心决策：根据对局状态输出建议
     pub fn decide(&mut self, _state: &GameState) -> Decision {
-        let mut decision = Decision::default();
-
-        // 默认使用规则引擎
-        decision.source = DecisionSource::RuleEngine;
+        let mut decision = Decision {
+            source: DecisionSource::RuleEngine,
+            ..Default::default()
+        };
 
         // 判定是否需要 LLM
         if self.should_trigger_llm(_state) {

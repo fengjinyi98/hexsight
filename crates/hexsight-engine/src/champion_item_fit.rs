@@ -166,30 +166,26 @@ impl ChampionItemFitScorer {
         }
 
         // 3. 施放模式匹配 (权重 15)
-        if champ.cast_pattern == "mana_cast"
-            && item.effect_tags.contains(&"mana_engine".to_string())
-        {
-            score += 15;
-        } else if champ.cast_pattern == "attack_based"
-            && item
-                .stats
-                .iter()
-                .any(|s| s.name == "attack_speed" || s.name == "ad")
-        {
+        let cast_pattern_matches = (champ.cast_pattern == "mana_cast"
+            && item.effect_tags.contains(&"mana_engine".to_string()))
+            || (champ.cast_pattern == "attack_based"
+                && item
+                    .stats
+                    .iter()
+                    .any(|s| s.name == "attack_speed" || s.name == "ad"));
+        if cast_pattern_matches {
             score += 15;
         }
 
         // 4. 站位修正 (权重 10)
-        if champ.position_role == "frontline"
+        let position_matches = (champ.position_role == "frontline"
             && item
                 .stats
                 .iter()
-                .any(|s| s.name == "hp" || s.name == "armor")
-        {
-            score += 10;
-        } else if champ.position_role == "backline"
-            && item.effect_tags.contains(&"mana_engine".to_string())
-        {
+                .any(|s| s.name == "hp" || s.name == "armor"))
+            || (champ.position_role == "backline"
+                && item.effect_tags.contains(&"mana_engine".to_string()));
+        if position_matches {
             score += 10;
         }
 

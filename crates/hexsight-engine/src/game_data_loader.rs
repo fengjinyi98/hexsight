@@ -138,7 +138,7 @@ impl GameDataLoader {
         // majority.json 的 data 是 object-of-objects 格式
         let raw: HashMap<String, serde_json::Value> = load_data_map(&path)?;
         let mut map = HashMap::new();
-        for (_key, group) in &raw {
+        for group in raw.values() {
             let hero_id = value_to_string(&group["heroid"]);
             let missions = group["mission"].as_array();
             if let Some(missions) = missions {
@@ -305,7 +305,7 @@ mod tests {
     #[test]
     fn load_traits_mode17() {
         let traits = GameDataLoader::load_traits(&test_config_root(), "17").unwrap();
-        assert!(traits.len() > 0, "mode17 羁绊数量为 0");
+        assert!(!traits.is_empty(), "mode17 羁绊数量为 0");
         // 验证种族(type=0)和职业(type=1)都存在
         let has_race = traits.iter().any(|t| t.trait_type == 0);
         let has_job = traits.iter().any(|t| t.trait_type == 1);
@@ -341,7 +341,7 @@ mod tests {
             let traits = GameDataLoader::load_traits(&test_config_root(), mode)
                 .unwrap_or_else(|_| panic!("mode {} 加载羁绊失败", mode));
             assert!(
-                traits.len() > 0,
+                !traits.is_empty(),
                 "mode {} 羁绊数量不足: {}",
                 mode,
                 traits.len()

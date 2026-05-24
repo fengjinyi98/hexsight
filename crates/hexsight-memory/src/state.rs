@@ -115,6 +115,12 @@ impl GameMemory {
     }
 }
 
+impl Default for GameMemory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -154,11 +160,5 @@ mod tests {
             }],
             ..Default::default()
         }
-    }
-}
-
-impl Default for GameMemory {
-    fn default() -> Self {
-        Self::new()
     }
 }

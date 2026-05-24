@@ -173,9 +173,9 @@ impl AugmentFitScorer {
                     .count();
 
                 for p in profiles {
-                    if p.recommended_hex_ids.contains(&effect.augment_id) {
-                        supported_ids.push(p.lineup_id.clone());
-                    } else if p.replacement_hex_ids.contains(&effect.augment_id) {
+                    if p.recommended_hex_ids.contains(&effect.augment_id)
+                        || p.replacement_hex_ids.contains(&effect.augment_id)
+                    {
                         supported_ids.push(p.lineup_id.clone());
                     }
                 }
@@ -364,16 +364,14 @@ impl EconomyPlanner {
         }
 
         // 速 8/速 9 节奏
-        if lineup_locked && current_level < 8 && round_stage >= 3.5 {
-            if current_gold >= 40 {
-                reasons.push("阵容已锁，金币充裕，优先升人口".to_string());
-                return EconomyDecisionResult {
-                    action: "level_up".into(),
-                    label: "升人口找核心牌".into(),
-                    target_gold: 20,
-                    reasons,
-                };
-            }
+        if lineup_locked && current_level < 8 && round_stage >= 3.5 && current_gold >= 40 {
+            reasons.push("阵容已锁，金币充裕，优先升人口".to_string());
+            return EconomyDecisionResult {
+                action: "level_up".into(),
+                label: "升人口找核心牌".into(),
+                target_gold: 20,
+                reasons,
+            };
         }
 
         // 连胜 → 可提前升人口

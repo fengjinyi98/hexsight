@@ -1000,8 +1000,13 @@ mod tests {
                 },
             )]),
         };
-        let kb =
-            builder.build_all_with_item_overrides(&[hero.clone()], &[], &[], &[], Some(&overrides));
+        let kb = builder.build_all_with_item_overrides(
+            std::slice::from_ref(&hero),
+            &[],
+            &[],
+            &[],
+            Some(&overrides),
+        );
         let champion = kb
             .champions
             .iter()

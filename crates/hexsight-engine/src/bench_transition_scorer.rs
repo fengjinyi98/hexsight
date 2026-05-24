@@ -124,26 +124,14 @@ impl BenchTransitionScorer {
     }
 
     pub(crate) fn final_holder_id(
-        item_id: &str,
+        _item_id: &str,
         target_lineups: &[LineupProfile],
         holder_role: HolderRole,
     ) -> Option<String> {
         for profile in target_lineups {
             let preferred = match holder_role {
-                HolderRole::Carry => {
-                    if profile.core_equipment_ids.iter().any(|id| id == item_id) {
-                        &profile.carry_hero_ids
-                    } else {
-                        &profile.carry_hero_ids
-                    }
-                }
-                HolderRole::Tank => {
-                    if profile.tank_equipment_ids.iter().any(|id| id == item_id) {
-                        &profile.tank_hero_ids
-                    } else {
-                        &profile.tank_hero_ids
-                    }
-                }
+                HolderRole::Carry => &profile.carry_hero_ids,
+                HolderRole::Tank => &profile.tank_hero_ids,
                 HolderRole::Utility => &profile.final_hero_ids,
             };
             if let Some(hero_id) = preferred.first() {

@@ -141,7 +141,7 @@ impl GameDataIndex {
             .filter(|h| h.cost > 0)
             .filter(|h| {
                 let ids = if is_race { &h.species } else { &h.hero_class };
-                split_trait_ids(ids).iter().any(|id| *id == trait_id)
+                split_trait_ids(ids).contains(&trait_id)
             })
             .collect()
     }

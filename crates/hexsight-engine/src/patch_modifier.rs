@@ -92,7 +92,7 @@ impl PatchModifier {
         }
     }
 
-    fn contains_id<'a, const N: usize>(target_id: &str, groups: [&'a Vec<String>; N]) -> bool {
+    fn contains_id<const N: usize>(target_id: &str, groups: [&Vec<String>; N]) -> bool {
         groups
             .iter()
             .any(|group| group.iter().any(|id| id == target_id))

@@ -41,7 +41,7 @@ impl BoardPowerScorer {
             .collect();
         let backliners: Vec<&ChampionCombatProfile> = profiles
             .iter()
-            .filter(|p| !frontliners.contains(&p))
+            .filter(|p| !frontliners.contains(p))
             .collect();
 
         let fallback_frontline = frontliners.is_empty();
