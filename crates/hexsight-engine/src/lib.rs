@@ -3,6 +3,7 @@
 // - 数据加载、索引与规则上下文生成
 // - 阵容规则档案构建（LineupProfileBuilder）
 // - 装备/阵容/过渡/赌狗/海克斯/经济/风险评分器
+// - 装备冲突检测与队伍效果覆盖率
 // - 开局路线分类、决策规划、过渡匹配、伤害预测
 // - 规则包加载、版本覆写、Schema校验
 // - 规则引擎输出结构化 RuleOutput JSON
@@ -17,6 +18,7 @@ pub mod decision;
 pub mod decision_planner;
 pub mod game_data_index;
 pub mod game_data_loader;
+pub mod item_conflict_scorer;
 pub mod item_fit_scorer;
 pub mod knowledge_builders;
 pub mod lineup;
@@ -32,6 +34,7 @@ pub mod reroll_eligibility_scorer;
 pub mod rule_pack_loader;
 pub mod rules;
 pub mod rules_context;
+pub mod team_effect_coverage;
 pub mod transition_risk_scorer;
 pub mod version_validator;
 
@@ -48,12 +51,12 @@ pub use decision::DecisionEngine;
 pub use decision_planner::DecisionPlanner;
 pub use game_data_index::GameDataIndex;
 pub use game_data_loader::GameDataLoader;
+pub use item_conflict_scorer::{ConflictGroupLoader, ItemConflictScorer, StackingPolicyLoader};
 pub use item_fit_scorer::ItemFitScorer;
 pub use knowledge_builders::{
-    ChampionCapabilityBuilder, ItemValueBuilder, KnowledgeKeywordLoader,
-    AugmentEffectProfileBuilder, TraitEffectProfileBuilder,
-    KnowledgeBase, KnowledgeBaseBuilder, KnowledgeCoverageReport,
-    ManualOverrideLoader,
+    AugmentEffectProfileBuilder, ChampionCapabilityBuilder, ItemValueBuilder, KnowledgeBase,
+    KnowledgeBaseBuilder, KnowledgeCoverageReport, KnowledgeKeywordLoader, ManualOverrideLoader,
+    TraitEffectProfileBuilder,
 };
 pub use lineup::LineupDB;
 pub use lineup_adapter::LineupAdapter;
@@ -61,11 +64,12 @@ pub use lineup_fit_scorer::{LineupFitScorer, LineupItemFitContext, TransitionStr
 pub use lineup_loader::LineupLoader;
 pub use lineup_profile_builder::LineupProfileBuilder;
 pub use llm_context::LlmContextBuilder;
-pub use mode_special_calibrator::{ModeSpecialPlanner, DamagePredictionCalibrator};
+pub use mode_special_calibrator::{DamagePredictionCalibrator, ModeSpecialPlanner};
 pub use opening_route_classifier::OpeningRouteClassifier;
 pub use remote_lineup_source::RemoteLineupSource;
 pub use reroll_eligibility_scorer::RerollEligibilityScorer;
 pub use rule_pack_loader::RulePackLoader;
 pub use rules::RulesEngine;
 pub use rules_context::RulesContextBuilder;
+pub use team_effect_coverage::TeamEffectCoverage;
 pub use version_validator::VersionValidator;

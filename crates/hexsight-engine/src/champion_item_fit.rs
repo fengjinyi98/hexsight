@@ -6,7 +6,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use hexsight_core::{ChampionCapability, EquipmentData, ItemValueProfile};
+use hexsight_core::{ChampionCapability, ConflictEnvironment, EquipmentData, ItemValueProfile};
+
+use crate::item_conflict_scorer::ItemConflictScorer;
 
 /// 装备适配等级
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, serde::Serialize)]
@@ -423,6 +425,93 @@ impl ChampionItemFitScorer {
         (fits, impact)
     }
 
+    /// 基于装备上下文和冲突评分器计算装备适配
+    pub fn score_with_item_context_and_conflicts(
+        champ: &ChampionCapability,
+        items: &[ItemValueProfile],
+        recommended_ids: &[String],
+        current_completed_item_ids: &[String],
+        current_component_ids: &[String],
+        replacement_groups: Option<&ItemReplacementGroups>,
+        synthesis_index: Option<&ItemSynthesisIndex>,
+        conflict_scorer: Option<&ItemConflictScorer>,
+        environment: &ConflictEnvironment,
+    ) -> (Vec<ChampionItemFit>, ItemGapImpact) {
+        let (mut fits, impact) = Self::score_with_item_context(
+            champ,
+            items,
+            recommended_ids,
+            current_completed_item_ids,
+            current_component_ids,
+            replacement_groups,
+            synthesis_index,
+        );
+
+        let Some(conflict_scorer) = conflict_scorer else {
+            return (fits, impact);
+        };
+
+        for fit in &mut fits {
+            if current_completed_item_ids.contains(&fit.item_id) {
+                continue;
+            }
+
+            let candidate_groups: HashSet<String> = conflict_scorer
+                .get_conflict_groups(&fit.item_id)
+                .into_iter()
+                .flat_map(|group| {
+                    group
+                        .conflicts
+                        .iter()
+                        .filter(|entry| entry.item_id == fit.item_id)
+                        .map(|_| group.label.clone())
+                        .collect::<Vec<_>>()
+                })
+                .collect();
+            if candidate_groups.is_empty() {
+                continue;
+            }
+
+            let mut candidate_items = current_completed_item_ids.to_vec();
+            candidate_items.push(fit.item_id.clone());
+            let warnings =
+                conflict_scorer.detect_conflicts_with_environment(&candidate_items, environment);
+            let matching_penalty: i32 = warnings
+                .iter()
+                .filter(|warning| candidate_groups.contains(&warning.group_label))
+                .map(|warning| warning.penalty_score)
+                .sum();
+            if matching_penalty >= 0 {
+                continue;
+            }
+
+            let score_penalty = (-matching_penalty / 2).max(1);
+            fit.score = (fit.score - score_penalty).clamp(0, 100);
+            fit.tier = Self::tier_for_score(fit.score);
+            for warning in warnings {
+                if candidate_groups.contains(&warning.group_label) {
+                    fit.penalties.push(format!(
+                        "{}重复覆盖，{}",
+                        warning.group_label, warning.remaining_value
+                    ));
+                }
+            }
+        }
+
+        fits.sort_by(|a, b| b.score.cmp(&a.score));
+        (fits, impact)
+    }
+
+    fn tier_for_score(score: i32) -> ItemTier {
+        match score {
+            s if s >= 75 => ItemTier::Core,
+            s if s >= 60 => ItemTier::Strong,
+            s if s >= 40 => ItemTier::Acceptable,
+            s if s >= 25 => ItemTier::Emergency,
+            _ => ItemTier::Bad,
+        }
+    }
+
     fn gap_alternatives(
         fits: &[ChampionItemFit],
         missing_core: &[&String],
@@ -587,9 +676,14 @@ impl ChampionItemOverrideLoader {
         }
     }
 }
+#[cfg(test)]
 mod tests {
     use super::*;
-    use hexsight_core::{ChampionRole, ItemStat, PowerSpike};
+    use crate::ItemConflictScorer;
+    use hexsight_core::{
+        ChampionRole, ConflictEntry, ConflictEnvironment, CoverageType, ItemConflictGroup,
+        ItemConflictGroups, ItemStat, PowerSpike,
+    };
 
     #[allow(dead_code)]
     fn make_ap_carry() -> ChampionCapability {
@@ -780,6 +874,76 @@ mod tests {
 
         assert_eq!(impact.core_missing_penalty, 10);
         assert!(impact.explanation.contains("可合成 1 件"));
+    }
+
+    #[test]
+    fn conflict_context_lowers_repeated_effect_recommendation() {
+        let champ = make_ap_carry();
+        let items = vec![
+            make_ap_item("2009", "红霸符", false),
+            make_ap_item("2020", "莫雷洛秘典", false),
+        ];
+        let mut groups = HashMap::new();
+        groups.insert(
+            "anti_heal".into(),
+            ItemConflictGroup {
+                label: "重伤".into(),
+                conflicts: vec![
+                    ConflictEntry {
+                        item_id: "2009".into(),
+                        item_name: "红霸符".into(),
+                        coverage: CoverageType::SingleTarget,
+                    },
+                    ConflictEntry {
+                        item_id: "2029".into(),
+                        item_name: "日炎斗篷".into(),
+                        coverage: CoverageType::AoeAura,
+                    },
+                ],
+                stacking_policy: hexsight_core::ConflictStackingPolicy {
+                    first_source: 100,
+                    second_source: 30,
+                    third_plus_source: 10,
+                },
+                notes: String::new(),
+            },
+        );
+        let scorer = ItemConflictScorer::new(&ItemConflictGroups {
+            version: "test".into(),
+            groups,
+        });
+
+        let (plain_fits, _) = ChampionItemFitScorer::score_with_item_context(
+            &champ,
+            &items,
+            &["2009".into()],
+            &["2029".into()],
+            &[],
+            None,
+            None,
+        );
+        let (conflict_fits, _) = ChampionItemFitScorer::score_with_item_context_and_conflicts(
+            &champ,
+            &items,
+            &["2009".into()],
+            &["2029".into()],
+            &[],
+            None,
+            None,
+            Some(&scorer),
+            &ConflictEnvironment::default(),
+        );
+
+        let plain_red = plain_fits.iter().find(|fit| fit.item_id == "2009").unwrap();
+        let conflict_red = conflict_fits
+            .iter()
+            .find(|fit| fit.item_id == "2009")
+            .unwrap();
+        assert!(conflict_red.score < plain_red.score);
+        assert!(conflict_red
+            .penalties
+            .iter()
+            .any(|penalty| penalty.contains("重伤")));
     }
 
     #[test]

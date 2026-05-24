@@ -1,0 +1,140 @@
+{
+  "version": "S18.1",
+  "groups": {
+    "anti_heal": {
+      "label": "重伤/减治疗",
+      "conflicts": [
+        { "itemId": "2009", "itemName": "红霸符", "coverage": "single_target" },
+        { "itemId": "2020", "itemName": "莫雷洛秘典", "coverage": "aoe_spell" },
+        { "itemId": "2029", "itemName": "日炎斗篷", "coverage": "aoe_aura" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 30,
+        "third_plus_source": 10
+      },
+      "notes": "重伤不叠加，第二个重伤来源仅提供覆盖补充或属性收益。对手回复阵容多时，覆盖稳定性加分"
+    },
+    "burn": {
+      "label": "灼烧",
+      "conflicts": [
+        { "itemId": "2009", "itemName": "红霸符", "coverage": "single_target" },
+        { "itemId": "2020", "itemName": "莫雷洛秘典", "coverage": "aoe_spell" },
+        { "itemId": "2029", "itemName": "日炎斗篷", "coverage": "aoe_aura" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 20,
+        "third_plus_source": 5
+      },
+      "notes": "灼烧主要看最大生命值百分比伤害，已有全场灼烧时单点灼烧收益大幅下降"
+    },
+    "armor_shred": {
+      "label": "护甲击碎/破甲",
+      "conflicts": [
+        { "itemId": "2032", "itemName": "薄暮法袍", "coverage": "aoe_aura" },
+        { "itemId": "2037", "itemName": "最后的轻语", "coverage": "single_target_spell" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 25,
+        "third_plus_source": 5
+      },
+      "notes": "同目标不叠加，AD阵容需求高。不同覆盖方式(光环/技能)可互补"
+    },
+    "mr_shred": {
+      "label": "魔抗击碎/减魔抗",
+      "conflicts": [
+        { "itemId": "2011", "itemName": "虚空之杖", "coverage": "single_target_spell" },
+        { "itemId": "2019", "itemName": "离子火花", "coverage": "aoe_aura" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 25,
+        "third_plus_source": 5
+      },
+      "notes": "AP阵容收益高，不同覆盖方式可互补"
+    },
+    "mana_engine": {
+      "label": "回蓝/启动",
+      "conflicts": [
+        { "itemId": "2004", "itemName": "朔极之矛", "coverage": "attack_trigger" },
+        { "itemId": "2022", "itemName": "蓝霸符", "coverage": "flat_regen" },
+        { "itemId": "2017", "itemName": "大天使之杖", "coverage": "time_based" },
+        { "itemId": "2024", "itemName": "适应性头盔", "coverage": "percent_regen" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 60,
+        "third_plus_source": 30
+      },
+      "notes": "低蓝条棋子多回蓝收益递减严重，高蓝条棋子可适当叠加。回蓝机制不同(普攻触发/固定回复)可互补"
+    },
+    "crit_enable": {
+      "label": "技能暴击/暴击体系",
+      "conflicts": [
+        { "itemId": "2001", "itemName": "无尽之刃", "coverage": "skill_crit_enable" },
+        { "itemId": "2038", "itemName": "珠光护手", "coverage": "skill_crit_enable" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 40,
+        "third_plus_source": 10
+      },
+      "notes": "技能暴击来源重复时属性收益保留但机制不叠加。需要判断棋子技能是否可暴击"
+    },
+    "sustain": {
+      "label": "吸血/续航",
+      "conflicts": [
+        { "itemId": "2003", "itemName": "海克斯科技枪刃", "coverage": "team_heal" },
+        { "itemId": "2006", "itemName": "汲取剑", "coverage": "self_shield_vamp" },
+        { "itemId": "2039", "itemName": "正义之手", "coverage": "self_vamp" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 50,
+        "third_plus_source": 20
+      },
+      "notes": "自带高续航棋子叠加续航装收益下降。对手爆发高时保留价值"
+    },
+    "shield_survival": {
+      "label": "护盾/保命",
+      "conflicts": [
+        { "itemId": "2005", "itemName": "夜之锋刃", "coverage": "untargetable_save" },
+        { "itemId": "2007", "itemName": "斯特拉克的挑战护手", "coverage": "shield_save" },
+        { "itemId": "2018", "itemName": "冕卫", "coverage": "shield_burst" },
+        { "itemId": "2023", "itemName": "圣盾使的誓约", "coverage": "shield_mana" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 35,
+        "third_plus_source": 10
+      },
+      "notes": "防爆发价值高，重复保命机制触发优先级可能冲突。每次战斗仅触发1次的保命互相影响"
+    },
+    "aura_team_buff": {
+      "label": "光环/团队增益",
+      "conflicts": [
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 80,
+        "third_plus_source": 50
+      },
+      "notes": "光环装备看站位覆盖人数和主C是否吃到。光环不直接冲突但站位限制可能互斥"
+    },
+    "unique_trigger": {
+      "label": "单次触发(每场战斗仅1次)",
+      "conflicts": [
+        { "itemId": "2006", "itemName": "汲取剑", "coverage": "once_per_fight_shield" },
+        { "itemId": "2005", "itemName": "夜之锋刃", "coverage": "once_per_fight_save" }
+      ],
+      "stackingPolicy": {
+        "first_source": 100,
+        "second_source": 40,
+        "third_plus_source": 5
+      },
+      "notes": "同一棋子装备多个'每场战斗仅触发1次'类装备时，触发顺序可能使后续触发失效"
+    }
+  }
+}

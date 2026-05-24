@@ -1,0 +1,58 @@
+{
+  "version": "S18.1",
+  "policies": {
+    "hard_no_stack": {
+      "description": "完全不可叠加的效果，第二个来源效果为0",
+      "value_per_source": [100, 0, 0]
+    },
+    "diminishing_strong": {
+      "description": "强递减，第二个来源仅保留25%",
+      "value_per_source": [100, 25, 5]
+    },
+    "diminishing_moderate": {
+      "description": "中等递减，第二个来源保留30-50%",
+      "value_per_source": [100, 40, 10]
+    },
+    "diminishing_weak": {
+      "description": "弱递减，属性类效果可叠加",
+      "value_per_source": [100, 60, 30]
+    },
+    "full_stack": {
+      "description": "完全可叠加，不降权",
+      "value_per_source": [100, 100, 100]
+    }
+  },
+  "default_policy": "diminishing_moderate",
+  "environment_modifiers": {
+    "opponent_heal_heavy": {
+      "description": "对手回复阵容多",
+      "effect": "重伤覆盖稳定性+20，冲突惩罚-10",
+      "groups": ["anti_heal"],
+      "penalty_relief": 10
+    },
+    "opponent_frontline_thick": {
+      "description": "对手前排很厚",
+      "effect": "破甲覆盖稳定性+15，冲突惩罚-10",
+      "groups": ["armor_shred"],
+      "penalty_relief": 10
+    },
+    "opponent_burst_heavy": {
+      "description": "对手爆发高",
+      "effect": "护盾/保命覆盖稳定性+20，冲突惩罚-15",
+      "groups": ["shield_survival", "unique_trigger"],
+      "penalty_relief": 15
+    },
+    "own_ap_heavy": {
+      "description": "己方AP阵容",
+      "effect": "魔抗击碎价值+25",
+      "groups": ["mr_shred"],
+      "penalty_relief": 25
+    },
+    "own_ad_heavy": {
+      "description": "己方AD阵容",
+      "effect": "护甲击碎价值+25",
+      "groups": ["armor_shred"],
+      "penalty_relief": 25
+    }
+  }
+}

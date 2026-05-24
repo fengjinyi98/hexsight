@@ -6,13 +6,14 @@
 use std::path::Path;
 
 use hexsight_core::{
-    ChampionCapability, EquipmentData, ItemValueProfile, LineupProfile, LineupScore, PlaystyleTag,
-    RulePack, TransitionStrength,
+    ChampionCapability, ConflictEnvironment, EquipmentData, ItemValueProfile, LineupProfile,
+    LineupScore, PlaystyleTag, RulePack, TransitionStrength,
 };
 
 use crate::champion_item_fit::{
     ChampionItemFitScorer, ItemReplacementGroupLoader, ItemReplacementGroups, ItemSynthesisIndex,
 };
+use crate::item_conflict_scorer::{ConflictGroupLoader, ItemConflictScorer, StackingPolicyLoader};
 use crate::knowledge_builders::KnowledgeBase;
 
 /// 阵容适配评分器
@@ -29,6 +30,8 @@ pub struct LineupItemFitContext<'a> {
     pub current_component_ids: &'a [String],
     pub replacement_groups: Option<ItemReplacementGroups>,
     pub synthesis_index: Option<ItemSynthesisIndex>,
+    pub conflict_scorer: Option<ItemConflictScorer>,
+    pub conflict_environment: ConflictEnvironment,
 }
 
 impl<'a> LineupItemFitContext<'a> {
@@ -49,6 +52,34 @@ impl<'a> LineupItemFitContext<'a> {
         } else {
             None
         };
+        let rules_dir = config_root.join("rules").join(version);
+        let conflict_path = rules_dir.join("item_conflict_groups.json");
+        let stacking_path = rules_dir.join("stacking_policy.json");
+        let conflict_scorer = if conflict_path.exists() {
+            let groups = ConflictGroupLoader::load(&conflict_path).map_err(|e| {
+                hexsight_core::HexError::Config(format!(
+                    "读取装备冲突配置失败 {}: {}",
+                    conflict_path.display(),
+                    e
+                ))
+            })?;
+            if stacking_path.exists() {
+                let policies = StackingPolicyLoader::load(&stacking_path).map_err(|e| {
+                    hexsight_core::HexError::Config(format!(
+                        "读取装备堆叠策略失败 {}: {}",
+                        stacking_path.display(),
+                        e
+                    ))
+                })?;
+                Some(ItemConflictScorer::new_with_stacking_policies(
+                    &groups, &policies,
+                ))
+            } else {
+                Some(ItemConflictScorer::new(&groups))
+            }
+        } else {
+            None
+        };
 
         Ok(Self {
             champions: &knowledge_base.champions,
@@ -57,6 +88,8 @@ impl<'a> LineupItemFitContext<'a> {
             current_component_ids,
             replacement_groups,
             synthesis_index: Some(ItemSynthesisIndex::from_equipment(equipment)),
+            conflict_scorer,
+            conflict_environment: ConflictEnvironment::default(),
         })
     }
 }
@@ -75,21 +108,24 @@ impl LineupFitScorer {
         rival_counts: &std::collections::HashMap<String, i32>,
         rule_pack: &RulePack,
     ) -> Vec<LineupScore> {
-        profiles.iter().map(|profile| {
-            Self::score_one(
-                profile,
-                current_hero_ids,
-                current_equipment_ids,
-                current_augment_ids,
-                current_gold,
-                current_hp,
-                current_level,
-                round_stage,
-                rival_counts,
-                rule_pack,
-                None,
-            )
-        }).collect()
+        profiles
+            .iter()
+            .map(|profile| {
+                Self::score_one(
+                    profile,
+                    current_hero_ids,
+                    current_equipment_ids,
+                    current_augment_ids,
+                    current_gold,
+                    current_hp,
+                    current_level,
+                    round_stage,
+                    rival_counts,
+                    rule_pack,
+                    None,
+                )
+            })
+            .collect()
     }
 
     /// 综合评分：带 P1 主 C 装备上下文
@@ -105,21 +141,24 @@ impl LineupFitScorer {
         rule_pack: &RulePack,
         item_context: &LineupItemFitContext<'_>,
     ) -> Vec<LineupScore> {
-        profiles.iter().map(|profile| {
-            Self::score_one(
-                profile,
-                current_hero_ids,
-                item_context.current_completed_item_ids,
-                current_augment_ids,
-                current_gold,
-                current_hp,
-                current_level,
-                round_stage,
-                rival_counts,
-                rule_pack,
-                Some(item_context),
-            )
-        }).collect()
+        profiles
+            .iter()
+            .map(|profile| {
+                Self::score_one(
+                    profile,
+                    current_hero_ids,
+                    item_context.current_completed_item_ids,
+                    current_augment_ids,
+                    current_gold,
+                    current_hp,
+                    current_level,
+                    round_stage,
+                    rival_counts,
+                    rule_pack,
+                    Some(item_context),
+                )
+            })
+            .collect()
     }
 
     fn score_one(
@@ -171,8 +210,7 @@ impl LineupFitScorer {
         let playstyle_switch = Self::playstyle_switch(profile, current_augment_ids, &mut reasons);
 
         // 10. 同行风险扣分
-        let rival_penalty = rival_counts.get(&profile.lineup_id)
-            .copied().unwrap_or(0) * 10;
+        let rival_penalty = rival_counts.get(&profile.lineup_id).copied().unwrap_or(0) * 10;
         if rival_penalty > 0 {
             risks.push(format!("同行 {} 家", rival_penalty / 10));
         }
@@ -213,21 +251,36 @@ impl LineupFitScorer {
             difficulty_penalty,
             reasons,
             risks,
-            requires_augment: profile.playstyle_tags.contains(&PlaystyleTag::RequiresAugment),
+            requires_augment: profile
+                .playstyle_tags
+                .contains(&PlaystyleTag::RequiresAugment),
         }
     }
 
-    fn item_fit(profile: &LineupProfile, equipment: &[String], _reasons: &mut Vec<String>, risks: &mut Vec<String>) -> i32 {
-        if profile.core_equipment_ids.is_empty() { return 30; }
-        if equipment.is_empty() { return 30; }
-        let match_count = profile.core_equipment_ids.iter()
+    fn item_fit(
+        profile: &LineupProfile,
+        equipment: &[String],
+        _reasons: &mut Vec<String>,
+        risks: &mut Vec<String>,
+    ) -> i32 {
+        if profile.core_equipment_ids.is_empty() {
+            return 30;
+        }
+        if equipment.is_empty() {
+            return 30;
+        }
+        let match_count = profile
+            .core_equipment_ids
+            .iter()
             .filter(|eid| equipment.contains(eid))
             .count();
         let total = profile.core_equipment_ids.len().max(1);
         let ratio = match_count as f64 / total as f64;
         let missing_count = profile.core_equipment_ids.len().saturating_sub(match_count);
         let core_missing_penalty = (missing_count as i32 * 20).min(60);
-        if ratio > 0.5 { _reasons.push(format!("核心装匹配 {}/{}", match_count, total)); }
+        if ratio > 0.5 {
+            _reasons.push(format!("核心装匹配 {}/{}", match_count, total));
+        }
         if missing_count > 0 {
             risks.push(format!("缺 {} 件核心装", missing_count));
         }
@@ -246,18 +299,23 @@ impl LineupFitScorer {
         if profile.core_equipment_ids.is_empty() {
             return 30;
         }
-        if context.current_completed_item_ids.is_empty() && context.current_component_ids.is_empty() {
+        if context.current_completed_item_ids.is_empty() && context.current_component_ids.is_empty()
+        {
             return 30;
         }
 
         let Some(carry_id) = profile.carry_hero_ids.first() else {
             return Self::item_fit(profile, context.current_completed_item_ids, reasons, risks);
         };
-        let Some(champion) = context.champions.iter().find(|champion| &champion.hero_id == carry_id) else {
+        let Some(champion) = context
+            .champions
+            .iter()
+            .find(|champion| &champion.hero_id == carry_id)
+        else {
             return Self::item_fit(profile, context.current_completed_item_ids, reasons, risks);
         };
 
-        let (_fits, impact) = ChampionItemFitScorer::score_with_item_context(
+        let (fits, impact) = ChampionItemFitScorer::score_with_item_context_and_conflicts(
             champion,
             context.items,
             &profile.core_equipment_ids,
@@ -265,17 +323,27 @@ impl LineupFitScorer {
             context.current_component_ids,
             context.replacement_groups.as_ref(),
             context.synthesis_index.as_ref(),
+            context.conflict_scorer.as_ref(),
+            &context.conflict_environment,
         );
 
         let total = profile.core_equipment_ids.len().max(1) as i32;
-        let direct_count = profile.core_equipment_ids.iter()
+        let direct_count = profile
+            .core_equipment_ids
+            .iter()
             .filter(|item_id| context.current_completed_item_ids.contains(item_id))
             .count() as i32;
-        let synth_count = profile.core_equipment_ids.iter()
+        let synth_count = profile
+            .core_equipment_ids
+            .iter()
             .filter(|item_id| !context.current_completed_item_ids.contains(item_id))
-            .filter(|item_id| context.synthesis_index.as_ref()
-                .map(|index| index.can_synthesize(item_id, context.current_component_ids))
-                .unwrap_or(false))
+            .filter(|item_id| {
+                context
+                    .synthesis_index
+                    .as_ref()
+                    .map(|index| index.can_synthesize(item_id, context.current_component_ids))
+                    .unwrap_or(false)
+            })
             .count() as i32;
         let alternative_count = (impact.alternatives.len() as i32)
             .min(total.saturating_sub(direct_count + synth_count));
@@ -296,8 +364,28 @@ impl LineupFitScorer {
             risks.push("核心装缺口过大，建议考虑转向".into());
         }
 
-        let score = ((direct_count * 100 + synth_count * 70 + alternative_count * 35) / total)
+        let mut score = ((direct_count * 100 + synth_count * 70 + alternative_count * 35) / total)
             .clamp(0, 100);
+
+        let conflict_penalty = fits
+            .iter()
+            .filter(|fit| profile.core_equipment_ids.contains(&fit.item_id))
+            .filter(|fit| !fit.penalties.is_empty())
+            .count() as i32
+            * 10;
+        if conflict_penalty > 0 {
+            risks.push(format!("核心装备冲突惩罚 {}", conflict_penalty));
+            for fit in fits
+                .iter()
+                .filter(|fit| profile.core_equipment_ids.contains(&fit.item_id))
+            {
+                for penalty in &fit.penalties {
+                    risks.push(format!("{}: {}", fit.item_name, penalty));
+                }
+            }
+            score = (score - conflict_penalty).clamp(0, 100);
+        }
+
         if context.current_component_ids.is_empty() {
             score
         } else {
@@ -306,79 +394,165 @@ impl LineupFitScorer {
     }
 
     fn champion_hit(profile: &LineupProfile, heroes: &[String], _reasons: &mut Vec<String>) -> i32 {
-        let final_hits = profile.final_hero_ids.iter()
+        let final_hits = profile
+            .final_hero_ids
+            .iter()
             .filter(|id| heroes.contains(id))
             .count();
-        let early_hits = profile.early_hero_ids.iter()
+        let early_hits = profile
+            .early_hero_ids
+            .iter()
             .filter(|id| heroes.contains(id))
             .count();
         let total_hits = final_hits + early_hits;
-        if total_hits > 0 { _reasons.push(format!("英雄命中 {} 个", total_hits)); }
+        if total_hits > 0 {
+            _reasons.push(format!("英雄命中 {} 个", total_hits));
+        }
         (total_hits as f64 / 3.0 * 100.0).min(100.0) as i32
     }
 
     fn augment_fit(profile: &LineupProfile, augments: &[String], reasons: &mut Vec<String>) -> i32 {
-        if augments.is_empty() { return 50; }
-        let rec_hits = profile.recommended_hex_ids.iter()
+        if augments.is_empty() {
+            return 50;
+        }
+        let rec_hits = profile
+            .recommended_hex_ids
+            .iter()
             .filter(|id| augments.contains(id))
             .count();
-        if rec_hits > 0 { reasons.push(format!("海克斯命中推荐 {}", rec_hits)); return 90; }
-        let rep_hits = profile.replacement_hex_ids.iter()
+        if rec_hits > 0 {
+            reasons.push(format!("海克斯命中推荐 {}", rec_hits));
+            return 90;
+        }
+        let rep_hits = profile
+            .replacement_hex_ids
+            .iter()
             .filter(|id| augments.contains(id))
             .count();
-        if rep_hits > 0 { reasons.push(format!("海克斯命中备选 {}", rep_hits)); return 70; }
+        if rep_hits > 0 {
+            reasons.push(format!("海克斯命中备选 {}", rep_hits));
+            return 70;
+        }
         40
     }
 
     fn trait_fit(profile: &LineupProfile, heroes: &[String], _reasons: &mut Vec<String>) -> i32 {
-        if heroes.is_empty() || profile.trait_targets.is_empty() { return 30; }
+        if heroes.is_empty() || profile.trait_targets.is_empty() {
+            return 30;
+        }
         // 简化：至少需要一个英雄命中才加分
         let has_any_hero = profile.final_hero_ids.iter().any(|id| heroes.contains(id));
-        if has_any_hero { 60 } else { 30 }
+        if has_any_hero {
+            60
+        } else {
+            30
+        }
     }
 
-    fn stage_fit(profile: &LineupProfile, stage: f64, level: i32, _reasons: &mut Vec<String>) -> i32 {
+    fn stage_fit(
+        profile: &LineupProfile,
+        stage: f64,
+        level: i32,
+        _reasons: &mut Vec<String>,
+    ) -> i32 {
         let is_reroll1 = profile.playstyle_tags.contains(&PlaystyleTag::Reroll1Cost);
         let is_fast8 = profile.playstyle_tags.contains(&PlaystyleTag::Fast8);
 
-        if is_reroll1 && stage <= 3.5 { return 85; }
-        if is_reroll1 && stage > 4.0 { return 20; }
-        if is_fast8 && stage >= 3.5 && level >= 7 { return 80; }
-        if is_fast8 && stage < 3.0 { return 60; }
+        if is_reroll1 && stage <= 3.5 {
+            return 85;
+        }
+        if is_reroll1 && stage > 4.0 {
+            return 20;
+        }
+        if is_fast8 && stage >= 3.5 && level >= 7 {
+            return 80;
+        }
+        if is_fast8 && stage < 3.0 {
+            return 60;
+        }
         70
     }
 
-    fn economy_fit(profile: &LineupProfile, gold: i32, _level: i32, _reasons: &mut Vec<String>) -> i32 {
+    fn economy_fit(
+        profile: &LineupProfile,
+        gold: i32,
+        _level: i32,
+        _reasons: &mut Vec<String>,
+    ) -> i32 {
         let is_fast9 = profile.playstyle_tags.contains(&PlaystyleTag::Fast9);
-        if is_fast9 && gold >= 40 { return 85; }
-        if is_fast9 && gold < 20 { return 30; }
-        if gold >= 30 { 75 }
-        else if gold >= 10 { 50 }
-        else { 30 }
+        if is_fast9 && gold >= 40 {
+            return 85;
+        }
+        if is_fast9 && gold < 20 {
+            return 30;
+        }
+        if gold >= 30 {
+            75
+        } else if gold >= 10 {
+            50
+        } else {
+            30
+        }
     }
 
-    fn health_safety(_profile: &LineupProfile, hp: i32, reasons: &mut Vec<String>, risks: &mut Vec<String>) -> i32 {
-        if hp < 30 { risks.push("血量危险".into()); return 20; }
-        if hp < 50 { risks.push("血量偏低".into()); return 50; }
-        if hp >= 80 { reasons.push("血量安全".into()); return 90; }
+    fn health_safety(
+        _profile: &LineupProfile,
+        hp: i32,
+        reasons: &mut Vec<String>,
+        risks: &mut Vec<String>,
+    ) -> i32 {
+        if hp < 30 {
+            risks.push("血量危险".into());
+            return 20;
+        }
+        if hp < 50 {
+            risks.push("血量偏低".into());
+            return 50;
+        }
+        if hp >= 80 {
+            reasons.push("血量安全".into());
+            return 90;
+        }
         70
     }
 
-    fn playstyle_switch(profile: &LineupProfile, augments: &[String], reasons: &mut Vec<String>) -> i32 {
-        let has_switch = profile.playstyle_tags.contains(&PlaystyleTag::AugmentEnabled);
-        if !has_switch { return 50; }
-        let has_required_aug = profile.recommended_hex_ids.iter()
+    fn playstyle_switch(
+        profile: &LineupProfile,
+        augments: &[String],
+        reasons: &mut Vec<String>,
+    ) -> i32 {
+        let has_switch = profile
+            .playstyle_tags
+            .contains(&PlaystyleTag::AugmentEnabled);
+        if !has_switch {
+            return 50;
+        }
+        let has_required_aug = profile
+            .recommended_hex_ids
+            .iter()
             .any(|id| augments.contains(id));
-        if has_required_aug { reasons.push("关键海克斯已激活".into()); 95 }
-        else { 30 }
+        if has_required_aug {
+            reasons.push("关键海克斯已激活".into());
+            95
+        } else {
+            30
+        }
     }
 
     fn difficulty_penalty(profile: &LineupProfile, stage: f64) -> i32 {
         let mut penalty = 0;
-        if profile.playstyle_tags.contains(&PlaystyleTag::Reroll3Cost) { penalty += 5; }
-        if profile.playstyle_tags.contains(&PlaystyleTag::Fast9) { penalty += 10; }
-        if profile.playstyle_tags.contains(&PlaystyleTag::ItemStrict) { penalty += 5; }
-        if profile.carry_costs.iter().any(|&c| c >= 5) && stage > 3.0 { penalty += 8; }
+        if profile.playstyle_tags.contains(&PlaystyleTag::Reroll3Cost) {
+            penalty += 5;
+        }
+        if profile.playstyle_tags.contains(&PlaystyleTag::Fast9) {
+            penalty += 10;
+        }
+        if profile.playstyle_tags.contains(&PlaystyleTag::ItemStrict) {
+            penalty += 5;
+        }
+        if profile.carry_costs.iter().any(|&c| c >= 5) && stage > 3.0 {
+            penalty += 8;
+        }
         penalty
     }
 }
@@ -411,12 +585,19 @@ impl TransitionStrengthScorer {
             + backline_score as f64 * rule_pack.weights.transition.backline
             + trait_score as f64 * rule_pack.weights.transition.transition_trait
             + item_score as f64 * rule_pack.weights.transition.transition_item
-            + augment_score as f64 * rule_pack.weights.transition.transition_augment) as i32;
+            + augment_score as f64 * rule_pack.weights.transition.transition_augment)
+            as i32;
 
         let mut weaknesses = Vec::new();
-        if two_star_count < 2 { weaknesses.push("二星英雄不足".into()); }
-        if !has_frontline { weaknesses.push("缺少前排坦克".into()); }
-        if completed_item_count < 1 { weaknesses.push("无成装".into()); }
+        if two_star_count < 2 {
+            weaknesses.push("二星英雄不足".into());
+        }
+        if !has_frontline {
+            weaknesses.push("缺少前排坦克".into());
+        }
+        if completed_item_count < 1 {
+            weaknesses.push("无成装".into());
+        }
 
         TransitionStrength {
             total_score: total,
@@ -436,13 +617,19 @@ impl TransitionStrengthScorer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ItemConflictScorer;
+    use crate::{GameDataIndex, LineupAdapter, LineupLoader, LineupProfileBuilder};
+    use hexsight_core::{ConflictEntry, CoverageType, ItemConflictGroup, ItemConflictGroups};
     use std::collections::HashMap;
     use std::path::PathBuf;
-    use crate::{GameDataIndex, LineupAdapter, LineupLoader, LineupProfileBuilder};
 
     fn load_profiles(mode: &str) -> Vec<LineupProfile> {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config");
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config");
         let index = GameDataIndex::load(&root, mode).unwrap();
         let raw = LineupLoader::load_cached_lineups(&root, mode, "S18").unwrap();
         let cards = LineupAdapter::cards_from_raw_list(&raw, mode);
@@ -458,7 +645,10 @@ mod tests {
             &[],
             &[],
             &[],
-            20, 100, 6, 3.5,
+            20,
+            100,
+            6,
+            3.5,
             &HashMap::new(),
             &rule_pack,
         );
@@ -513,11 +703,8 @@ mod tests {
 
     #[test]
     fn missing_core_items_reduce_lineup_score_and_emit_risk() {
-        let profile = make_profile_with_core_items(vec![
-            "item_a".into(),
-            "item_b".into(),
-            "item_c".into(),
-        ]);
+        let profile =
+            make_profile_with_core_items(vec!["item_a".into(), "item_b".into(), "item_c".into()]);
         let rule_pack = RulePack::default();
 
         let missing = LineupFitScorer::score_all(
@@ -525,7 +712,10 @@ mod tests {
             &["hero1".into()],
             &["wrong_item".into()],
             &[],
-            30, 80, 7, 3.5,
+            30,
+            80,
+            7,
+            3.5,
             &HashMap::new(),
             &rule_pack,
         );
@@ -534,14 +724,20 @@ mod tests {
             &["hero1".into()],
             &["item_a".into(), "item_b".into(), "item_c".into()],
             &[],
-            30, 80, 7, 3.5,
+            30,
+            80,
+            7,
+            3.5,
             &HashMap::new(),
             &rule_pack,
         );
 
         assert!(matched[0].total_score > missing[0].total_score);
         assert_eq!(missing[0].item_fit_score, 0);
-        assert!(missing[0].risks.iter().any(|risk| risk.contains("缺 3 件核心装")));
+        assert!(missing[0]
+            .risks
+            .iter()
+            .any(|risk| risk.contains("缺 3 件核心装")));
     }
 
     fn make_context_champion() -> ChampionCapability {
@@ -570,7 +766,10 @@ mod tests {
             item_id: id.into(),
             name: name.into(),
             item_type: "成型装备".into(),
-            stats: vec![hexsight_core::ItemStat { name: "ap".into(), value: 30.0 }],
+            stats: vec![hexsight_core::ItemStat {
+                name: "ap".into(),
+                value: 30.0,
+            }],
             effect_tags: vec!["mana_engine".into()],
             best_for_profiles: vec!["ap_carry_mana".into()],
             bad_for_profiles: vec![],
@@ -580,6 +779,36 @@ mod tests {
             tier: None,
             damage_type_fit: vec!["ap".into()],
         }
+    }
+
+    fn make_anti_heal_conflict_scorer() -> ItemConflictScorer {
+        ItemConflictScorer::new(&ItemConflictGroups {
+            version: "test".into(),
+            groups: HashMap::from([(
+                "anti_heal".into(),
+                ItemConflictGroup {
+                    label: "重伤".into(),
+                    conflicts: vec![
+                        ConflictEntry {
+                            item_id: "2009".into(),
+                            item_name: "红霸符".into(),
+                            coverage: CoverageType::SingleTarget,
+                        },
+                        ConflictEntry {
+                            item_id: "2029".into(),
+                            item_name: "日炎斗篷".into(),
+                            coverage: CoverageType::AoeAura,
+                        },
+                    ],
+                    stacking_policy: hexsight_core::ConflictStackingPolicy {
+                        first_source: 100,
+                        second_source: 30,
+                        third_plus_source: 10,
+                    },
+                    notes: String::new(),
+                },
+            )]),
+        })
     }
 
     #[test]
@@ -620,6 +849,8 @@ mod tests {
             current_component_ids: &no_components,
             replacement_groups: Some(groups.clone()),
             synthesis_index: Some(synthesis.clone()),
+            conflict_scorer: None,
+            conflict_environment: ConflictEnvironment::default(),
         };
         let synthesis_context = LineupItemFitContext {
             champions: &champions,
@@ -628,6 +859,8 @@ mod tests {
             current_component_ids: &synth_components,
             replacement_groups: Some(groups.clone()),
             synthesis_index: Some(synthesis.clone()),
+            conflict_scorer: None,
+            conflict_environment: ConflictEnvironment::default(),
         };
         let completed_context = LineupItemFitContext {
             champions: &champions,
@@ -636,6 +869,8 @@ mod tests {
             current_component_ids: &no_components,
             replacement_groups: Some(groups),
             synthesis_index: Some(synthesis),
+            conflict_scorer: None,
+            conflict_environment: ConflictEnvironment::default(),
         };
 
         let score = |context: &LineupItemFitContext<'_>| {
@@ -643,7 +878,10 @@ mod tests {
                 &[profile.clone()],
                 &["hero1".into()],
                 &[],
-                30, 80, 7, 3.5,
+                30,
+                80,
+                7,
+                3.5,
                 &HashMap::new(),
                 &RulePack::default(),
                 context,
@@ -657,14 +895,83 @@ mod tests {
 
         assert!(synthesizable.item_fit_score > alternative.item_fit_score);
         assert!(completed.item_fit_score > synthesizable.item_fit_score);
-        assert!(alternative.reasons.iter().any(|reason| reason.contains("蓝霸符")));
-        assert!(synthesizable.reasons.iter().any(|reason| reason.contains("当前散件可合成核心装")));
+        assert!(alternative
+            .reasons
+            .iter()
+            .any(|reason| reason.contains("蓝霸符")));
+        assert!(synthesizable
+            .reasons
+            .iter()
+            .any(|reason| reason.contains("当前散件可合成核心装")));
+    }
+
+    #[test]
+    fn item_context_consumes_conflict_scorer_in_lineup_score() {
+        let profile = make_profile_with_core_items(vec!["2009".into()]);
+        let champions = vec![make_context_champion()];
+        let items = vec![
+            make_context_item("2009", "红霸符"),
+            make_context_item("2020", "莫雷洛秘典"),
+        ];
+        let current_completed = vec!["2029".to_string()];
+        let no_components: Vec<String> = vec![];
+
+        let plain_context = LineupItemFitContext {
+            champions: &champions,
+            items: &items,
+            current_completed_item_ids: &current_completed,
+            current_component_ids: &no_components,
+            replacement_groups: None,
+            synthesis_index: None,
+            conflict_scorer: None,
+            conflict_environment: ConflictEnvironment::default(),
+        };
+        let conflict_context = LineupItemFitContext {
+            champions: &champions,
+            items: &items,
+            current_completed_item_ids: &current_completed,
+            current_component_ids: &no_components,
+            replacement_groups: None,
+            synthesis_index: None,
+            conflict_scorer: Some(make_anti_heal_conflict_scorer()),
+            conflict_environment: ConflictEnvironment::default(),
+        };
+
+        let score = |context: &LineupItemFitContext<'_>| {
+            LineupFitScorer::score_all_with_item_context(
+                &[profile.clone()],
+                &["hero1".into()],
+                &[],
+                30,
+                80,
+                7,
+                3.5,
+                &HashMap::new(),
+                &RulePack::default(),
+                context,
+            )
+            .remove(0)
+        };
+
+        let plain = score(&plain_context);
+        let conflicted = score(&conflict_context);
+
+        assert!(conflicted.item_fit_score < plain.item_fit_score);
+        assert!(conflicted
+            .risks
+            .iter()
+            .any(|risk| risk.contains("核心装备冲突惩罚")));
+        assert!(conflicted.risks.iter().any(|risk| risk.contains("重伤")));
     }
 
     #[test]
     fn real_data_p1_item_context_scores_lineup_from_rule_config() {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent().unwrap().parent().unwrap().join("config");
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config");
         let index = GameDataIndex::load(&root, "17").unwrap();
         let raw = LineupLoader::load_cached_lineups(&root, "17", "S18").unwrap();
         let cards = LineupAdapter::cards_from_raw_list(&raw, "17");
@@ -675,20 +982,30 @@ mod tests {
         let kb = crate::KnowledgeBaseBuilder::with_defaults()
             .build_all_with_rule_config(&heroes, &equipment, &hexes, &index.traits, &root, "S18.1")
             .unwrap();
-        let profile = profiles.iter()
+        let profile = profiles
+            .iter()
             .find(|profile| {
                 !profile.core_equipment_ids.is_empty()
-                    && profile.carry_hero_ids.iter().any(|id| kb.champions.iter().any(|champion| &champion.hero_id == id))
+                    && profile
+                        .carry_hero_ids
+                        .iter()
+                        .any(|id| kb.champions.iter().any(|champion| &champion.hero_id == id))
                     && profile.core_equipment_ids.iter().any(|id| {
-                        index.equipment(id)
-                            .map(|equip| !equip.synthesis1.is_empty() && !equip.synthesis2.is_empty())
+                        index
+                            .equipment(id)
+                            .map(|equip| {
+                                !equip.synthesis1.is_empty() && !equip.synthesis2.is_empty()
+                            })
                             .unwrap_or(false)
                     })
             })
             .unwrap();
-        let core = profile.core_equipment_ids.iter()
+        let core = profile
+            .core_equipment_ids
+            .iter()
             .find_map(|id| {
-                index.equipment(id)
+                index
+                    .equipment(id)
                     .filter(|equip| !equip.synthesis1.is_empty() && !equip.synthesis2.is_empty())
                     .map(|equip| (id.clone(), equip.clone()))
             })
@@ -702,7 +1019,8 @@ mod tests {
             &equipment,
             &root,
             "S18.1",
-        ).unwrap();
+        )
+        .unwrap();
         let wrong_context = LineupItemFitContext::from_rule_config(
             &kb,
             &current_completed,
@@ -710,28 +1028,122 @@ mod tests {
             &equipment,
             &root,
             "S18.1",
-        ).unwrap();
+        )
+        .unwrap();
 
         let component_score = LineupFitScorer::score_all_with_item_context(
             &[profile.clone()],
             &profile.final_hero_ids,
             &[],
-            30, 80, 7, 3.5,
+            30,
+            80,
+            7,
+            3.5,
             &HashMap::new(),
             &RulePack::default(),
             &component_context,
-        ).remove(0);
+        )
+        .remove(0);
         let wrong_score = LineupFitScorer::score_all_with_item_context(
             &[profile.clone()],
             &profile.final_hero_ids,
             &[],
-            30, 80, 7, 3.5,
+            30,
+            80,
+            7,
+            3.5,
             &HashMap::new(),
             &RulePack::default(),
             &wrong_context,
-        ).remove(0);
+        )
+        .remove(0);
 
         assert!(component_score.item_fit_score > wrong_score.item_fit_score);
-        assert!(component_score.reasons.iter().any(|reason| reason.contains("当前散件可合成核心装")));
+        assert!(component_score
+            .reasons
+            .iter()
+            .any(|reason| reason.contains("当前散件可合成核心装")));
+    }
+
+    #[test]
+    fn real_data_p2_conflict_context_changes_lineup_item_score() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("config");
+        let index = GameDataIndex::load(&root, "17").unwrap();
+        let raw = LineupLoader::load_cached_lineups(&root, "17", "S18").unwrap();
+        let cards = LineupAdapter::cards_from_raw_list(&raw, "17");
+        let profiles = LineupProfileBuilder::build_all(&cards, &index);
+        let heroes: Vec<_> = index.heroes_by_id.values().cloned().collect();
+        let equipment: Vec<_> = index.equipment_by_id.values().cloned().collect();
+        let hexes: Vec<_> = index.hexes_by_id.values().cloned().collect();
+        let kb = crate::KnowledgeBaseBuilder::with_defaults()
+            .build_all_with_rule_config(&heroes, &equipment, &hexes, &index.traits, &root, "S18.1")
+            .unwrap();
+        let profile = profiles
+            .iter()
+            .find(|profile| {
+                profile.core_equipment_ids.contains(&"2009".to_string())
+                    && profile
+                        .carry_hero_ids
+                        .iter()
+                        .any(|id| kb.champions.iter().any(|champion| &champion.hero_id == id))
+            })
+            .expect("真实 S18 阵容应存在主 C 核心红霸符用例");
+
+        let neutral_completed = vec!["2010".to_string()];
+        let conflict_completed = vec!["2029".to_string()];
+        let no_components: Vec<String> = vec![];
+        let neutral_context = LineupItemFitContext::from_rule_config(
+            &kb,
+            &neutral_completed,
+            &no_components,
+            &equipment,
+            &root,
+            "S18.1",
+        )
+        .unwrap();
+        let conflict_context = LineupItemFitContext::from_rule_config(
+            &kb,
+            &conflict_completed,
+            &no_components,
+            &equipment,
+            &root,
+            "S18.1",
+        )
+        .unwrap();
+
+        let score = |context: &LineupItemFitContext<'_>| {
+            LineupFitScorer::score_all_with_item_context(
+                &[profile.clone()],
+                &profile.final_hero_ids,
+                &[],
+                30,
+                80,
+                7,
+                3.5,
+                &HashMap::new(),
+                &RulePack::default(),
+                context,
+            )
+            .remove(0)
+        };
+        let neutral = score(&neutral_context);
+        let conflicted = score(&conflict_context);
+
+        assert!(
+            conflicted.item_fit_score < neutral.item_fit_score,
+            "真实 P2 冲突应降低阵容装备评分: neutral={}, conflicted={}",
+            neutral.item_fit_score,
+            conflicted.item_fit_score
+        );
+        assert!(conflicted
+            .risks
+            .iter()
+            .any(|risk| risk.contains("核心装备冲突惩罚")));
+        assert!(conflicted.risks.iter().any(|risk| risk.contains("红霸符")));
     }
 }
