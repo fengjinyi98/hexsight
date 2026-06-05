@@ -12,7 +12,7 @@ RUST_LIB := $(RUST_LIB_DIR)/libhexsight_ffi.a
 SWIFT_BUILD_DIR := swift/.build
 APP_BUNDLE := $(SWIFT_BUILD_DIR)/debug/HexSight
 
-.PHONY: all build build-rust build-swift run clean
+.PHONY: all build build-rust build-swift run clean audit-vision
 
 all: build
 
@@ -54,6 +54,10 @@ test-rust:
 # === Swift 测试 ===
 test-swift:
 	cd swift && swift test
+
+# === 视觉识别目标审计 ===
+audit-vision:
+	python3 scripts/audit_vision_recognition.py --root .
 
 # === 生成 FFI 头文件 ===
 header:

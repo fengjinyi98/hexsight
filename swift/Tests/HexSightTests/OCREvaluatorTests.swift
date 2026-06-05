@@ -139,4 +139,28 @@ final class OCREvaluatorTests: XCTestCase {
         XCTAssertEqual(annotations["sample_b.png"]?.traits, ["法师"])
         XCTAssertEqual(annotations["sample_b.png"]?.augments, ["潘朵拉的装备"])
     }
+
+    func testAnnotationLoadingTreatsMissingFieldsAsEmpty() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let json = """
+        {
+          "augment_sample.png": {
+            "augments": ["成群结队", "假人化", "集中火力"]
+          }
+        }
+        """
+        try json.data(using: .utf8)?.write(to: directory.appendingPathComponent("ocr_annotations.json"))
+
+        let annotations = try OCREvaluator.loadAnnotations(in: directory)
+
+        XCTAssertNil(annotations["augment_sample.png"]?.round)
+        XCTAssertEqual(annotations["augment_sample.png"]?.shop, [])
+        XCTAssertEqual(annotations["augment_sample.png"]?.traits, [])
+        XCTAssertEqual(annotations["augment_sample.png"]?.opponents, [])
+        XCTAssertEqual(annotations["augment_sample.png"]?.augments, ["成群结队", "假人化", "集中火力"])
+    }
 }

@@ -180,7 +180,7 @@ final class OCRRegionMapper {
             regions.append(OCRRegion(
                 id: "augment_name_\(index)",
                 kind: .augmentName,
-                rect: CGRect(x: x, y: 520, width: 260, height: 52)
+                rect: CGRect(x: x, y: 465, width: 260, height: 52)
             ))
         }
 
@@ -239,7 +239,7 @@ final class OCRRegionMapper {
             regions.append(OCRRegion(
                 id: "augment_name_\(index)",
                 kind: .augmentName,
-                rect: CGRect(x: x, y: 500, width: 300, height: 58)
+                rect: CGRect(x: x, y: 465, width: 300, height: 58)
             ))
         }
 

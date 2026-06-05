@@ -27,7 +27,7 @@
 | 实现经验条扫描 | `crates/hexsight-vision/src/bar.rs` | 已完成 | `bar::tests::scan_exp_bar_returns_blue_fill_percentage` |
 | 实现装备图标匹配 | `crates/hexsight-vision/src/icon.rs` | 已完成装备席接入 | `tests::recognize_populates_equipment_bench_cost_and_star_fields` |
 | 建立装备模板目录 | `config/vision_templates/equipment/` | 已完成最小模板与目录约定 | `icon::tests::match_equipment_and_trait_return_loaded_template_names` |
-| 补齐海克斯选择 OCR 样本 | `docs/ocr_samples/` | 未完成 | 缺 15-25 张真实海克斯选择 PNG |
+| 补齐海克斯选择 OCR 样本 | `docs/ocr_samples/` | 未完成 | 已有 3 张真实海克斯选择 PNG 与标注，仍需补到 15-25 张 |
 | 输出字段级准确率 | `swift run HexSight --ocr-eval` | 已完成 | 输出 `fieldAccuracy`，字段含 `round/shop/trait/opponent/augment` |
 
 ## P1 必做项
@@ -39,7 +39,7 @@
 | 增加备战席 ROI | `config/regions.json`、`RegionConfig` | 已完成 | `config/regions.json` 的 `bench_slots` |
 | 识别备战席英雄头像 | `crates/hexsight-vision/src/lib.rs` | 已完成 | `RecognizedFrame.bench_heroes` 与集成测试 |
 | 棋盘英雄补费用 / 星级 | `crates/hexsight-vision` | 已完成 | 英雄费用索引 + 星标扫描集成测试 |
-| 扩展真实截图回归集 | `docs/OCR_SAMPLE_COLLECTION_TODO.md` | 未完成 | 当前 30 张，目标 80-120 张 |
+| 扩展真实截图回归集 | `docs/OCR_SAMPLE_COLLECTION_TODO.md` | 未完成 | 当前 30 张主截图，目标 80-120 张 |
 
 ## P2 后续项
 
@@ -67,7 +67,7 @@
 
 | 阻塞项 | 影响 | 所需外部输入 |
 |---|---|---|
-| 海克斯选择真实样本不足 | 无法证明三选、刷新、不同等级场景的字段级准确率 | 15-25 张真实海克斯选择 PNG |
+| 海克斯选择真实样本不足 | 无法证明三选、刷新、不同等级场景的字段级准确率 | 当前 3 张已标注，仍需补到 15-25 张真实海克斯选择 PNG |
 | 内测回归集不足 | 无法证明 80-120 张内测集覆盖 | 50-90 张新增真实截图与可选标注 JSON |
 | 对手棋盘 / 选秀画面缺样本 | P2 工程出口已具备，真实准确率仍无法证明 | 对手视角切屏方案、选秀阶段截图和标注 |
 
@@ -80,3 +80,4 @@
 | Swift OCR 回归 | `cd swift && swift run HexSight --ocr-eval ../docs/ocr_samples` | 输出包含 `frames` 与 `fieldAccuracy` 的评测 JSON |
 | Swift 测试 | `cd swift && swift test` | 0 failures |
 | Swift 构建 | `cd swift && swift build` | Build complete |
+| 视觉目标审计 | `make audit-vision` | 模板、ROI、OCR 样本数量和海克斯标注数量均达标；当前会因真实样本不足失败 |

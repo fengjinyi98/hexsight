@@ -80,4 +80,11 @@ final class OCRNormalizerTests: XCTestCase {
 
         XCTAssertEqual(normalizer.bestNormalizedText(from: candidates, kind: .shopTraitName), "虚空")
     }
+
+    func testDataDictionaryKeepsAugmentNamesContainingDummyText() {
+        let dictionary = OCRDataDictionary.load()
+
+        XCTAssertTrue(dictionary.augments.contains("假人化"))
+        XCTAssertFalse(dictionary.heroes.contains("木桩假人"))
+    }
 }

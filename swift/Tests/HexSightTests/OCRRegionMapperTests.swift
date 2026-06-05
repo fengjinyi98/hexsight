@@ -79,6 +79,20 @@ final class OCRRegionMapperTests: XCTestCase {
         XCTAssertGreaterThan(firstOpponentHP.origin.x, 3420)
     }
 
+    func testAugmentNameRegionsTargetCardTitleBandInRealSamples() {
+        let mapper = OCRRegionMapper()
+        let image = makeImage(width: 4064, height: 2640, topColor: (40, 60, 80))
+
+        let regions = mapper.regions(cgImage: image, profile: .appBaoMac)
+        let augmentNames = regions.filter { $0.kind == .augmentName }
+
+        XCTAssertEqual(augmentNames.count, 3)
+        XCTAssertEqual(augmentNames[0].rect.origin.x, 910, accuracy: 8)
+        XCTAssertEqual(augmentNames[0].rect.origin.y, 1137, accuracy: 16)
+        XCTAssertEqual(augmentNames[0].rect.width, 551, accuracy: 8)
+        XCTAssertLessThan(augmentNames[0].rect.maxY, 1270)
+    }
+
     private func makeImage(width: Int, height: Int, topColor: (UInt8, UInt8, UInt8)) -> CGImage {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bytesPerRow = width * 4

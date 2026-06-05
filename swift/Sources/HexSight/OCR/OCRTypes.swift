@@ -158,6 +158,14 @@ struct OCRFrameAnnotation: Codable, Equatable {
     let opponents: [String]
     let augments: [String]
 
+    private enum CodingKeys: String, CodingKey {
+        case round
+        case shop
+        case traits
+        case opponents
+        case augments
+    }
+
     init(
         round: String? = nil,
         shop: [String] = [],
@@ -170,6 +178,19 @@ struct OCRFrameAnnotation: Codable, Equatable {
         self.traits = traits
         self.opponents = opponents
         self.augments = augments
+    }
+
+    /// init(from:) 标注容错解码入口
+    /// 核心职责：
+    /// - 支持单张样本只标注部分彩段
+    /// - 将缺失数组字段归一为空数组
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        round = try container.decodeIfPresent(String.self, forKey: .round)
+        shop = try container.decodeIfPresent([String].self, forKey: .shop) ?? []
+        traits = try container.decodeIfPresent([String].self, forKey: .traits) ?? []
+        opponents = try container.decodeIfPresent([String].self, forKey: .opponents) ?? []
+        augments = try container.decodeIfPresent([String].self, forKey: .augments) ?? []
     }
 }
 

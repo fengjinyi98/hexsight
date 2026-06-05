@@ -30,7 +30,7 @@ struct OCRDataDictionary {
         }
 
         return OCRDataDictionary(
-            heroes: heroes.filter { isUsefulName($0) }.sorted(),
+            heroes: heroes.filter { isUsefulHeroName($0) }.sorted(),
             traits: traits.filter { isUsefulName($0) }.sorted(),
             augments: augments.filter { isUsefulName($0) }.sorted()
         )
@@ -62,6 +62,10 @@ struct OCRDataDictionary {
 
     private static func isUsefulName(_ value: String) -> Bool {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !trimmed.isEmpty && trimmed != "0" && !trimmed.contains("假人")
+        return !trimmed.isEmpty && trimmed != "0"
+    }
+
+    private static func isUsefulHeroName(_ value: String) -> Bool {
+        isUsefulName(value) && !value.contains("假人")
     }
 }
